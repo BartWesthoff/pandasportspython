@@ -1,16 +1,23 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from pipeline.pipeline import Pipeline
+from pipeline.steps.preprocessors.preprocessor import PreProcessor
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+if __name__ == "__main__":
+    #Helper().ensure_pythonhashseed(4)
+    data = ""
 
+    # pipeline = Pipeline(PreProcessor(), D2V(), SVM(), ApiOutput())
+    print("hi")
+    pipeline = Pipeline(PreProcessor())
+    pipeline.process()
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+    # Example 3. Plotter and settings example
+    # settings = Helper().load_yaml()
+    # args = settings['pipeline']['combination']
+    # d2v = args['d2v']
+    # svm = args['svm']
+    # pipeline = Pipeline(PreProcessor(), D2V(**d2v), SVM(**svm),
+    #                     StatsOutput())
+    #
+    # outcome = pipeline.process(set(data))
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
