@@ -2,12 +2,18 @@
 ## Pipeline uitleg
 
 #### stappen
-1. preprocessor => maakt alle data 'gelijk' aan elkaar zodat er mee gewerkt kan worden.
-2. Embedder => zet data (video's) om naar data punten (x,y,z,likelihood)
-3. training=> Een model dat gemaakt is, wordt gebruikt om data puntne te herkennen en zo een binaire uitslag te geven (goed/fout)
-3.1 ** bepalen 1 model per oefening of een 'super' model dat alle oefeningen bijhoud?
-4. output => lokaal opslaan / deployen van het getrained model bij stap 3.
-
+<pre>
+1.0 preprocessor
+    Maakt alle data 'gelijk' aan elkaar zodat er mee gewerkt kan worden.
+2.0 Embedder 
+    Zet data (video's) om naar data punten (x,y,z,likelihood)
+3.0 training 
+    Een model dat gemaakt is, wordt gebruikt om data puntne te herkennen en zo een binaire uitslag te geven (goed/fout)
+    
+    3.1 ** bepalen 1 model per oefening of een 'super' model dat alle oefeningen bijhoud?
+4.0 output
+    Lokaal opslaan / deployen van het getrained model bij stap 3.
+</pre>
 ## Project structuur
 
 ### Folder structuur
