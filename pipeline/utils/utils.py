@@ -1,10 +1,13 @@
 import json
-import pickle
-
 import os
+import pickle
 import sys
+from random import *
 
 import moviepy.editor as mpy
+
+from classes.joint import Joint
+from classes.pose import Pose
 
 
 class Utils:
@@ -14,8 +17,6 @@ class Utils:
         self.jsonfile = "testing.json"
         self.yamlfile = "settings.yaml"
         self.root_dir = os.getcwd()
-
-
 
     # def getdict(self):
     #     """" return the dictionary of all saved data """
@@ -40,11 +41,38 @@ class Utils:
     #         with open(self.yamlfile, "x") as f:
     #             f.write("")
 
+    def generatePose(self):
+        """"returns dummy random generated pose"""
+        sides = ["left", "right"]
+        joint_names = ["Eye", "Ear", "Shoulder", "Elbow", "Wrist", "Hip", "Knee", "Ankle"]
+        joints = []
+        for side in sides:
+            for name in joint_names:
+                jointname = side + name
+                joints.append(self.generateJoint(jointname))
+        joints.append(self.generateJoint("nose"))
+        return Pose(joints)
+
+    def generateJoint(self, name):
+        """"returns dummy random generated Joint"""
+
+        maxInt = 100000
+        # TODO randomness vasthouden
+        random = Random()
+
+        x = random.randint(0, maxInt + 1)
+        y = random.randint(0, maxInt + 1)
+        z = random.randint(0, maxInt + 1)
+        likelihood = random.randint(0, maxInt + 1)
+        joint = Joint(x=x / maxInt * 100, y=y / maxInt * 100, z=z / maxInt * 100, likelihood=likelihood / maxInt,
+                      name=name)
+
+        return joint
+
     def save(self, _dict):
         """saves dictionary to disk"""
         with open(self.jsonfile, "w+") as f:
             json.dump(_dict, f, indent=4)
-
 
     def deletefile(self, filename):
         """deletes file from system"""
@@ -64,8 +92,6 @@ class Utils:
             # restart the current process
             os.execl(sys.executable, sys.executable, *sys.argv)
 
-
-
     def save_model(self, model, modelname):
         """saves machine learning model"""
         filename = modelname + '.sav'
@@ -77,12 +103,12 @@ class Utils:
         loaded_model = pickle.load(open(filename, 'rb'))
         return loaded_model
 
-    def load_yaml(self):
-        """laods yamlfile """
-        """returns settings type of dictionary"""
-        with open(self.yamlfile, "r") as f:
-            data = yaml.load(f, Loader=yaml.FullLoader)
-        return data
+    # def load_yaml(self):
+    #     """laods yamlfile """
+    #     """returns settings type of dictionary"""
+    #     with open(self.yamlfile, "r") as f:
+    #         data = yaml.load(f, Loader=yaml.FullLoader)
+    #     return data
 
     #
     # def save_yaml(self, data):
@@ -140,5 +166,3 @@ class Utils:
 
         videoclip.reader.close()
         videoclip.audio.reader.close_proc()
-
-
