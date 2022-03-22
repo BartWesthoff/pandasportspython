@@ -10,7 +10,7 @@ class Pipeline:
         self.steps = steps
 
     # process -> take some data, modify it, output some data
-    def process(self):
+    def process(self,data):
         """
         :param data:  1-d List of strings (queries)
         :return: list of tuples [(anomaly,id,query)]
@@ -18,5 +18,5 @@ class Pipeline:
 
 
         for step in self.steps:
-            data = step.process()
+            data = step.process(data)
         return data

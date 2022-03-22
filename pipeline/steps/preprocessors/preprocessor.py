@@ -49,16 +49,3 @@ class PreProcessor(Step):
                 if not os.path.exists(destination):
                     os.rename(source, destination)
                     Utils().removesound(str(destination))
-
-
-
-
-
-
-
-
-
-
-
-# if __name__ == '__main__':
-#     edit_video(loadtitle, savetitle, cuts)

@@ -43,6 +43,7 @@ class Utils:
 
     def generatePose(self):
         """"returns dummy random generated pose"""
+        # TODO gezicht weghalen
         sides = ["left", "right"]
         joint_names = ["Eye", "Ear", "Shoulder", "Elbow", "Wrist", "Hip", "Knee", "Ankle"]
         joints = []
@@ -59,7 +60,7 @@ class Utils:
         maxInt = 100000
         # TODO randomness vasthouden
         random = Random()
-
+        random.seed(10)
         x = random.randint(0, maxInt + 1)
         y = random.randint(0, maxInt + 1)
         z = random.randint(0, maxInt + 1)
@@ -124,42 +125,8 @@ class Utils:
     #         data = yaml.load(f, Loader=yaml.FullLoader)
     #     return data["settings"]
 
-    # def edit_video(self):
-    #     vcodec = "libx264"
-    #
-    #     videoquality = "24"
-    #
-    #     # slow, ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
-    #     compression = "slow"
-    #
-    #     title = "test"
-    #     loadtitle = title + '.mov'
-    #     savetitle = title + '.mp4'
-    #
-    #     # modify these start and end times for your subclips
-    #     cuts = [('00:00:02.949', '00:00:04.152'),
-    #             ('00:00:06.328', '00:00:13.077')]
-    #     # load file
-    #     video = mpy.VideoFileClip(loadtitle)
-    #
-    #     # cut file
-    #     clips = []
-    #     for cut in cuts:
-    #         clip = video.subclip(cut[0], cut[1])
-    #         clips.append(clip)
-    #
-    #     final_clip = mpy.concatenate_videoclips(clips)
-    #
-    #     # save file
-    #     final_clip.write_videofile(savetitle, threads=4, fps=24,
-    #                                codec=vcodec,
-    #                                preset=compression,
-    #                                ffmpeg_params=["-crf", videoquality])
-    #
-    #     video.close()
-
     def removesound(self, name):
-        # TODO besluiten: videoclip in mp4,mpeg .... (Bart)
+        # TODO: converter maken
         videoclip = mpy.VideoFileClip(name)
         new_clip = videoclip.without_audio()
         new_clip.write_videofile(name.replace("squat0", "no_sound_squat"))

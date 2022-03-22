@@ -6,7 +6,7 @@ if __name__ == "__main__":
     # Utils().ensure_pythonhashseed(4)
     data = ""
     pipeline = Pipeline(PreProcessor())
-    pipeline.process()
+    pipeline.process(data)
     pose2 = Utils().generatePose()
     print(pose2.ToJson())
 # 46.832

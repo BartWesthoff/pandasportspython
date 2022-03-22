@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod, abstractproperty
 
 """
 steps sub-classes must implement method process
-
 """
 
 
