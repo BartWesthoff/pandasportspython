@@ -1,5 +1,6 @@
 class Pipeline:
     # What is a Pipeline?
+    # A Pipeline is a set of instructions
     def __init__(self, *steps):
         """
         :param pipeline: step objects
@@ -10,12 +11,11 @@ class Pipeline:
         self.steps = steps
 
     # process -> take some data, modify it, output some data
-    def process(self,data):
+    def process(self, data):
         """
         :param data:  1-d List of strings (queries)
         :return: list of tuples [(anomaly,id,query)]
         """
-
 
         for step in self.steps:
             data = step.process(data)
