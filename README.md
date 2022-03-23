@@ -1,6 +1,5 @@
 
-## Pipeline uitleg
-
+## Panda Sports (fitness posture tracking app)
 
 ## Project structuur
 
