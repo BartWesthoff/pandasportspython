@@ -4,7 +4,9 @@ import pickle
 import sys
 from random import *
 
+import cv2
 import moviepy.editor as mpy
+import mediapipe as mp
 
 from classes.joint import Joint
 from classes.pose import Pose
@@ -18,12 +20,66 @@ class Utils:
         self.yamlfile = "settings.yaml"
         self.root_dir = os.getcwd()
 
-    # def getdict(self):
-    #     """" return the dictionary of all saved data """
-    #     with open(self.jsonfile, "r") as f:
-    #         a = json.load(f)
-    #     # print(a)
-    #     return a
+    def getdict(self):
+        """" return the dictionary of all saved data """
+        with open(self.jsonfile, "r") as f:
+            a = json.load(f)
+        return a
+
+    def saveObject(self, object, filename):
+        """" saves object to (pickle) file"""
+        with open(filename, 'wb') as fp:
+            pickle.dump(object, fp)
+
+    def openObject(self, filename):
+        """" opens object from (pickle) file"""
+        with open(filename, 'rb') as fp:
+            object = pickle.load(fp)
+        return object
+
+    def embedVideo(self, file):
+        cap = cv2.VideoCapture(file)
+        mp_drawing = mp.solutions.drawing_utils
+        mp_drawing_styles = mp.solutions.drawing_styles
+        mp_pose = mp.solutions.pose
+        pose = mp_pose.Pose()
+        allframes = []
+        while cap.isOpened():
+            success, image = cap.read()
+            if not success:
+                break
+
+            # To improve performance, optionally mark the image as not writeable to
+            # pass by reference.
+            image.flags.writeable = False
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            results = pose.process(image)
+
+            # Draw the pose annotation on the image.
+
+            image.flags.writeable = True
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+            currentframe = []
+
+            for data_point in results.pose_landmarks.landmark:
+                # print('x is', data_point.x, 'y is', data_point.y, 'z is', data_point.z,
+                #       'visibility is', data_point.visibility)
+                currentframe.append(data_point.x)
+                currentframe.append(data_point.y)
+                currentframe.append(data_point.z)
+            allframes.append(currentframe)
+
+            mp_drawing.draw_landmarks(
+                image,
+                results.pose_landmarks,
+                mp_pose.POSE_CONNECTIONS,
+                landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
+            # cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
+        cap.release()
+        self.saveObject(allframes,"framestest")
+        return allframes
+
 
     # def _checkifexists(self):
     #     """ check if jsonfile exists so that we can do IO operations"""
