@@ -7,7 +7,7 @@ step sub-classes must implement method process
 
 class Step(ABC):
     """" checks if class is instantiated"""
-    def __init__(self, type):
+    def __init__(self, type=None):
         """ this has to be type because in a """
         """ inherented situation it will always become true """
         # NOTE: issubclass(self.__class__, type) werkt niet

@@ -19,6 +19,7 @@ class Utils:
         self.jsonfile = "testing.json"
         self.yamlfile = "settings.yaml"
         self.root_dir = os.getcwd()
+        self.datafolder = os.sep.join(['data', 'production'])
 
     def getdict(self):
         """" return the dictionary of all saved data """
