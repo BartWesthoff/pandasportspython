@@ -3,6 +3,9 @@ import os
 import pickle
 from random import *
 
+from keras.applications.densenet import layers
+from keras.layers import Embedding
+
 from classes.joint import Joint
 from classes.pose import Pose
 
@@ -139,22 +142,32 @@ class Utils:
     #     return data["settings"]
 
     def playground(self):
-        from keras import Model
-        from keras.layers import Input, Dense, Bidirectional
+        from keras import Model, Sequential
+        from keras.layers import Input, Dense, Bidirectional, embeddings
         from keras.layers.recurrent import LSTM
         import numpy as np
         # define model for simple BI-LSTM + DNN based binary classifier
 
         def define_model():
-            input1 = Input(shape=(99,
-                                  1))  # take the reshape last two values, see "data = np.reshape(data,(137,99,1))" which is "data/batch-size, row, column"
-            lstm1 = Bidirectional(LSTM(units=32))(input1)
-            dnn_hidden_layer1 = Dense(3, activation='relu')(lstm1)
-            dnn_output = Dense(1, activation='sigmoid')(dnn_hidden_layer1)
-            model = Model(inputs=[input1], outputs=[dnn_output])
+            # input1 = Input(shape=(137, 99,
+            #                       1))  # take the reshape last two values, see "data = np.reshape(data,(137,99,1))" which is "data/batch-size, row, column"
+            #
+            # dnn_output = Dense(1)
+
+            model = Sequential()
+            # Add an Embedding layer expecting input vocab of size 1000, and
+            # output embedding dimension of size 64.
+            # model.add(Embedding(input_dim=1, output_dim=64))
+
+            # Add a LSTM layer with 128 internal units.
+            model.add(layers.LSTM(128,input_shape=(137,99)))
+
+            # Add a Dense layer with 10 units.
+            model.add(Dense(64, activation="relu"))
+            model.add(Dense(1, activation="sigmoid"))
             # compile the model
             model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-            model.summary()
+            # model.summary()
             return model
 
         allframes = Utils().openObject("framestest")
@@ -162,19 +175,18 @@ class Utils:
         data = np.array(allframes)  # (137,99) (frames, joints*3)
 
         import random
-        Y = [random.randint(0, 1) for i in range(137)]  # Class label for the dummy data
+        Y = [1]  # Class label for the dummy data
         print("data = ", data)
         # Reshape the data into 3-D numpy array
-        data = np.reshape(data, (137, 99, 1))  # Here we have a total of 10 rows or records
+        data = np.reshape(data, (1, 137, 99, 1))  # Here we have a total of 10 rows or records
         print("data after reshape => ", data)
         # Call the model
         model = define_model()
         # fit the model
-        model.fit(data, np.array(Y), epochs=4, batch_size=2, verbose=1)
+        model.fit(data, np.array(Y), epochs=10, batch_size=2, verbose=1)
         # Take a test data to test the working of the model
         test_data = np.array(allframes)
         # reshape the test data
-        test_data = np.reshape(test_data, (137, 99, 1))
-        # predict the sigmoid output [0,1] for the 'test_data'
+        test_data = np.reshape(test_data, (1, 137, 99, 1))
         pred = model.predict(test_data)
         print("predicted sigmoid output => ", pred)
