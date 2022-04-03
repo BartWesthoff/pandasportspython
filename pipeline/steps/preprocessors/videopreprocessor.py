@@ -2,6 +2,7 @@ import os
 
 from pipeline.steps.preprocessors.preprocessor import PreProcessor
 from pipeline.utils.utils import Utils
+import moviepy as mpy
 
 """
 PreProcessor class
@@ -43,4 +44,11 @@ class VideoPreProcessor(PreProcessor):
                 # Video bestaat al zonder geluid
                 if not os.path.exists(destination):
                     os.rename(source, destination)
-                    Utils().removesound(str(destination))
+                    self.removesound(str(destination))
+    def removesound(self, name):
+        videoclip = mpy.VideoFileClip(name)
+        new_clip = videoclip.without_audio()
+        new_clip.write_videofile(name.replace("squat0", "no_sound_squat"))
+
+        videoclip.reader.close()
+        videoclip.audio.reader.close_proc()
