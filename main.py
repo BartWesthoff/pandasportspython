@@ -3,6 +3,7 @@ import numpy as np
 from pipeline.pipeline import Pipeline
 from pipeline.steps.input.input import Input
 from pipeline.steps.preprocessors.videopreprocessor import VideoPreProcessor
+from pipeline.steps.embedder.videoembedder import VideoEmbeder
 from pipeline.utils.utils import Utils
 from sklearn import svm
 if __name__ == "__main__":
@@ -43,14 +44,15 @@ if __name__ == "__main__":
     #           [   x0,y0,z0,x1,y1,z1   ], #frame 1
     #           [   x0,y0,z0,x1,y1,z1   ], #frame 2
     #         ]
-    # allframes = Utils().embedVideo("school video.mp4")
-    allframes = Utils().openObject("framestest")
+
+    allframes = VideoEmbeder().process("school video.mp4")
+    #allframes = Utils().openObject("framestest")
     # print(allframes)
     array = np.array(allframes) # (137,99) (frames, joints*3)
 
-    data = np.reshape(array, (137, 99, 1))  # Here we have a total of 10 rows or records
+   # data = np.reshape(array, (1,137, 99, 1))  # Here we have a total of 10 rows or records
 
-    print(data.shape)
+    print(array.shape)
     # X = [[0, 0], [1, 1]]
     # y = [0, 1]
     # clf = svm.SVC()
