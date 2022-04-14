@@ -6,7 +6,7 @@ Embedder class
 used to embed video material
 """
 
-
+# Goal of this step is to capture & display the data points onto the current frame
 class VideoEmbeder(Embedder):
 
     def process(self, data):
@@ -24,13 +24,16 @@ class VideoEmbeder(Embedder):
         :param query: string
         :return: modified string
         """
+        # Initialiseer mediapipe video
         cap = cv2.VideoCapture(video)
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
+        # mediapipepose
         mp_pose = mp.solutions.pose
         pose = mp_pose.Pose()
         allframes = []
         while cap.isOpened():
+            # grabs & decodes the frame
             success, image = cap.read()
             if not success:
                 break
@@ -39,6 +42,7 @@ class VideoEmbeder(Embedder):
             # pass by reference.
             image.flags.writeable = False
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            # gets pose
             results = pose.process(image)
 
             # Draw the pose annotation on the image.
@@ -48,14 +52,17 @@ class VideoEmbeder(Embedder):
 
             currentframe = []
 
+            # cycle through all datapoints, add to current frame
             for data_point in results.pose_landmarks.landmark:
                 # print('x is', data_point.x, 'y is', data_point.y, 'z is', data_point.z,
                 #       'visibility is', data_point.visibility)
                 currentframe.append(data_point.x)
                 currentframe.append(data_point.y)
                 currentframe.append(data_point.z)
+            #add new frame  
             allframes.append(currentframe)
-
+            
+            # add everything to current frame
             mp_drawing.draw_landmarks(
                 image,
                 results.pose_landmarks,

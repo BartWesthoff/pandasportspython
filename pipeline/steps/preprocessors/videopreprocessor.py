@@ -11,7 +11,7 @@ used to preprocess video material
 
 
 class VideoPreProcessor(PreProcessor):
-
+    # Makes strings into the same format
     def process(self, data):
         """
         :param data: 1-d List of Strings
@@ -21,7 +21,7 @@ class VideoPreProcessor(PreProcessor):
         self._preprocessVideo(data)
 
         return
-
+    # Alters the names to make them have the same format
     def _preprocessVideo(self, data):
         """
         :param query: string
@@ -45,6 +45,8 @@ class VideoPreProcessor(PreProcessor):
                 if not os.path.exists(destination):
                     os.rename(source, destination)
                     self.removesound(str(destination))
+
+    # removes the audio from each clip
     def removesound(self, name):
         videoclip = mpy.VideoFileClip(name)
         new_clip = videoclip.without_audio()

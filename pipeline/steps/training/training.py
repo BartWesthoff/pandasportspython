@@ -10,7 +10,7 @@ NOTE: denk ik niet nodig want trainen gebeurt met model.fit maar dit is wel een 
 //TODO: even overleggen hoe we dit gaan aanpakken.
 """
 
-
+# Moet nog gedaan worden
 class Training(Step):
 
     def __init__(self):
