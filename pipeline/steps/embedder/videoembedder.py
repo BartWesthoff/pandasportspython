@@ -25,6 +25,7 @@ class VideoEmbeder(Embedder):
         :param query: string
         :return: modified string
         """
+        #haalt de default waarde van de landmarks op
         cap = cv2.VideoCapture(video)
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
@@ -48,7 +49,7 @@ class VideoEmbeder(Embedder):
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
             currentframe = []
-
+            #Maakt list met floats van de poselandmarks
             for data_point in results.pose_landmarks.landmark:
                 # print('x is', data_point.x, 'y is', data_point.y, 'z is', data_point.z,
                 #       'visibility is', data_point.visibility)
