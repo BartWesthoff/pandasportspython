@@ -18,3 +18,4 @@ if __name__ == "__main__":
     pipeline.process(data)
 
     # Resultaat uit de pipeline halen
+# init
