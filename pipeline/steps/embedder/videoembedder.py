@@ -1,7 +1,11 @@
-from pipeline.steps.embedder.embedder import Embedder
+import os
+
 import cv2
 import mediapipe as mp
+
+from pipeline.steps.embedder.embedder import Embedder
 from pipeline.utils.utils import Utils
+
 """
 Embedder class
 used to embed video material
@@ -62,8 +66,14 @@ class VideoEmbeder(Embedder):
                 results.pose_landmarks,
                 mp_pose.POSE_CONNECTIONS,
                 landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
-            # cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
+            cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
         cap.release()
-        Utils().saveObject(allframes, "framestest")
-        return allframes
 
+        if os.path.isfile("frames"):
+            frames = Utils.openObject("frames")
+            frames.append(allframes)
+            Utils.saveObject(frames, "frames")
+        else:
+            Utils().saveObject([allframes], "frames")
+
+        return allframes

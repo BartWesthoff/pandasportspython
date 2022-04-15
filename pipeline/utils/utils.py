@@ -28,6 +28,7 @@ class Utils:
     def saveObject(object, filename):
         """" saves object to (pickle) file"""
         with open(filename, 'wb') as fp:
+            print("saving object")
             pickle.dump(object, fp)
 
     @staticmethod
