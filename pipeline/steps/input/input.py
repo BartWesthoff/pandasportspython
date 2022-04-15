@@ -6,6 +6,8 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+
+from classes.cloudfile import CloudFile
 from pipeline.steps.step import Step
 # from tabulate import tabulate
 from pipeline.utils.utils import Utils
@@ -19,7 +21,7 @@ class Input(Step):
         super().__init__()
         self.service = self.get_gdrive_service()
 
-    def get_gdrive_service(self):
+    def get_gdrive_service(self) -> object:
         creds = None
         # The file token.pickle stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
@@ -41,40 +43,49 @@ class Input(Step):
         # return Google Drive API service
         return build('drive', 'v3', credentials=creds)
 
-    def process(self, data):
+    def process(self, data) -> list[CloudFile]:
         """Shows basic usage of the Drive v3 API.
         Prints the names and ids of the first 5 files the user has access to.
         """
+
         folder = self.get_files_in_folder("videos minor ai")
-        # for video in folder:
-        #     self.download_file(video)
+        for cloudfile in folder:
+            if cloudfile.name is str and not os.path.exists(Utils().datafolder + os.sep + cloudfile.name):
+                # TODO check if cloudfile.name is str
+                self.download_file(cloudfile)
+
         return folder
 
-    def get_files_in_folder(self, foldername):
-        """given items returned by Google Drive API, prints them in a tabular way"""
-        folderid = ""
+    def get_files_in_folder(self, foldername: str) -> list[CloudFile]:
+        """given items returned by Google Drive API"""
+        """returns list of CloudFile objects"""
+
         results = self.service.files().list(
             fields="nextPageToken, files(id, name, parents)").execute()
         # get the results
+        folderid = ""
         items = results.get('files', [])
 
         if not items:
             # empty drive
             print('No files found.')
-            return None
+            return []
 
         files_in_folder = []
         for item in items:
             item_id = item["id"]
             name = item["name"]
-            print(type(item))
-            parents = [None]
-            if "parents" in item:
-                parents = item["parents"]
-            if name == foldername:
-                folderid = item_id
-            if parents[0] == folderid:
-                files_in_folder.append(item_id)
+            if type(name) is str:
+
+                parents = [None]
+                if "parents" in item:
+                    parents = item["parents"]
+
+                if name == foldername:
+                    folderid = item_id
+                if parents[0] == folderid:
+                    files_in_folder.append(CloudFile(item_id, name, parents))
+                    # files_in_folder.append({"name": name, "id": item_id})
 
         return files_in_folder
 
@@ -99,13 +110,14 @@ class Input(Step):
         media = MediaFileUpload('school video.mp4',
                                 mimetype='video/mp4',
                                 resumable=True)
-        file = self.service.files().create(body=file_metadata,
-                                           media_body=media,
-                                           fields='id').execute()
-        int(f'File ID: {file.get("id")}')
+        self.service.files().create(body=file_metadata,
+                                    media_body=media,
+                                    fields='id').execute()
 
-    def download_file(self, folderid):
-        request = self.service.files().get_media(fileId=folderid)
+    def download_file(self, file: CloudFile) -> None:
+        file_id = file.id
+        name = file.name
+        request = self.service.files().get_media(fileId=file_id)
         fh = io.BytesIO()
         downloader = MediaIoBaseDownload(fh, request)
         done = False
@@ -114,5 +126,5 @@ class Input(Step):
             print(f"Download {int(status.progress() * 100)}")
         fh.seek(0)
 
-        with open(f"{Utils().datafolder}{os.sep}{folderid}.mp4", 'wb') as f:
+        with open(f"{Utils().datafolder}{os.sep}{name}", 'wb') as f:
             f.write(fh.read())
