@@ -1,12 +1,10 @@
 import json
 import os
 import pickle
-import sys
 from random import *
 
-import cv2
-import moviepy.editor as mpy
-import mediapipe as mp
+from keras.applications.densenet import layers
+from keras.layers import Embedding
 
 from classes.joint import Joint
 from classes.pose import Pose
@@ -17,69 +15,28 @@ class Utils:
     def __init__(self):
         self.name = "Utils"
         self.jsonfile = "testing.json"
-        self.yamlfile = "settings.yaml"
+        # self.yamlfile = "settings.yaml"
         self.root_dir = os.getcwd()
+        self.datafolder = os.sep.join(['data', 'production'])
 
-    def getdict(self):
-        """" return the dictionary of all saved data """
-        with open(self.jsonfile, "r") as f:
-            a = json.load(f)
-        return a
-
-    def saveObject(self, object, filename):
+    # def getdict(self):
+    #     """" return the dictionary of all saved data """
+    #     with open(self.jsonfile, "r") as f:
+    #         a = json.load(f)
+    #     return a
+    @staticmethod
+    def saveObject(object, filename):
         """" saves object to (pickle) file"""
         with open(filename, 'wb') as fp:
+            print("saving object")
             pickle.dump(object, fp)
 
-    def openObject(self, filename):
+    @staticmethod
+    def openObject(filename):
         """" opens object from (pickle) file"""
         with open(filename, 'rb') as fp:
             object = pickle.load(fp)
         return object
-
-    def embedVideo(self, file):
-        cap = cv2.VideoCapture(file)
-        mp_drawing = mp.solutions.drawing_utils
-        mp_drawing_styles = mp.solutions.drawing_styles
-        mp_pose = mp.solutions.pose
-        pose = mp_pose.Pose()
-        allframes = []
-        while cap.isOpened():
-            success, image = cap.read()
-            if not success:
-                break
-
-            # To improve performance, optionally mark the image as not writeable to
-            # pass by reference.
-            image.flags.writeable = False
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            results = pose.process(image)
-
-            # Draw the pose annotation on the image.
-
-            image.flags.writeable = True
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-
-            currentframe = []
-
-            for data_point in results.pose_landmarks.landmark:
-                # print('x is', data_point.x, 'y is', data_point.y, 'z is', data_point.z,
-                #       'visibility is', data_point.visibility)
-                currentframe.append(data_point.x)
-                currentframe.append(data_point.y)
-                currentframe.append(data_point.z)
-            allframes.append(currentframe)
-
-            mp_drawing.draw_landmarks(
-                image,
-                results.pose_landmarks,
-                mp_pose.POSE_CONNECTIONS,
-                landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
-            # cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
-        cap.release()
-        self.saveObject(allframes,"framestest")
-        return allframes
-
 
     # def _checkifexists(self):
     #     """ check if jsonfile exists so that we can do IO operations"""
@@ -110,7 +67,8 @@ class Utils:
         joints.append(self.generateJoint("nose"))
         return Pose(joints)
 
-    def generateJoint(self, name):
+    @staticmethod
+    def generateJoint(name):
         """"returns dummy random generated Joint"""
 
         maxInt = 100000
@@ -131,30 +89,33 @@ class Utils:
         with open(self.jsonfile, "w+") as f:
             json.dump(_dict, f, indent=4)
 
-    def deletefile(self, filename):
+    @staticmethod
+    def deletefile(filename):
         """deletes file from system"""
         if os.path.exists(filename):
             os.remove(filename)
         else:
             print("The file does not exist")
 
-    def ensure_pythonhashseed(self, seed):
-        """makes sure to run application with given pythonhashseed so outputs is not random """
-        current_seed = os.environ.get("PYTHONHASHSEED")
+    # def ensure_pythonhashseed(self, seed):
+    #     """makes sure to run application with given pythonhashseed so outputs is not random """
+    #     current_seed = os.environ.get("PYTHONHASHSEED")
+    #
+    #     seed = str(seed)
+    #     if current_seed is None or current_seed != seed:
+    #         print(f'Setting PYTHONHASHSEED="{seed}"')
+    #         os.environ["PYTHONHASHSEED"] = seed
+    #         # restart the current process
+    #         os.execl(sys.executable, sys.executable, *sys.argv)
 
-        seed = str(seed)
-        if current_seed is None or current_seed != seed:
-            print(f'Setting PYTHONHASHSEED="{seed}"')
-            os.environ["PYTHONHASHSEED"] = seed
-            # restart the current process
-            os.execl(sys.executable, sys.executable, *sys.argv)
-
-    def save_model(self, model, modelname):
+    @staticmethod
+    def save_model(model, modelname):
         """saves machine learning model"""
         filename = modelname + '.sav'
         pickle.dump(model, open(filename, 'wb'))
 
-    def load_model(self, filename):
+    @staticmethod
+    def load_model(filename):
         """loads given machine loading model"""
         filename += ".sav"
         loaded_model = pickle.load(open(filename, 'rb'))
@@ -181,11 +142,52 @@ class Utils:
     #         data = yaml.load(f, Loader=yaml.FullLoader)
     #     return data["settings"]
 
-    def removesound(self, name):
-        # TODO: converter maken
-        videoclip = mpy.VideoFileClip(name)
-        new_clip = videoclip.without_audio()
-        new_clip.write_videofile(name.replace("squat0", "no_sound_squat"))
+    def playground(self):
+        from keras import Model, Sequential
+        from keras.layers import Input, Dense, Bidirectional, embeddings
+        from keras.layers.recurrent import LSTM
+        import numpy as np
+        # define model for simple BI-LSTM + DNN based binary classifier
 
-        videoclip.reader.close()
-        videoclip.audio.reader.close_proc()
+        def define_model():
+            # input1 = Input(shape=(137, 99,
+            #                       1))  # take the reshape last two values, see "data = np.reshape(data,(137,99,1))" which is "data/batch-size, row, column"
+            #
+            # dnn_output = Dense(1)
+
+            model = Sequential()
+            # Add an Embedding layer expecting input vocab of size 1000, and
+            # output embedding dimension of size 64.
+            # model.add(Embedding(input_dim=1, output_dim=64))
+
+            # Add a LSTM layer with 128 internal units.
+            model.add(layers.LSTM(128,input_shape=(137,99)))
+
+            # Add a Dense layer with 10 units.
+            model.add(Dense(64, activation="relu"))
+            model.add(Dense(1, activation="sigmoid"))
+            # compile the model
+            model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+            # model.summary()
+            return model
+
+        allframes = Utils().openObject("framestest")
+        # print(allframes)
+        data = np.array(allframes)  # (137,99) (frames, joints*3)
+
+        import random
+        Y = [1]  # Class label for the dummy data
+        print("data = ", data)
+        # Reshape the data into 3-D numpy array
+        data = np.reshape(data, (1, 137, 99, 1))  # Here we have a total of 10 rows or records
+        print("data after reshape => ", data)
+        # Call the model
+        model = define_model()
+        # fit the model
+        model.fit(data, np.array(Y), epochs=10, batch_size=2, verbose=1)
+        # Take a test data to test the working of the model
+        test_data = np.array(allframes)
+        # reshape the test data
+        test_data = np.reshape(test_data, (1, 137, 99, 1))
+        pred = model.predict(test_data)
+        print("predicted sigmoid output => ", pred)
