@@ -2,9 +2,10 @@ import os
 
 import cv2
 
+from classes.cloudfile import CloudFile
 from pipeline.steps.preprocessors.preprocessor import PreProcessor
 from pipeline.utils.utils import Utils
-import moviepy as mpy
+import moviepy.editor as mpy
 
 """
 PreProcessor class
@@ -20,15 +21,22 @@ class VideoPreProcessor(PreProcessor):
         :return: dictionary of 1-d List of Strings (but even spaced so they can be inferred correctly)
             and original queries
         """
-        self._preprocessVideo(data)
+        data = self._preprocessVideo(data)
 
-        return
+        return data
 
-    def _preprocessVideo(self, data):
+    def _preprocessVideo(self, data: list[CloudFile]):
         """
         :param query: string
         :return: modified string
         """
+        for i in data:
+            print(i.name)
+        # idee is dat we deze video namen gebruiken om van gedownloaden data goede data te maken
+        # wordt bijvoorbeeld gedownload in een download mapje,
+        # en daar sorteren we de video's en bewerken we ze
+        # bewerkte data komt dan is positief of negatief
+        # kan ook in 1 mapje production
 
         for name in ["positive", "negative"]:
             folder = Utils().root_dir + os.sep + "data" + os.sep + f"{name}_squat" + os.sep
@@ -47,6 +55,7 @@ class VideoPreProcessor(PreProcessor):
                 if not os.path.exists(destination):
                     os.rename(source, destination)
                     self.removesound(str(destination))
+        return data
 
     def removesound(self, name):
         videoclip = mpy.VideoFileClip(name)
