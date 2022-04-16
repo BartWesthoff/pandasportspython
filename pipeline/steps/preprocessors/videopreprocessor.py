@@ -1,11 +1,13 @@
 import os
 
 import cv2
+import moviepy.editor as mpy
+from PIL.ImagePath import Path
+from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
 from classes.cloudfile import CloudFile
 from pipeline.steps.preprocessors.preprocessor import PreProcessor
 from pipeline.utils.utils import Utils
-import moviepy.editor as mpy
 
 """
 PreProcessor class
@@ -74,6 +76,8 @@ class VideoPreProcessor(PreProcessor):
     def cropVideo(self, name: str, fps):
 
         # Open the video
+        name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
+        print(name)
         cap = cv2.VideoCapture(name)
 
         # Initialize frame counter
@@ -124,7 +128,7 @@ class VideoPreProcessor(PreProcessor):
                 # cnts, _ = cv2.findContours(im, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
                 # list(cnts).sort(key=lambda x: cv2.boundingRect(x)[2], reverse=True)
 
-                cv2.rectangle(frame1, (x, y), (x + w, y + h), (128, 0, 255,), 10)
+                # cv2.rectangle(frame1, (x, y), (x + w, y + h), (128, 0, 255,), 10)
 
                 # Save final result
                 cv2.imwrite(f'img{cnt}.png', frame1[y:y + h, x:x + w])
@@ -163,3 +167,60 @@ class VideoPreProcessor(PreProcessor):
 
         cv2.destroyAllWindows()
         video.release()
+
+    def trimvideo(self, name: str, start_time: float, end_time: float):
+        name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
+        ffmpeg_extract_subclip(f"{name}.mp4", start_time, end_time, targetname=f"{name}_short.mp4")
+
+
+    def trimvideo2(self,name: str):
+        vcodec = "libx264"
+        name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
+        videoquality = "30"
+
+        # slow, ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
+        compression = "slow"
+
+        title = name
+        loadtitle = title + '.mp4'
+        savetitle = title
+
+        # modify these start and end times for your subclips
+        cuts = [('00:00:02.949', '00:00:04.152'),
+                ('00:00:06.328', '00:00:13.077')]
+
+
+        # load file
+        video = mpy.VideoFileClip(loadtitle)
+
+        # cut file
+        clips = []
+        clip = None
+        for index, cut in enumerate(cuts):
+            clip = video.subclip(cut[0], cut[1])
+            clip.write_videofile(f"{savetitle}-{index}.mp4", threads=4, fps=30,
+                                 codec=vcodec,
+                                 preset=compression,
+                                 ffmpeg_params=["-crf", videoquality])
+        print(type(clip))
+
+        #     clips.append(clip)
+        #
+        # final_clip = mpy.concatenate_videoclips(clips)
+        #
+        #
+        # final_clip = mpy.CompositeVideoClip([final_clip, txt])
+        #
+        # # save file
+
+        #
+        # video.close()
+
+    def runBash(self, command):
+        os.system(command)
+
+    def crop(self, start, end, name, output):
+        name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
+        str = "ffmpeg -i " + f"{name}.mp4" + " -ss  " + start + " -to " + end + " -c copy " + f"{output}.mp4"
+        print(str)
+        self.runBash(str)
