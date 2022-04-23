@@ -20,9 +20,9 @@ class VideoEmbeder(Embedder):
         :return: dictionary of 1-d List of Strings (but even spaced so they can be inferred correctly)
             and original queries
         """
-        self._embedVideo(data)
+        points = self._embedVideo(data)
 
-        return
+        return points
 
     def _embedVideo(self, video):
         """
@@ -57,19 +57,23 @@ class VideoEmbeder(Embedder):
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
             currentframe = []
+            if results.pose_landmarks is None:
+                print("No pose results.")
+                # currentframe.append(image)
+            else:
 
-            for data_point in results.pose_landmarks.landmark:
-                # print('x is', data_point.x, 'y is', data_point.y, 'z is', data_point.z,
-                #       'visibility is', data_point.visibility)
-                normalized = False
-                if normalized:
-                    currentframe.append(data_point.x)
-                    currentframe.append(data_point.y)
-                    currentframe.append(data_point.z)
-                else:
-                    currentframe.append(data_point.x * width)
-                    currentframe.append(data_point.y * height)
-                    currentframe.append(data_point.z)
+                for data_point in results.pose_landmarks.landmark:
+                    # print('x is', data_point.x, 'y is', data_point.y, 'z is', data_point.z,
+                    #       'visibility is', data_point.visibility)
+                    normalized = False
+                    if normalized:
+                        currentframe.append(data_point.x)
+                        currentframe.append(data_point.y)
+                        currentframe.append(data_point.z)
+                    else:
+                        currentframe.append(data_point.x * width)
+                        currentframe.append(data_point.y * height)
+                        currentframe.append(data_point.z)
 
             allframes.append(currentframe)
 

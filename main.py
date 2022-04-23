@@ -1,15 +1,25 @@
-from pipeline.pipeline import Pipeline
-from pipeline.steps.evaluation.videoevaluation import VideoEvaluation
-from pipeline.steps.input.input import Input
-from pipeline.steps.output.videooutput import VideoOutput
+import numpy as np
+
+from classes.cloudfile import CloudFile
+from pipeline.steps.embedder.videoembedder import VideoEmbeder
 from pipeline.steps.preprocessors.videopreprocessor import VideoPreProcessor
-from pipeline.steps.training.videotraining import VideoTraining
+from pipeline.utils.utils import Utils
 
 if __name__ == "__main__":
-    # pipeline = Pipeline(Input(), VideoPreProcessor(), VideoTraining(), VideoEvaluation(), VideoOutput())
-    # pipeline.process()
+    # frames = Utils().openObject("voorbeeld")
+    frames = VideoEmbeder().process("school video.mp4")
+    Utils().saveObject(frames, "frames test")
+    file = CloudFile(id="", name="20220330_112652_short.mp4", parents="")
+    VideoPreProcessor().process([file])
 
-    #VideoPreProcessor().trimvideo("20220330_112652", 0.0, 11.0)
+    # frames = VideoEmbeder().process("result2.mp4")
+    #
+    # Utils().saveObject(frames, "frames kleur")
+    # convert array to numpy array
 
-    VideoPreProcessor().crop("00:01:00", "00:01:09", "20220330_112652", "trimmedvideo")
-    #VideoPreProcessor().trimvideo2("20220330_112652")
+    # squat = Utils().augmentation(frames[0], 20)
+    # for i in squat:
+    #     print(i[0])
+    # VideoPreProcessor().showvideo(f"{Utils().datafolder + os.sep}20220330_121747.mp4")
+    # VideoPreProcessor().cropVideo("20220330_112652_short.mp4", 30)
+    # Utils().playground()

@@ -160,6 +160,11 @@ class Utils:
             squats.append(new_squat)
         return squats
 
+    def changeFileName(self, fileName, newName):
+        path = os.sep.join(fileName.split(os.sep)[:-1])
+        output_source = os.sep.join([path, newName])
+        return output_source
+
     def playground(self):
         from keras import Sequential
         from keras.layers import Dense
@@ -195,7 +200,7 @@ class Utils:
         Y = [1 for _ in range(0, 400)]  # Class label for the dummy data
         print("data = ", data)
         # Reshape the data into 3-D numpy array
-        data = np.reshape(data, (400, 137, 99, 1))  # Here we have a total of 10 rows or records
+        data = np.reshape(data, (400, 137, 99))  # Here we have a total of 10 rows or records
         print("data after reshape => ", data)
         # Call the model
         model = define_model()
@@ -206,6 +211,6 @@ class Utils:
         correct_pose = Utils().openObject("voorbeeld")
         test_data = np.array(correct_pose)
         # reshape the test data
-        test_data = np.reshape(test_data, (1, 137, 99, 1))
+        test_data = np.reshape(test_data, (1, 137, 99))
         pred = model.predict(test_data)
         print("predicted sigmoid output => ", pred)
