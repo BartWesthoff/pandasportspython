@@ -1,10 +1,14 @@
+import copy
+import itertools
 import json
 import os
 import pickle
 from random import *
 
 from keras.applications.densenet import layers
-from keras.layers import Embedding
+from keras import Sequential
+from keras.layers import Dense
+import numpy as np
 
 from classes.joint import Joint
 from classes.pose import Pose
@@ -28,7 +32,6 @@ class Utils:
     def saveObject(object, filename):
         """" saves object to (pickle) file"""
         with open(filename, 'wb') as fp:
-            print("saving object")
             pickle.dump(object, fp)
 
     @staticmethod
@@ -142,11 +145,52 @@ class Utils:
     #         data = yaml.load(f, Loader=yaml.FullLoader)
     #     return data["settings"]
 
+    def augmentation(self, squat: list, spread: int):
+        random_x = [i for i in range(-spread // 2, spread // 2 + 1) if i != 0]
+        random_y = [i for i in range(-spread // 2, spread // 2 + 1) if i != 0]
+        c = list(itertools.product(random_x, random_y))
+        squats = []
+
+        for combination in c:
+            new_squat = []
+            for frame in squat:
+                lenght = len(frame)
+                modified_array = copy.deepcopy(frame)
+                for i in range(0, lenght, 3):
+                    modified_array[i] += combination[0]
+                    modified_array[i + 1] += combination[1]
+                new_squat.append(modified_array)
+            squats.append(new_squat)
+        return squats
+
+    def changeFileName(self, fileName, newName):
+        path = os.sep.join(fileName.split(os.sep)[:-1])
+        output_source = os.sep.join([path, newName])
+        return output_source
+
+    def define_model():
+        # input1 = Input(shape=(137, 99,
+        #                       1))  # take the reshape last two values, see "data = np.reshape(data,(137,99,1))" which is "data/batch-size, row, column"
+        #
+        # dnn_output = Dense(1)
+
+        model = Sequential()
+        # Add an Embedding layer expecting input vocab of size 1000, and
+        # output embedding dimension of size 64.
+        # model.add(Embedding(input_dim=1, output_dim=64))
+
+        # Add a LSTM layer with 128 internal units.
+        model.add(layers.LSTM(128, input_shape=(137, 99)))
+
+        # Add a Dense layer with 10 units.
+        model.add(Dense(64, activation="relu"))
+        model.add(Dense(1, activation="sigmoid"))
+        # compile the model
+        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        # model.summary()
+        return model
+
     def playground(self):
-        from keras import Model, Sequential
-        from keras.layers import Input, Dense, Bidirectional, embeddings
-        from keras.layers.recurrent import LSTM
-        import numpy as np
         # define model for simple BI-LSTM + DNN based binary classifier
 
         def define_model():
@@ -161,7 +205,7 @@ class Utils:
             # model.add(Embedding(input_dim=1, output_dim=64))
 
             # Add a LSTM layer with 128 internal units.
-            model.add(layers.LSTM(128,input_shape=(137,99)))
+            model.add(layers.LSTM(128, input_shape=(137, 99)))
 
             # Add a Dense layer with 10 units.
             model.add(Dense(64, activation="relu"))
@@ -171,23 +215,24 @@ class Utils:
             # model.summary()
             return model
 
-        allframes = Utils().openObject("framestest")
+        train_data = Utils().openObject("400 squats")
         # print(allframes)
-        data = np.array(allframes)  # (137,99) (frames, joints*3)
+        data = np.array(train_data)  # (137,99) (frames, joints*3)
 
-        import random
-        Y = [1]  # Class label for the dummy data
+        Y = [1 for _ in range(0, 400)]  # Class label for the dummy data
         print("data = ", data)
         # Reshape the data into 3-D numpy array
-        data = np.reshape(data, (1, 137, 99, 1))  # Here we have a total of 10 rows or records
+        data = np.reshape(data, (400, 137, 99))  # Here we have a total of 10 rows or records
         print("data after reshape => ", data)
         # Call the model
         model = define_model()
         # fit the model
-        model.fit(data, np.array(Y), epochs=10, batch_size=2, verbose=1)
+        model.fit(data, np.array(Y), epochs=2, batch_size=2, verbose=1)
+
         # Take a test data to test the working of the model
-        test_data = np.array(allframes)
+        correct_pose = Utils().openObject("voorbeeld")
+        test_data = np.array(correct_pose)
         # reshape the test data
-        test_data = np.reshape(test_data, (1, 137, 99, 1))
+        test_data = np.reshape(test_data, (1, 137, 99))
         pred = model.predict(test_data)
         print("predicted sigmoid output => ", pred)
