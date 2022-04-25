@@ -1,8 +1,8 @@
-from typing import List
+from typing import Set
 
 class Joint:
 
-    # self nog todo, is likelihood een floating point?
+    # Is likelihood een floating point?
     def __init__(self, x: float, y: float, z: float, likelihood: float, name: str) -> None:
         self.x = x
         self.y = y
@@ -10,7 +10,7 @@ class Joint:
         self.likelihood = likelihood
         self.name = name
 
-    def ToJson(self) -> (str, float, float, float, float):  # self weer todo
+    def ToJson(self) -> Set(str, float, float, float, float):
         return {self.name: {
             "x": self.x,
             "y": self.y,
