@@ -112,13 +112,13 @@ class Utils:
     #         os.execl(sys.executable, sys.executable, *sys.argv)
 
     @staticmethod
-    def save_model(model, modelname):
+    def save_model(model, modelname) -> None: 
         """saves machine learning model"""
         filename = modelname + '.sav'
         pickle.dump(model, open(filename, 'wb'))
 
     @staticmethod
-    def load_model(filename):
+    def load_model(filename): # return type model inzien, is een list of set
         """loads given machine loading model"""
         filename += ".sav"
         loaded_model = pickle.load(open(filename, 'rb'))
