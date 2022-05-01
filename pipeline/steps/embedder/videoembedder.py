@@ -3,7 +3,7 @@ import os
 import cv2
 import mediapipe as mp
 
-from pipeline.steps.embedder.embedder import Embedder
+from pipeline.steps.step import Step
 from pipeline.utils.utils import Utils
 
 """
@@ -12,7 +12,7 @@ used to embed video material
 """
 
 
-class VideoEmbeder(Embedder):
+class VideoEmbeder(Step):
 
     def process(self, data):
         """
@@ -21,7 +21,6 @@ class VideoEmbeder(Embedder):
             and original queries
         """
         points = self._embedVideo(data)
-
         return points
 
     def _embedVideo(self, video):

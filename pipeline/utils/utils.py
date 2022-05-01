@@ -5,7 +5,10 @@ import os
 import pickle
 from random import *
 
+import numpy as np
+from keras import Sequential
 from keras.applications.densenet import layers
+from keras.layers import Dense
 
 from classes.joint import Joint
 from classes.pose import Pose
@@ -165,33 +168,30 @@ class Utils:
         output_source = os.sep.join([path, newName])
         return output_source
 
+    def define_model(self):
+        # input1 = Input(shape=(137, 99,
+        #                       1))  # take the reshape last two values, see "data = np.reshape(data,(137,99,1))" which is "data/batch-size, row, column"
+        #
+        # dnn_output = Dense(1)
+
+        model = Sequential()
+        # Add an Embedding layer expecting input vocab of size 1000, and
+        # output embedding dimension of size 64.
+        # model.add(Embedding(input_dim=1, output_dim=64))
+
+        # Add a LSTM layer with 128 internal units.
+        model.add(layers.LSTM(128, input_shape=(137, 99)))
+
+        # Add a Dense layer with 10 units.
+        model.add(Dense(64, activation="relu"))
+        model.add(Dense(1, activation="sigmoid"))
+        # compile the model
+        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        # model.summary()
+        return model
+
     def playground(self):
-        from keras import Sequential
-        from keras.layers import Dense
-        import numpy as np
         # define model for simple BI-LSTM + DNN based binary classifier
-
-        def define_model():
-            # input1 = Input(shape=(137, 99,
-            #                       1))  # take the reshape last two values, see "data = np.reshape(data,(137,99,1))" which is "data/batch-size, row, column"
-            #
-            # dnn_output = Dense(1)
-
-            model = Sequential()
-            # Add an Embedding layer expecting input vocab of size 1000, and
-            # output embedding dimension of size 64.
-            # model.add(Embedding(input_dim=1, output_dim=64))
-
-            # Add a LSTM layer with 128 internal units.
-            model.add(layers.LSTM(128, input_shape=(137, 99)))
-
-            # Add a Dense layer with 10 units.
-            model.add(Dense(64, activation="relu"))
-            model.add(Dense(1, activation="sigmoid"))
-            # compile the model
-            model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-            # model.summary()
-            return model
 
         train_data = Utils().openObject("400 squats")
         # print(allframes)
@@ -203,9 +203,9 @@ class Utils:
         data = np.reshape(data, (400, 137, 99))  # Here we have a total of 10 rows or records
         print("data after reshape => ", data)
         # Call the model
-        model = define_model()
+        model = self.define_model()
         # fit the model
-        model.fit(data, np.array(Y), epochs=10, batch_size=2, verbose=1)
+        model.fit(data, np.array(Y), epochs=2, batch_size=2, verbose=1)
 
         # Take a test data to test the working of the model
         correct_pose = Utils().openObject("voorbeeld")

@@ -5,7 +5,7 @@ import moviepy.editor as mpy
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
 from classes.cloudfile import CloudFile
-from pipeline.steps.preprocessors.preprocessor import PreProcessor
+from pipeline.steps.step import Step
 from pipeline.utils.utils import Utils
 
 """
@@ -14,7 +14,7 @@ used to preprocess video material
 """
 
 
-class VideoPreProcessor(PreProcessor):
+class VideoPreProcessor(Step):
 
     def process(self, data: list[CloudFile]):
         return self._preprocessVideo(data)
