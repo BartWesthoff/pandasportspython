@@ -6,6 +6,9 @@ import mediapipe as mp
 from pipeline.steps.embedder.embedder import Embedder
 from pipeline.utils.utils import Utils
 
+from typing import Set
+
+
 """
 Embedder class
 used to embed video material
@@ -14,7 +17,7 @@ used to embed video material
 
 class VideoEmbeder(Embedder):
 
-    def process(self, data):
+    def process(self, data)-> None:
         """
         :param data: 1-d List of Strings
         :return: dictionary of 1-d List of Strings (but even spaced so they can be inferred correctly)
@@ -24,7 +27,7 @@ class VideoEmbeder(Embedder):
 
         return points
 
-    def _embedVideo(self, video):
+    def _embedVideo(self, video)"""-> Set[sizeOf(results.pose_landmarks.landmark)]""": # dit moet nog worden bijgewerkt
         """
         :param query: string
         :return: modified string
