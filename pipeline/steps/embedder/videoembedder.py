@@ -23,9 +23,9 @@ class VideoEmbeder(Embedder):
         :return: dictionary of 1-d List of Strings (but even spaced so they can be inferred correctly)
             and original queries
         """
-        self._embedVideo(data)
+        points = self._embedVideo(data)
 
-        return
+        return points
 
     def _embedVideo(self, video)"""-> Set[sizeOf(results.pose_landmarks.landmark)]""": # dit moet nog worden bijgewerkt
         """
@@ -37,6 +37,11 @@ class VideoEmbeder(Embedder):
         mp_drawing_styles = mp.solutions.drawing_styles
         mp_pose = mp.solutions.pose
         pose = mp_pose.Pose()
+
+        width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float `width`
+        height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
+        print("width: ", width)
+        print("height: ", height)
         allframes = []
         while cap.isOpened():
             success, image = cap.read()
@@ -55,13 +60,24 @@ class VideoEmbeder(Embedder):
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
             currentframe = []
+            if results.pose_landmarks is None:
+                print("No pose results.")
+                # currentframe.append(image)
+            else:
 
-            for data_point in results.pose_landmarks.landmark:
-                # print('x is', data_point.x, 'y is', data_point.y, 'z is', data_point.z,
-                #       'visibility is', data_point.visibility)
-                currentframe.append(data_point.x)
-                currentframe.append(data_point.y)
-                currentframe.append(data_point.z)
+                for data_point in results.pose_landmarks.landmark:
+                    # print('x is', data_point.x, 'y is', data_point.y, 'z is', data_point.z,
+                    #       'visibility is', data_point.visibility)
+                    normalized = False
+                    if normalized:
+                        currentframe.append(data_point.x)
+                        currentframe.append(data_point.y)
+                        currentframe.append(data_point.z)
+                    else:
+                        currentframe.append(data_point.x * width)
+                        currentframe.append(data_point.y * height)
+                        currentframe.append(data_point.z)
+
             allframes.append(currentframe)
 
             mp_drawing.draw_landmarks(
@@ -71,12 +87,12 @@ class VideoEmbeder(Embedder):
                 landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
             cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
         cap.release()
-
-        if os.path.isfile("frames"):
-            frames = Utils.openObject("frames")
+        name = "voorbeeld"
+        if os.path.isfile(name):
+            frames = Utils.openObject(name)
             frames.append(allframes)
-            Utils.saveObject(frames, "frames")
+            Utils.saveObject(frames, name)
         else:
-            Utils().saveObject([allframes], "frames")
+            Utils().saveObject([allframes], name)
 
         return allframes

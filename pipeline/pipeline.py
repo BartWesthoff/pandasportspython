@@ -1,4 +1,5 @@
 from typing import List
+from pipeline.steps.input.input import Input
 
 class Pipeline:
     # What is a Pipeline?
@@ -18,7 +19,14 @@ class Pipeline:
         :param data:  1-d List of strings (queries)
         :return: list of tuples [(anomaly,id,query)]
         """
+        data = None
 
+        # if first item in array is not of type step
+        if not isinstance(self.steps[0], Input):
+            raise ValueError("First step must be Input")
         for step in self.steps:
-            data = step.process(data)
+            if type(step) == type(Input):
+                data = step.process()
+            else:
+                data = step.process(data)
         return data

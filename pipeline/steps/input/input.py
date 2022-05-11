@@ -44,16 +44,16 @@ class Input(Step):
         return build('drive', 'v3', credentials=creds)
 
     def process(self, data) -> list[CloudFile]:
-        """Shows basic usage of the Drive v3 API.
-        Prints the names and ids of the first 5 files the user has access to.
-        """
+        """given items returned by Google Drive API"""
+        """returns list of CloudFile objects"""
 
         folder = self.get_files_in_folder("videos minor ai")
         for cloudfile in folder:
             if cloudfile.name is str and not os.path.exists(Utils().datafolder + os.sep + cloudfile.name):
                 # TODO check if cloudfile.name is str
                 self.download_file(cloudfile)
-
+                break
+                # verwijderen als je pipeline wilt testen
         return folder
 
     def get_files_in_folder(self, foldername: str) -> list[CloudFile]:
