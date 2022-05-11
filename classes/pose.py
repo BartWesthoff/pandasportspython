@@ -1,3 +1,5 @@
+from typing import Set
+
 class Pose:
 
     def __init__(self, joints: int) -> None:
