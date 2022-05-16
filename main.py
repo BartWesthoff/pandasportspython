@@ -6,26 +6,6 @@ from pipeline.steps.preprocessors.videopreprocessor import VideoPreProcessor
 from pipeline.utils.utils import Utils
 
 if __name__ == "__main__":
-    # frames = Utils().openObject("voorbeeld")
-    # convert frames to numpy array
-    # frames = np.array(frames)
-    # print(frames.shape)
-    frames = VideoEmbeder().process("school video.mp4")
-    frames = np.array(frames)
-    print(frames.shape)
-
-    # Utils().saveObject(frames, "frames test")
-    # file = CloudFile(id="", name="20220330_112652_short.mp4", parents="")
-    # VideoPreProcessor().process([file])
-
-    # frames = VideoEmbeder().process("result2.mp4")
-    #
-    # Utils().saveObject(frames, "frames kleur")
-    # convert array to numpy array
-
-    # squat = Utils().augmentation(frames[0], 20)
-    # for i in squat:
-    #     print(i[0])
-    # VideoPreProcessor().showvideo(f"{Utils().datafolder + os.sep}20220330_121747.mp4")
-    # VideoPreProcessor().cropVideo("20220330_112652_short.mp4", 30)
-    # Utils().playground()
+    settings = Utils.load_settings()
+    print(type(settings))  # <class 'dict'>
+    print(settings)  # example: {'use_gpu': 0, 'use_local': 1}

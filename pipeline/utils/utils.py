@@ -6,6 +6,7 @@ import pickle
 from random import *
 
 import numpy as np
+import yaml
 from keras import Sequential
 from keras.applications.densenet import layers
 from keras.layers import Dense
@@ -137,15 +138,16 @@ class Utils:
     #     with open(self.yamlfile, "w") as f:
     #         yaml.dump_all(data, f)
     # propably not needed ^^
+    @staticmethod
+    def load_settings():
+        """loads yamlfile """
+        """returns settings type of dictionary"""
+        with open("settings.yaml", "r") as f:
+            data = yaml.load(f, Loader=yaml.FullLoader)
+        return data["settings"]
 
-    # def load_settings(self):
-    #     """loads yamlfile """
-    #     """returns settings type of dictionary"""
-    #     with open(self.yamlfile, "r") as f:
-    #         data = yaml.load(f, Loader=yaml.FullLoader)
-    #     return data["settings"]
-
-    def augmentation(self, squat: list, spread: int):
+    @staticmethod
+    def augmentation(squat: list, spread: int):
         random_x = [i for i in range(-spread // 2, spread // 2 + 1) if i != 0]
         random_y = [i for i in range(-spread // 2, spread // 2 + 1) if i != 0]
         c = list(itertools.product(random_x, random_y))
@@ -163,12 +165,14 @@ class Utils:
             squats.append(new_squat)
         return squats
 
-    def changeFileName(self, fileName, newName):
+    @staticmethod
+    def changeFileName(fileName, newName):
         path = os.sep.join(fileName.split(os.sep)[:-1])
         output_source = os.sep.join([path, newName])
         return output_source
 
-    def define_model(self):
+    @staticmethod
+    def define_model():
         # input1 = Input(shape=(137, 99,
         #                       1))  # take the reshape last two values, see "data = np.reshape(data,(137,99,1))" which is "data/batch-size, row, column"
         #
