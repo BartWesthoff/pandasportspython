@@ -103,7 +103,9 @@ class VideoEmbeder(Step):
         points = self._embedVideo(data)
         return points
 
-    def _embedVideo(self, video)"""-> Set[sizeOf(results.pose_landmarks.landmark)]""": # dit moet nog worden bijgewerkt
+    def _embedVideo(self, video):
+    # -> Set[sizeOf(results.pose_landmarks.landmark)]
+    # dit moet nog worden bijgewerkt
         """
         :param query: string
         :return: modified string
