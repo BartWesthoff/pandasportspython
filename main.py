@@ -7,10 +7,16 @@ from pipeline.utils.utils import Utils
 
 if __name__ == "__main__":
     # frames = Utils().openObject("voorbeeld")
+    # convert frames to numpy array
+    # frames = np.array(frames)
+    # print(frames.shape)
     frames = VideoEmbeder().process("school video.mp4")
-    Utils().saveObject(frames, "frames test")
-    file = CloudFile(id="", name="20220330_112652_short.mp4", parents="")
-    VideoPreProcessor().process([file])
+    frames = np.array(frames)
+    print(frames.shape)
+
+    # Utils().saveObject(frames, "frames test")
+    # file = CloudFile(id="", name="20220330_112652_short.mp4", parents="")
+    # VideoPreProcessor().process([file])
 
     # frames = VideoEmbeder().process("result2.mp4")
     #
