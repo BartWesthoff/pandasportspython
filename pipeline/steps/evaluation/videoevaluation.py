@@ -1,6 +1,4 @@
-from pipeline.steps.evaluation.evaluation import Evaluation
-from pipeline.steps.preprocessors.preprocessor import PreProcessor
-
+from pipeline.steps.step import Step
 
 """
 Evaluation class
@@ -8,7 +6,7 @@ used to evaluate model performance
 """
 
 
-class VideoEvaluation(Evaluation):
+class VideoEvaluation(Step):
 
     def process(self, data):
         """

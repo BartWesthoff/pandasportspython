@@ -1,13 +1,12 @@
-from pipeline.steps.output.output import Output
-from pipeline.steps.preprocessors.preprocessor import PreProcessor
 
 """
 PreProcessor class
 used to preprocess video material
 """
+from pipeline.steps.step import Step
 
 
-class VideoOutput(Output):
+class VideoOutput(Step):
 
     def process(self, data):
         """
