@@ -1,3 +1,16 @@
 settings:
   use_local: 0
 
+  landmarks_to_pick:
+    - "left_shoulder"
+    - "right_shoulder"
+    - "left_hip"
+    - "right_hip"
+    - "left_knee"
+    - "right_knee"
+    - "left_ankle"
+    - "right_ankle"
+    - "left_foot_index"
+    - "right_foot_index"
+
+

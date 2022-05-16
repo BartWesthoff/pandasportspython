@@ -141,7 +141,7 @@ class VideoEmbeder(Step):
                 for index, data_point in enumerate(results.pose_landmarks.landmark):
                     # print('x is', data_point.x, 'y is', data_point.y, 'z is', data_point.z,
                     #       'visibility is', data_point.visibility)
-                    if landmarks_config[index] in landmarks_to_pick:
+                    if landmarks_config[index] in self.settings["landmarks_to_pick"]:
 
                         print(landmarks_config[index], ": ", data_point.x, data_point.y, data_point.z)
                         normalized = False
