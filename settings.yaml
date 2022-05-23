@@ -13,5 +13,6 @@ settings:
     - "left_foot_index"
     - "right_foot_index"
   testing: False
+  normalize_landmarks: False
 
 

@@ -142,8 +142,7 @@ class VideoEmbeder(Step):
                     if landmarks_config[index] in self.settings["landmarks_to_pick"]:
 
                         print(landmarks_config[index], ": ", data_point.x, data_point.y, data_point.z)
-                        normalized = False
-                        if normalized:
+                        if self.settings['normalize_landmarks']:
                             currentframe.append(data_point.x)
                             currentframe.append(data_point.y)
                             currentframe.append(data_point.z)
