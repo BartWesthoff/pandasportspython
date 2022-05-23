@@ -3,6 +3,7 @@ import itertools
 import json
 import os
 import pickle
+from collections.abc import Iterable
 from random import *
 
 import numpy as np
@@ -40,7 +41,7 @@ class Utils:
             pickle.dump(object, fp)
 
     @staticmethod
-    def openObject(filename: str):  # return object
+    def openObject(filename: str) -> np.ndarray | Iterable | int | float:  # return object
         """" opens object from (pickle) file"""
         with open(filename, 'rb') as fp:
             object = pickle.load(fp)
@@ -92,13 +93,13 @@ class Utils:
 
         return joint
 
-    def save(self, _dict) -> None:
+    def save(self, _dict: dict) -> None:
         """saves dictionary to disk"""
         with open(self.jsonfile, "w+") as f:
             json.dump(_dict, f, indent=4)
 
     @staticmethod
-    def deletefile(filename):
+    def deletefile(filename: str) -> None:
         """deletes file from system"""
         if os.path.exists(filename):
             os.remove(filename)
@@ -117,13 +118,13 @@ class Utils:
     #         os.execl(sys.executable, sys.executable, *sys.argv)
 
     @staticmethod
-    def save_model(model, modelname) -> None:
+    def save_model(model: object, modelname: str) -> None:
         """saves machine learning model"""
         filename = modelname + '.sav'
         pickle.dump(model, open(filename, 'wb'))
 
     @staticmethod
-    def load_model(filename):  # return type model inzien, is een list of set
+    def load_model(filename: str):  # return type model inzien, is een list of set
         """loads given machine loading model"""
         filename += ".sav"
         loaded_model = pickle.load(open(filename, 'rb'))
@@ -143,7 +144,7 @@ class Utils:
     #         yaml.dump_all(data, f)
     # propably not needed ^^
     @staticmethod
-    def load_settings():
+    def load_settings() -> dict:
         """loads yamlfile """
         """returns settings type of dictionary"""
         with open("settings.yaml", "r") as f:
@@ -151,7 +152,7 @@ class Utils:
         return data["settings"]
 
     @staticmethod
-    def augmentation(squat: list, spread: int):
+    def augmentation(squat: list, spread: int) -> list[list[int]]:
         random_x = [i for i in range(-spread // 2, spread // 2 + 1) if i != 0]
         random_y = [i for i in range(-spread // 2, spread // 2 + 1) if i != 0]
         c = list(itertools.product(random_x, random_y))
@@ -170,13 +171,13 @@ class Utils:
         return squats
 
     @staticmethod
-    def changeFileName(fileName, newName):
-        path = os.sep.join(fileName.split(os.sep)[:-1])
-        output_source = os.sep.join([path, newName])
+    def changeFileName(filename: str, newname: str) -> str:
+        path = os.sep.join(filename.split(os.sep)[:-1])
+        output_source = os.sep.join([path, newname])
         return output_source
 
     @staticmethod
-    def define_model():
+    def define_model() -> Sequential:
         # input1 = Input(shape=(137, 99, 1))  # take the reshape last two values, see "data = np.reshape(data,(137,
         # 99,1))" which is "data/batch-size, row, column"
         #

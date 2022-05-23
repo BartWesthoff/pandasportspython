@@ -135,6 +135,7 @@ class VideoPreProcessor(Step):
             cv2.destroyAllWindows()
             return f'{output}.mp4'
 
+    # alleen voor vergelijken gebruiken
     def grayvideo(self, source: str, newname: str):
         """" Convert video to black/white """
         output = Utils().changeFileName(source, newname)
@@ -194,11 +195,13 @@ class VideoPreProcessor(Step):
     #     cv2.destroyAllWindows()
     #     video.release()
 
+    # deprecated waarschijnlijk
     def trimvideo(self, name: str, start_time: float, end_time: float):
         """" Trim video """
         name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
         ffmpeg_extract_subclip(f"{name}.mp4", start_time, end_time, targetname=f"{name}_short.mp4")
 
+    # deprecated waarschijnlijk
     def trimvideo2(self, name: str):
         """" 2nd Trim video method """
         vcodec = "libx264"
@@ -242,10 +245,12 @@ class VideoPreProcessor(Step):
         #
         # video.close()
 
+    # deprecated waarschijnlijk
     def runBash(self, command: str):
         """ Run bash command """
         os.system(command)
 
+    # deprecated waarschijnlijk
     def crop(self, start, end, source: str, output: str):
         """ shortens video """
         name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + source

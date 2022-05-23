@@ -8,7 +8,7 @@ used to evaluate model performance
 
 class VideoEvaluation(Step):
 
-    def process(self, data):
+    def process(self, data) -> None:
         """
         :param data: 1-d List of Strings
         :return: dictionary of 1-d List of Strings (but even spaced so they can be inferred correctly)

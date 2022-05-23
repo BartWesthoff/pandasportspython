@@ -1,10 +1,12 @@
 from typing import List
 from pipeline.steps.input.input import Input
+from pipeline.steps.step import Step
+
 
 class Pipeline:
     # What is a Pipeline?
     # A Pipeline is a set of instructions
-    def __init__(self, *steps: str) -> None:
+    def __init__(self, *steps: Step) -> None:
         """
         :param pipeline: step objects
         :return: nothing

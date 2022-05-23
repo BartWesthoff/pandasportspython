@@ -3,7 +3,6 @@ import os
 import numpy as np
 
 from pipeline.steps.step import Step
-from pipeline.steps.training.training import Training
 from pipeline.utils.utils import Utils
 
 

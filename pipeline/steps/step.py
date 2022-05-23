@@ -9,6 +9,7 @@ step sub-classes must implement method process
 
 class Step(ABC):
     """" checks if class is instantiated"""
+
     def __init__(self, class_type=None):
         """ this has to be type because in a """
         """ inherented situation it will always become true """
@@ -17,15 +18,15 @@ class Step(ABC):
             raise Exception('I am abstract!')
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.__class__.__name__
 
     @abstractmethod
-    def process(self, data):
+    def process(self, data) -> object:
         pass
 
     @property
-    def settings(self):
+    def settings(self) -> dict:
         with open("settings.yaml", "r") as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data["settings"]

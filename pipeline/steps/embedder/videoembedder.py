@@ -6,9 +6,6 @@ import mediapipe as mp
 from pipeline.steps.step import Step
 from pipeline.utils.utils import Utils
 
-from typing import Set
-
-
 """
 Embedder class
 used to embed video material
@@ -88,13 +85,10 @@ landmarks_config_reverse = {
     "right_foot_index": 32,
 }
 
-landmarks_to_pick = ["left_shoulder", "right_shoulder", "left_hip", "right_hip", "left_knee", "right_knee",
-                     "left_ankle", "right_ankle", "left_foot_index", "right_foot_index"]
-
 
 class VideoEmbeder(Step):
 
-    def process(self, data)-> None:
+    def process(self, data) -> list[list[float]]:
         """
         :param data: 1-d List of Strings
         :return: dictionary of 1-d List of Strings (but even spaced so they can be inferred correctly)
@@ -103,9 +97,9 @@ class VideoEmbeder(Step):
         points = self._embedVideo(data)
         return points
 
-    def _embedVideo(self, video):
-    # -> Set[sizeOf(results.pose_landmarks.landmark)]
-    # dit moet nog worden bijgewerkt
+    def _embedVideo(self, video: str) -> list[list[float]]:
+        # -> Set[sizeOf(results.pose_landmarks.landmark)]
+        # dit moet nog worden bijgewerkt
         """
         :param query: string
         :return: modified string
@@ -142,7 +136,6 @@ class VideoEmbeder(Step):
                 print("No pose results.")
                 # currentframe.append(image)
             else:
-                print("")
                 for index, data_point in enumerate(results.pose_landmarks.landmark):
                     # print('x is', data_point.x, 'y is', data_point.y, 'z is', data_point.z,
                     #       'visibility is', data_point.visibility)
