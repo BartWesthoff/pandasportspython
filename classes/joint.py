@@ -1,4 +1,5 @@
-from typing import Set
+from typing import Set, Dict, Any
+
 
 class Joint:
 
@@ -10,7 +11,7 @@ class Joint:
         self.likelihood = likelihood
         self.name = name
 
-    def ToJson(self) -> Set(str, float, float, float, float):
+    def ToJson(self) -> dict[Any, Any]:
         return {self.name: {
             "x": self.x,
             "y": self.y,

@@ -14,8 +14,8 @@ from keras.layers import Dense
 from classes.joint import Joint
 from classes.pose import Pose
 
+
 # Type hinting
-from typing import List
 
 
 class Utils:
@@ -33,14 +33,14 @@ class Utils:
     #         a = json.load(f)
     #     return a
     @staticmethod
-    def saveObject(object, filename: str) -> None: # wat is object
+    def saveObject(object, filename: str) -> None:  # wat is object
         """" saves object to (pickle) file"""
         with open(filename, 'wb') as fp:
             print("saving object")
             pickle.dump(object, fp)
 
     @staticmethod
-    def openObject(filename: str): # return object
+    def openObject(filename: str):  # return object
         """" opens object from (pickle) file"""
         with open(filename, 'rb') as fp:
             object = pickle.load(fp)
@@ -61,8 +61,8 @@ class Utils:
     #     if not os.path.exists(self.yamlfile):
     #         with open(self.yamlfile, "x") as f:
     #             f.write("")
- 
-     def generatePose(self) -> List(str, str, str, str, str, str, str, str):
+
+    def generatePose(self) -> Pose:
         """"returns dummy random generated pose"""
         # TODO gezicht weghalen
         sides = ["left", "right"]
@@ -76,7 +76,7 @@ class Utils:
         return Pose(joints)
 
     @staticmethod
-    def generateJoint(name: str): # wat is joint
+    def generateJoint(name: str):  # wat is joint
         """"returns dummy random generated Joint"""
 
         maxInt = 100000
@@ -117,13 +117,13 @@ class Utils:
     #         os.execl(sys.executable, sys.executable, *sys.argv)
 
     @staticmethod
-    def save_model(model, modelname) -> None: 
+    def save_model(model, modelname) -> None:
         """saves machine learning model"""
         filename = modelname + '.sav'
         pickle.dump(model, open(filename, 'wb'))
 
     @staticmethod
-    def load_model(filename): # return type model inzien, is een list of set
+    def load_model(filename):  # return type model inzien, is een list of set
         """loads given machine loading model"""
         filename += ".sav"
         loaded_model = pickle.load(open(filename, 'rb'))
@@ -177,8 +177,8 @@ class Utils:
 
     @staticmethod
     def define_model():
-        # input1 = Input(shape=(137, 99,
-        #                       1))  # take the reshape last two values, see "data = np.reshape(data,(137,99,1))" which is "data/batch-size, row, column"
+        # input1 = Input(shape=(137, 99, 1))  # take the reshape last two values, see "data = np.reshape(data,(137,
+        # 99,1))" which is "data/batch-size, row, column"
         #
         # dnn_output = Dense(1)
 

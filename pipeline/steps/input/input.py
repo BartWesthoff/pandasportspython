@@ -49,21 +49,21 @@ class Input(Step):
 
         folder = self.get_files_in_folder("videos minor ai")
         for cloudfile in folder:
-            if cloudfile.name is str and not os.path.exists(Utils().datafolder + os.sep + cloudfile.name):
+            if not os.path.exists(Utils().datafolder + os.sep + cloudfile.name):
                 # TODO check if cloudfile.name is str
                 self.download_file(cloudfile)
-                break
-                # verwijderen als je pipeline wilt testen
+                if self.settings['testing']:
+                    break
         return folder
 
     def get_files_in_folder(self, foldername: str) -> list[CloudFile]:
         """given items returned by Google Drive API"""
         """returns list of CloudFile objects"""
 
-        results = self.service.files().list(
+        results = self.service.files().list(pageSize=400,
             fields="nextPageToken, files(id, name, parents)").execute()
         # get the results
-        folderid = ""
+        folderid = "1GO8kwJTL8x8Pg1Dy5AdhCOECz9rKoqOs"
         items = results.get('files', [])
 
         if not items:
@@ -75,18 +75,13 @@ class Input(Step):
         for item in items:
             item_id = item["id"]
             name = item["name"]
-            if type(name) is str:
 
-                parents = [None]
-                if "parents" in item:
-                    parents = item["parents"]
-
-                if name == foldername:
-                    folderid = item_id
-                if parents[0] == folderid:
-                    files_in_folder.append(CloudFile(item_id, name, parents))
+            parents = [None]
+            if "parents" in item:
+                parents = item["parents"]
+            if parents == [folderid]:
+                files_in_folder.append(CloudFile(id=item_id, name=name, parents=parents))
                     # files_in_folder.append({"name": name, "id": item_id})
-
         return files_in_folder
 
     # def get_size_format(self, b, factor=1024, suffix="B"):
@@ -117,6 +112,7 @@ class Input(Step):
     def download_file(self, file: CloudFile) -> None:
         file_id = file.id
         name = file.name
+        print(f"downloading {file_id}")
         request = self.service.files().get_media(fileId=file_id)
         fh = io.BytesIO()
         downloader = MediaIoBaseDownload(fh, request)

@@ -12,5 +12,6 @@ settings:
     - "right_ankle"
     - "left_foot_index"
     - "right_foot_index"
+  testing: False
 
 
