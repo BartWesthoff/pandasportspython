@@ -14,5 +14,6 @@ settings:
     - "right_foot_index"
   testing: False
   normalize_landmarks: False
+  model_name: "KNN_model"
 
 

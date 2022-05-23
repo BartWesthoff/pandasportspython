@@ -1,8 +1,19 @@
-from classes.cloudfile import CloudFile
-from pipeline.steps.embedder.videoembedder import VideoEmbeder
-from pipeline.steps.input.input import GoogleDriveService
-from pipeline.steps.preprocessors.videopreprocessor import VideoPreProcessor
+from random import *
+
+import numpy as np
+from sklearn import svm
+from sklearn.svm import SVC
+
+from pipeline.steps.training.videotraining import VideoTrainer
 from pipeline.utils.utils import Utils
 
 if __name__ == "__main__":
-    GoogleDriveService().process()
+    VideoTrainer().process('')
+    clf = Utils.openObject('SVMmodel')
+    for i in range(0, 100):
+        array = np.array(Utils().generatePoseList(10, 10)).reshape(1, 900)
+        print(clf.predict(array)[0], end=" ")
+
+
+
+

@@ -3,9 +3,10 @@ PreProcessor class
 used to preprocess video material
 """
 from pipeline.steps.step import Step
+from pipeline.utils.utils import Utils
 
 
-class VideoOutput(Step):
+class VideoPrediction(Step):
 
     def process(self, data):
         """
@@ -13,9 +14,9 @@ class VideoOutput(Step):
         :return: dictionary of 1-d List of Strings (but even spaced so they can be inferred correctly)
             and original queries
         """
-        # self.dosomething(data)
-        # ik denk dat deze class overbodig is
-        # we kunenn beter de statitische evaluation gebruiken als laatste stap
-        # eventueel deployen van het model kan ook los van de pipeline
-        print(data)
+        # voorbeeld data np.array(Utils().generatePoseList(10, 10)).reshape(1, 900))[0]][0]
+        model = Utils.openObject(self.settings['model_name'])
+        model.predict(data)
+
+        # eventueel voting classifier gebruiken
         return data

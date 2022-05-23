@@ -37,7 +37,7 @@ class Utils:
     def saveObject(object, filename: str) -> None:  # wat is object
         """" saves object to (pickle) file"""
         with open(filename, 'wb') as fp:
-            print("saving object")
+            print(f"saving object {filename}")
             pickle.dump(object, fp)
 
     @staticmethod
@@ -83,7 +83,6 @@ class Utils:
         maxInt = 100000
         # TODO randomness vasthouden
         random = Random()
-        random.seed(10)
         x = random.randint(0, maxInt + 1)
         y = random.randint(0, maxInt + 1)
         z = random.randint(0, maxInt + 1)
@@ -91,7 +90,27 @@ class Utils:
         joint = Joint(x=x / maxInt * 100, y=y / maxInt * 100, z=z / maxInt * 100, likelihood=likelihood / maxInt,
                       name=name)
 
-        return joint
+
+    def generatePoseList(self, frames, poses) -> list[list[int]]:
+        random = Random()
+
+        squat = []
+
+        for _ in range(frames):
+            pose = []
+            for i in range(poses * 3):
+                x = random.randint(0, 1080)
+                y = random.randint(0, 1920)
+                z = random.randint(0, 100)
+
+                pose.append(x)
+                pose.append(y)
+                pose.append(z)
+            squat.append(pose)
+        return squat
+
+
+
 
     def save(self, _dict: dict) -> None:
         """saves dictionary to disk"""
