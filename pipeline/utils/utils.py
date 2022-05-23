@@ -14,10 +14,13 @@ from keras.layers import Dense
 from classes.joint import Joint
 from classes.pose import Pose
 
+# Type hinting
+from typing import List
+
 
 class Utils:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.name = "Utils"
         self.jsonfile = "testing.json"
         # self.yamlfile = "settings.yaml"
@@ -30,13 +33,14 @@ class Utils:
     #         a = json.load(f)
     #     return a
     @staticmethod
-    def saveObject(object, filename):
+    def saveObject(object, filename: str) -> None: # wat is object
         """" saves object to (pickle) file"""
         with open(filename, 'wb') as fp:
+            print("saving object")
             pickle.dump(object, fp)
 
     @staticmethod
-    def openObject(filename):
+    def openObject(filename: str): # return object
         """" opens object from (pickle) file"""
         with open(filename, 'rb') as fp:
             object = pickle.load(fp)
@@ -57,8 +61,8 @@ class Utils:
     #     if not os.path.exists(self.yamlfile):
     #         with open(self.yamlfile, "x") as f:
     #             f.write("")
-
-    def generatePose(self):
+ 
+     def generatePose(self) -> List(str, str, str, str, str, str, str, str):
         """"returns dummy random generated pose"""
         # TODO gezicht weghalen
         sides = ["left", "right"]
@@ -72,7 +76,7 @@ class Utils:
         return Pose(joints)
 
     @staticmethod
-    def generateJoint(name):
+    def generateJoint(name: str): # wat is joint
         """"returns dummy random generated Joint"""
 
         maxInt = 100000
@@ -88,7 +92,7 @@ class Utils:
 
         return joint
 
-    def save(self, _dict):
+    def save(self, _dict) -> None:
         """saves dictionary to disk"""
         with open(self.jsonfile, "w+") as f:
             json.dump(_dict, f, indent=4)
@@ -113,13 +117,13 @@ class Utils:
     #         os.execl(sys.executable, sys.executable, *sys.argv)
 
     @staticmethod
-    def save_model(model, modelname):
+    def save_model(model, modelname) -> None: 
         """saves machine learning model"""
         filename = modelname + '.sav'
         pickle.dump(model, open(filename, 'wb'))
 
     @staticmethod
-    def load_model(filename):
+    def load_model(filename): # return type model inzien, is een list of set
         """loads given machine loading model"""
         filename += ".sav"
         loaded_model = pickle.load(open(filename, 'rb'))
