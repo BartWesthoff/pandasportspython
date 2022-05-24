@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import numpy as np
 import tensorflow as tf
@@ -31,6 +33,7 @@ class ThubEmbedder(Step):
         }
         # squat of 1 video
         self.squat = []
+        self.embedder = os.sep.join(['data', 'embedders', self.settings['tf_lite_model']])
 
     def process(self, data) -> list[list[int]]:
         """
@@ -44,7 +47,7 @@ class ThubEmbedder(Step):
 
         print(data)
         cap = cv2.VideoCapture(data)
-        interpreter = tf.lite.Interpreter(model_path=self.settings['tf_lite_model'])
+        interpreter = tf.lite.Interpreter(model_path=self.embedder)
         # interpreter = tf.lite.Interpreter(model_path='thunder.tflite') change 192 to 256
         # interpreter = tf.lite.Interpreter(model_path='thunder_int8.tflite') # unint type echt verschikkelijk traag
         # interpreter = tf.lite.Interpreter(model_path='lightning_int8.tflite') # 192 echt verschikkelijk traag

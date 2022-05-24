@@ -16,12 +16,12 @@ settings:
   normalize_landmarks: False
   model_name: "KNN_model"
   
-  tf_lite_model: "lightning_int8.tflite"
-#    - 'thunder.tflite' #  256# flaot
-#    - 'thunder_int8.tflite' # 256 UINT8 #SLOW
-#    - 'lightning_int8.tflite' # 192 UINT8 #SLOW
-#    - 'lightning_float16.tflite'#  192 # moet nog naar uint8
-#    - 'thunder_float16.tflite' # 256 # moet nog naar uint8
-#    - 'lightning.tflite' # 192 # snel float
+  tf_lite_model: "thunder_float16.tflite"
+#    - 'thunder.tflite'
+#    - 'thunder_int8.tflite'
+#    - 'lightning_int8.tflite'
+#    - 'lightning_float16.tflite'
+#    - 'thunder_float16.tflite'
+#    - 'lightning.tflite'
 
 

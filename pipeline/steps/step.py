@@ -30,3 +30,5 @@ class Step(ABC):
         with open("settings.yaml", "r") as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data["settings"]
+
+
