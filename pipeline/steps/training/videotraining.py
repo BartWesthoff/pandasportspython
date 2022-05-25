@@ -1,6 +1,6 @@
 import numpy as np
 
-from pipeline.models.KNNmodel import SVMModel
+from pipeline.models.SVMmodel import SVMModel
 from pipeline.steps.step import Step
 from pipeline.utils.utils import Utils
 
