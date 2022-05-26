@@ -1,4 +1,5 @@
 import os
+from random import *
 
 import cv2
 import moviepy.editor as mpy
@@ -135,6 +136,42 @@ class VideoPreProcessor(Step):
             cv2.destroyAllWindows()
             return f'{output}.mp4'
 
+    def playVideo(self, source: str):
+        """" plays video """
+        cap = cv2.VideoCapture(source)
+
+        # Check if camera opened successfully
+        if not cap.isOpened():
+            print("Error opening video  file")
+
+        # Read until video is completed
+        while cap.isOpened():
+
+            # Capture frame-by-frame
+            ret, frame = cap.read()
+            if ret:
+
+                # Display the resulting frame
+                cv2.imshow('Frame', frame)
+
+                # Press Q on keyboard to  exit
+                if cv2.waitKey(25) & 0xFF == ord('q'):
+                    break
+                # Press S on keyboard to  exit
+                if cv2.waitKey(25) & 0xFF == ord('s'):
+                    print("Saving" + str(randint(0, 100)))
+
+            # Break the loop
+            else:
+                break
+
+        # When everything done, release
+        # the video capture object
+        cap.release()
+
+        # Closes all the frames
+        cv2.destroyAllWindows()
+
     # alleen voor vergelijken gebruiken
     def grayvideo(self, source: str, newname: str):
         """" Convert video to black/white """
@@ -216,8 +253,7 @@ class VideoPreProcessor(Step):
         savetitle = title
 
         # modify these start and end times for your subclips
-        cuts = [('00:00:02.949', '00:00:04.152'),
-                ('00:00:06.328', '00:00:13.077')]
+        cuts = [('00:00:00.000', '00:00:05.530')]
 
         # load file
         video = mpy.VideoFileClip(loadtitle)
@@ -227,23 +263,24 @@ class VideoPreProcessor(Step):
         clip = None
         for index, cut in enumerate(cuts):
             clip = video.subclip(cut[0], cut[1])
+            if video.rotation == 90:
+                clip = video.resize(clip.size[::-1])
+                clip.rotation = 0
             clip.write_videofile(f"{savetitle}-{index}.mp4", threads=4, fps=30,
                                  codec=vcodec,
                                  preset=compression,
                                  ffmpeg_params=["-crf", videoquality])
         print(type(clip))
 
-        #     clips.append(clip)
-        #
-        # final_clip = mpy.concatenate_videoclips(clips)
-        #
-        #
         # final_clip = mpy.CompositeVideoClip([final_clip, txt])
         #
         # # save file
+        # final_clip.write_videofile(savetitle, threads=4, fps=24,
+        #                            codec=vcodec,
+        #                            preset=compression,
+        #                            ffmpeg_params=["-crf", videoquality])
 
-        #
-        # video.close()
+        video.close()
 
     # deprecated waarschijnlijk
     def runBash(self, command: str):
@@ -251,8 +288,10 @@ class VideoPreProcessor(Step):
         os.system(command)
 
     # deprecated waarschijnlijk
-    def crop(self, start, end, source: str, output: str):
+    def crop(self, start: float, end: float, source: str, output: str):
         """ shortens video """
-        name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + source
-        str = "ffmpeg -i " + f"{name}.mp4" + " -ss  " + start + " -to " + end + " -c copy " + f"{output}.mp4"
+        name = os.sep.join([Utils().datafolder, source])
+        output =os.sep.join([Utils().datafolder, output])
+
+        str = f"ffmpeg -i {name}.mp4 -ss  {start} -to {end} -c copy {output}.mp4"
         self.runBash(str)
