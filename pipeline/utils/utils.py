@@ -3,7 +3,7 @@ import itertools
 import json
 import os
 import pickle
-from collections.abc import Iterable
+from collections import abc
 from random import *
 
 import numpy as np
@@ -12,11 +12,8 @@ from keras import Sequential
 from keras.applications.densenet import layers
 from keras.layers import Dense
 
-from classes.joint import Joint
-from classes.pose import Pose
-
-
-# Type hinting
+from classes import joint
+from classes import pose
 
 
 class Utils:
@@ -41,7 +38,7 @@ class Utils:
             pickle.dump(object, fp)
 
     @staticmethod
-    def openObject(filename: str) -> np.ndarray | Iterable | int | float:  # return object
+    def openObject(filename: str) -> np.ndarray | abc.Iterable | int | float:  # return object
         """" opens object from (pickle) file"""
         with open(filename, 'rb') as fp:
             object = pickle.load(fp)
@@ -63,7 +60,7 @@ class Utils:
     #         with open(self.yamlfile, "x") as f:
     #             f.write("")
 
-    def generatePose(self) -> Pose:
+    def generatePose(self) -> pose.Pose:
         """"returns dummy random generated pose"""
         # TODO gezicht weghalen
         sides = ["left", "right"]
@@ -74,21 +71,21 @@ class Utils:
                 jointname = side + name
                 joints.append(self.generateJoint(jointname))
         joints.append(self.generateJoint("nose"))
-        return Pose(joints)
+        return pose.Pose(joints)
 
     @staticmethod
-    def generateJoint(name: str):  # wat is joint
+    def generateJoint(name: str) -> joint.Joint:  # wat is joint
         """"returns dummy random generated Joint"""
 
         maxInt = 100000
-        # TODO randomness vasthouden
         random = Random()
         x = random.randint(0, maxInt + 1)
         y = random.randint(0, maxInt + 1)
         z = random.randint(0, maxInt + 1)
         likelihood = random.randint(0, maxInt + 1)
-        joint = Joint(x=x / maxInt * 100, y=y / maxInt * 100, z=z / maxInt * 100, likelihood=likelihood / maxInt,
+        join = joint.Joint(x=x / maxInt * 100, y=y / maxInt * 100, z=z / maxInt * 100, likelihood=likelihood / maxInt,
                       name=name)
+        return join
 
 
     def generatePoseList(self, frames, poses) -> list[list[int]]:

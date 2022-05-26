@@ -18,7 +18,7 @@ if __name__ == "__main__":
     #     print(clf.predict(array)[0], end=" ")
     #
 
-
+    #
     # squat = ThubEmbedder().process(os.sep.join([Utils().datafolder, '20220330_121948_Trim5.mp4']))
     # # squat to numpy array
     # array = np.array(squat)
