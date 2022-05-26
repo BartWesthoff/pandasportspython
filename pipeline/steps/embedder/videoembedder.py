@@ -104,6 +104,7 @@ class VideoEmbeder(Step):
         :param query: string
         :return: modified string
         """
+        #haalt de default waarde van de landmarks op
         cap = cv2.VideoCapture(video)
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
@@ -132,6 +133,7 @@ class VideoEmbeder(Step):
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
             currentframe = []
+
             if results.pose_landmarks is None:
                 print("No pose results.")
                 # currentframe.append(image)
