@@ -1,13 +1,17 @@
+from typing import Set, Dict, Any
+
+
 class Joint:
 
-    def __init__(self, x, y, z, likelihood, name):
+    # Is likelihood een floating point?
+    def __init__(self, x: float, y: float, z: float, likelihood: float, name: str) -> None:
         self.x = x
         self.y = y
         self.z = z
         self.likelihood = likelihood
         self.name = name
 
-    def ToJson(self):
+    def ToJson(self) -> dict[Any, Any]:
         return {self.name: {
             "x": self.x,
             "y": self.y,
