@@ -6,6 +6,7 @@ from pipeline.steps.step import Step
 from pipeline.utils.utils import Utils
 
 
+# Klasse voor VideoPrediction
 class VideoPrediction(Step):
 
     def process(self, data):

@@ -6,6 +6,7 @@ from sklearn import svm
 from pipeline.models.model import Model
 from pipeline.utils.utils import Utils
 
+#Klasse voor het fitten van het SVMModel
 
 class SVMModel(Model):
 

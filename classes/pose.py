@@ -1,5 +1,6 @@
 from typing import Set, List, Dict, Any
 
+#Klasse voor het opslaan van joints 
 
 class Pose:
 

@@ -1,5 +1,6 @@
 from typing import Set, Dict, Any
 
+#Klasse voor het opslaan van x,y,x, coördinaten in een frame
 
 class Joint:
 
