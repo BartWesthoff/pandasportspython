@@ -13,12 +13,13 @@ from classes.cloudfile import CloudFile
 # from tabulate import tabulate
 from pipeline.utils.utils import Utils
 
+
 SCOPES = ['https://www.googleapis.com/auth/drive']  # read,write,update,delete permission
 
 
 class Input:
     """" checks if class is instantiated"""
-
+    # Klasse voor de imput van de googleDrive
     def __init__(self):
         """ this has to be type because in a """
         """ inherented situation it will always become true """
@@ -42,10 +43,13 @@ class Input:
 
 
 class GoogleDriveService(Input):
+    # Klasse voor het opzetten van een verbinding met de GoogleDrive
+
     def __init__(self):
         super().__init__()
         self.service = self.get_gdrive_service()
 
+    #Verbinden met Google Drive
     @staticmethod
     def get_gdrive_service() -> object:
         """" instantiate a Google Drive service object """
@@ -70,6 +74,8 @@ class GoogleDriveService(Input):
         # return Google Drive API service
         return build('drive', 'v3', credentials=creds)
 
+    # Open een specifieke folder en download alle files die gedownload kunnen worden.
+    # functie returns de specifieke folder
     def process(self) -> list[CloudFile]:
         """given items returned by Google Drive API"""
         """returns list of CloudFile objects"""
@@ -82,6 +88,7 @@ class GoogleDriveService(Input):
                     break
         return folder
 
+    # Haalt alle files op uit de folder
     def get_files_in_folder(self, foldername: str) -> list[CloudFile]:
         """given items returned by Google Drive API"""
         """returns list of CloudFile objects"""
@@ -138,6 +145,7 @@ class GoogleDriveService(Input):
     #                                 media_body=media,
     #                                 fields='id').execute()
 
+    # Functie om files mee te downloaden
     def download_file(self, file: CloudFile) -> None:
         file_id = file.id
         name = file.name

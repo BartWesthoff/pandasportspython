@@ -33,6 +33,7 @@ class ThubEmbedder(Step):
         }
         # squat of 1 video
         self.squat = []
+        # laad 'data\\embedders\\thunder_float16.tflite'
         self.embedder = os.sep.join(['data', 'embedders', self.settings['tf_lite_model']])
 
     def process(self, data) -> list[list[int]]:
@@ -46,6 +47,7 @@ class ThubEmbedder(Step):
     def embed(self, data: str) -> list[list[int]]:
 
         print(data)
+        #Open een video bestand en maak een Interpreter aan
         cap = cv2.VideoCapture(data)
         interpreter = tf.lite.Interpreter(model_path=self.embedder)
         # interpreter = tf.lite.Interpreter(model_path='thunder.tflite') change 192 to 256
@@ -54,6 +56,7 @@ class ThubEmbedder(Step):
         # interpreter = tf.lite.Interpreter(model_path='lightning_float16.tflite') goed te doen 192 demensie
         # interpreter = tf.lite.Interpreter(model_path='thunder_float16.tflite') goed te doen 256 demensie
         interpreter.allocate_tensors()
+
         while cap.isOpened():
             ret, frame = cap.read()
 
@@ -96,6 +99,7 @@ class ThubEmbedder(Step):
         # cv2.destroyAllWindows()
         return self.squat
 
+    #Voeg keypoints van poses toe aan list squat
     def appendkeypoints(self, frame, keypoints):
         y, x, c = frame.shape
         shaped = np.squeeze(np.multiply(keypoints, [y, x, 1]))
@@ -111,6 +115,7 @@ class ThubEmbedder(Step):
                 self.squat.append(pose)
                 pose = []
 
+    # creëer keypoints van de frames
     def draw_keypoints(self, frame, keypoints, confidence_threshold):
         y, x, c = frame.shape
         shaped = np.squeeze(np.multiply(keypoints, [y, x, 1]))
@@ -119,7 +124,8 @@ class ThubEmbedder(Step):
             ky, kx, kp_conf = kp
             if kp_conf > confidence_threshold:
                 cv2.circle(frame, (int(kx), int(ky)), 4, (0, 255, 0), -1)
-
+    
+    # Maakt een lineseqment tussen keypoints in het frame
     def draw_connections(self, frame, keypoints, confidence_threshold):
         y, x, c = frame.shape
         shaped = np.squeeze(np.multiply(keypoints, [y, x, 1]))

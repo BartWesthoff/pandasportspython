@@ -13,7 +13,7 @@ PreProcessor class
 used to preprocess video material
 """
 
-
+#Klasse om de video vooraf aan te passen 
 class VideoPreProcessor(Step):
 
     def process(self, data: list[CloudFile]):
@@ -52,6 +52,7 @@ class VideoPreProcessor(Step):
             # self.grayvideo(name, name)
         return data
 
+    # Geluid verwijderen uit de video
     def removesound(self, source: str, output: str):
         """" Remove sound from video """
         videoclip = mpy.VideoFileClip(source)
@@ -63,12 +64,14 @@ class VideoPreProcessor(Step):
         videoclip.reader.close()
         videoclip.audio.reader.close_proc()
 
+    # Frames per second aanpassen
     def capFPS(self, source: str, output: str, fps: int):
         """" Cap FPS of video """
         video = mpy.VideoFileClip(source)
         video.write_videofile(output, fps=fps)
         video.close()
 
+    # verhoudingen van de video aanpassen
     def cropVideo(self, source: str, newname: str):
         """" changed width and height of video """
         output = Utils().changeFileName(source, newname)
@@ -136,6 +139,7 @@ class VideoPreProcessor(Step):
             return f'{output}.mp4'
 
     # alleen voor vergelijken gebruiken
+    # Functie om de video om te zetten naar grijswaarden
     def grayvideo(self, source: str, newname: str):
         """" Convert video to black/white """
         output = Utils().changeFileName(source, newname)
@@ -196,6 +200,8 @@ class VideoPreProcessor(Step):
     #     video.release()
 
     # deprecated waarschijnlijk
+
+    # Functie om de Lengte van de video aan te passen ( bijvoorbeeld om clips van afzonderlijke squats te maken
     def trimvideo(self, name: str, start_time: float, end_time: float):
         """" Trim video """
         name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name

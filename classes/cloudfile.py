@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 
+#Klasse voor het opslaan van cloudfiles
 
 class CloudFile:
 

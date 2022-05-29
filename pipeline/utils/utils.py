@@ -37,12 +37,19 @@ class Utils:
             print(f"saving object {filename}")
             pickle.dump(object, fp)
 
+
     @staticmethod
-    def openObject(filename: str) -> np.ndarray | abc.Iterable | int | float:  # return object
-        """" opens object from (pickle) file"""
-        with open(filename, 'rb') as fp:
-            object = pickle.load(fp)
-        return object
+    def openObject(filename):
+        with open(filename, 'rb') as inputfile:
+            obj = pickle.load(inputfile)
+        return obj
+    
+    #@staticmethod
+    #def openObject(filename: str) -> np.ndarray | abc.Iterable | int | float:  # return object
+    #    """" opens object from (pickle) file"""
+    #    with open(filename, 'rb') as fp:
+    #        object = pickle.load(fp)
+    #    return object
 
     # def _checkifexists(self):
     #     """ check if jsonfile exists so that we can do IO operations"""
@@ -59,7 +66,8 @@ class Utils:
     #     if not os.path.exists(self.yamlfile):
     #         with open(self.yamlfile, "x") as f:
     #             f.write("")
-
+    
+    # functie om de joints te creëren die samen een dummy pose vormen
     def generatePose(self) -> pose.Pose:
         """"returns dummy random generated pose"""
         # TODO gezicht weghalen
@@ -74,6 +82,7 @@ class Utils:
         return pose.Pose(joints)
 
     @staticmethod
+    # Genereert random joints welke gebruikt worden om de pose te maken
     def generateJoint(name: str) -> joint.Joint:  # wat is joint
         """"returns dummy random generated Joint"""
 
@@ -87,7 +96,7 @@ class Utils:
                       name=name)
         return join
 
-
+    # Generereert een lijst van poses die samen een squat vormen
     def generatePoseList(self, frames, poses) -> list[list[int]]:
         random = Random()
 
@@ -108,12 +117,13 @@ class Utils:
 
 
 
-
+    # Slaat de meegeleverde dictionary op in een json file
     def save(self, _dict: dict) -> None:
         """saves dictionary to disk"""
         with open(self.jsonfile, "w+") as f:
             json.dump(_dict, f, indent=4)
 
+    # Functie om een bestand te verwijderem
     @staticmethod
     def deletefile(filename: str) -> None:
         """deletes file from system"""
@@ -133,12 +143,14 @@ class Utils:
     #         # restart the current process
     #         os.execl(sys.executable, sys.executable, *sys.argv)
 
+    # FUnctie om het model op te slaan
     @staticmethod
     def save_model(model: object, modelname: str) -> None:
         """saves machine learning model"""
         filename = modelname + '.sav'
         pickle.dump(model, open(filename, 'wb'))
 
+    # Functie om het model te laden
     @staticmethod
     def load_model(filename: str):  # return type model inzien, is een list of set
         """loads given machine loading model"""
@@ -159,6 +171,8 @@ class Utils:
     #     with open(self.yamlfile, "w") as f:
     #         yaml.dump_all(data, f)
     # propably not needed ^^
+    
+    #Funcie om de instellingen te laden
     @staticmethod
     def load_settings() -> dict:
         """loads yamlfile """
@@ -167,6 +181,7 @@ class Utils:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data["settings"]
 
+    # Functie om de squats te vergroten
     @staticmethod
     def augmentation(squat: list, spread: int) -> list[list[int]]:
         random_x = [i for i in range(-spread // 2, spread // 2 + 1) if i != 0]
@@ -192,6 +207,7 @@ class Utils:
         output_source = os.sep.join([path, newname])
         return output_source
 
+    #Sequential model definiëren
     @staticmethod
     def define_model() -> Sequential:
         # input1 = Input(shape=(137, 99, 1))  # take the reshape last two values, see "data = np.reshape(data,(137,
@@ -215,6 +231,7 @@ class Utils:
         # model.summary()
         return model
 
+    # Functie om met de training data te spelen
     def playground(self):
         # define model for simple BI-LSTM + DNN based binary classifier
 

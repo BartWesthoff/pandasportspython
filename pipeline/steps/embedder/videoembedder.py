@@ -14,7 +14,7 @@ used to embed video material
 landmarks_config = {
     0: "nose",
     1: "left_eye_inner",
-    2: "left_eye",
+    2: "left_eye", 
     3: "left_eye_outer",
     4: "right_eye_inner",
     5: "right_eye",
@@ -120,15 +120,14 @@ class VideoEmbeder(Step):
             success, image = cap.read()
             if not success:
                 break
-
-            # To improve performance, optionally mark the image as not writeable to
+            
+            # Om de prestaties te verbeteren, is de afbeelding gemarkeerd als niet beschrijfbaar
             # pass by reference.
             image.flags.writeable = False
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             results = pose.process(image)
 
-            # Draw the pose annotation on the image.
-
+            #Teken de pose annotation op de afbeelding.
             image.flags.writeable = True
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
@@ -143,6 +142,8 @@ class VideoEmbeder(Step):
                     #       'visibility is', data_point.visibility)
                     if landmarks_config[index] in self.settings["landmarks_to_pick"]:
 
+                        #Als settings staat op 'normalize_landmarks' voeg de data points to aan de list "currentframe"
+                        #Voor alle andere settings worden de data punten eerste aangepast en daarna toegevoegd aan de list "currentframe"
                         print(landmarks_config[index], ": ", data_point.x, data_point.y, data_point.z)
                         if self.settings['normalize_landmarks']:
                             currentframe.append(data_point.x)
