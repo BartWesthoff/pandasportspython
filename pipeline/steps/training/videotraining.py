@@ -1,13 +1,13 @@
-import numpy as np
-
 from pipeline.models.SVMmodel import SVMModel
 from pipeline.steps.step import Step
 from pipeline.utils.utils import Utils
 
-# Klasse voor het trainen van het model
-class VideoTrainer(Step):
 
-    def process(self, data) -> object:
+class VideoTrainer(Step):
+    """" Class for the video training step"""
+
+    def process(self, data: list) -> object:
+        """" process the data of the step """
         model = SVMModel('')
         fitted_model = model.fit()
         Utils().saveObject(fitted_model, 'SVMmodel')

@@ -7,6 +7,7 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
 from classes.cloudfile import CloudFile
 from pipeline.steps.step import Step
+from pipeline.utils.deprecated import deprecated
 from pipeline.utils.utils import Utils
 
 """
@@ -14,13 +15,16 @@ PreProcessor class
 used to preprocess video material
 """
 
-#Klasse om de video vooraf aan te passen 
+
 class VideoPreProcessor(Step):
+    """" class for video preprocessing """
 
     def process(self, data: list[CloudFile]):
+        """" processes given data"""
         return self._preprocessVideo(data)
 
-    def _preprocessVideo(self, data: list[CloudFile]):
+    def _preprocessVideo(self, data: list[CloudFile]) -> list[CloudFile]:
+        """" preprocesses video """
         # for i in data:
         #     print(i.name)
         # # idee is dat we deze video namen gebruiken om van gedownloaden data goede data te maken
@@ -36,7 +40,6 @@ class VideoPreProcessor(Step):
         #         source = folder + file_name
         #
         #         # Adding the count to the new file name and extension
-        #         # TODO bespreken: hoe gaan we 'ready' data neerzetten?
         #         # met production data folder of gewoon overwritten
         #         destination = folder + f"{name}_squat{index // 2}.mp4"
         #
@@ -53,9 +56,8 @@ class VideoPreProcessor(Step):
             # self.grayvideo(name, name)
         return data
 
-    # Geluid verwijderen uit de video
     def removesound(self, source: str, output: str):
-        """" Remove sound from video """
+        """" Removes sound from video """
         videoclip = mpy.VideoFileClip(source)
         new_clip = videoclip.without_audio()
         name = source.split(os.sep)[-1].split(".")[0]
@@ -65,15 +67,13 @@ class VideoPreProcessor(Step):
         videoclip.reader.close()
         videoclip.audio.reader.close_proc()
 
-    # Frames per second aanpassen
-    def capFPS(self, source: str, output: str, fps: int):
+    def capFPS(self, source: str, output: str, fps: int) -> None:
         """" Cap FPS of video """
         video = mpy.VideoFileClip(source)
         video.write_videofile(output, fps=fps)
         video.close()
 
-    # verhoudingen van de video aanpassen
-    def cropVideo(self, source: str, newname: str):
+    def cropVideo(self, source: str, newname: str) -> str:
         """" changed width and height of video """
         output = Utils().changeFileName(source, newname)
         cap = cv2.VideoCapture(source)
@@ -139,7 +139,7 @@ class VideoPreProcessor(Step):
             cv2.destroyAllWindows()
             return f'{output}.mp4'
 
-    def playVideo(self, source: str):
+    def playVideo(self, source: str) -> None:
         """" plays video """
         cap = cv2.VideoCapture(source)
 
@@ -176,7 +176,6 @@ class VideoPreProcessor(Step):
         cv2.destroyAllWindows()
 
     # alleen voor vergelijken gebruiken
-    # Functie om de video om te zetten naar grijswaarden
     def grayvideo(self, source: str, newname: str):
         """" Convert video to black/white """
         output = Utils().changeFileName(source, newname)
@@ -236,15 +235,14 @@ class VideoPreProcessor(Step):
     #     cv2.destroyAllWindows()
     #     video.release()
 
-    # deprecated waarschijnlijk
-
-    # Functie om de Lengte van de video aan te passen ( bijvoorbeeld om clips van afzonderlijke squats te maken
+    @deprecated
     def trimvideo(self, name: str, start_time: float, end_time: float):
         """" Trim video """
         name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
         ffmpeg_extract_subclip(f"{name}.mp4", start_time, end_time, targetname=f"{name}_short.mp4")
 
     # deprecated waarschijnlijk
+    @deprecated
     def trimvideo2(self, name: str):
         """" 2nd Trim video method """
         vcodec = "libx264"
@@ -288,16 +286,14 @@ class VideoPreProcessor(Step):
 
         video.close()
 
-    # deprecated waarschijnlijk
-    def runBash(self, command: str):
+    def runBash(self, command: str) -> None:
         """ Run bash command """
         os.system(command)
 
-    # deprecated waarschijnlijk
-    def crop(self, start: float, end: float, source: str, output: str):
-        """ shortens video """
+    def crop(self, start: float, end: float, source: str, output: str) -> None:
+        """ crop video by given start and end time """
         name = os.sep.join([Utils().datafolder, source])
-        output =os.sep.join([Utils().datafolder, output])
+        output = os.sep.join([Utils().datafolder, output])
 
         str = f"ffmpeg -i {name}.mp4 -ss  {start} -to {end} -c copy {output}.mp4"
         self.runBash(str)

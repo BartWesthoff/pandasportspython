@@ -4,10 +4,10 @@ import cv2
 import numpy as np
 import tensorflow as tf
 
-from pipeline.steps.step import Step
+from pipeline.steps.embedder.videoembedder import Embedder
 
 
-class ThubEmbedder(Step):
+class TFEmbedder(Embedder):
 
     def __init__(self):
         super().__init__()
@@ -37,17 +37,13 @@ class ThubEmbedder(Step):
         self.embedder = os.sep.join(['data', 'embedders', self.settings['tf_lite_model']])
 
     def process(self, data) -> list[list[int]]:
-        """
-        :param data: 1-d List of Strings
-        :return: dictionary of 1-d List of Strings (but even spaced so they can be inferred correctly)
-            and original queries
-        """
+        """ Process data """
         return self.embed(data)
 
     def embed(self, data: str) -> list[list[int]]:
-
+        """ Embeds the data """
         print(data)
-        #Open een video bestand en maak een Interpreter aan
+        # Open een video bestand en maak een Interpreter aan
         cap = cv2.VideoCapture(data)
         interpreter = tf.lite.Interpreter(model_path=self.embedder)
         # interpreter = tf.lite.Interpreter(model_path='thunder.tflite') change 192 to 256
@@ -99,8 +95,8 @@ class ThubEmbedder(Step):
         # cv2.destroyAllWindows()
         return self.squat
 
-    #Voeg keypoints van poses toe aan list squat
     def appendkeypoints(self, frame, keypoints):
+        """ Appends keypoints to squat """
         y, x, c = frame.shape
         shaped = np.squeeze(np.multiply(keypoints, [y, x, 1]))
         pose = []
@@ -115,8 +111,8 @@ class ThubEmbedder(Step):
                 self.squat.append(pose)
                 pose = []
 
-    # creëer keypoints van de frames
     def draw_keypoints(self, frame, keypoints, confidence_threshold):
+        """ Draws keypoints on the video """
         y, x, c = frame.shape
         shaped = np.squeeze(np.multiply(keypoints, [y, x, 1]))
 
@@ -124,9 +120,9 @@ class ThubEmbedder(Step):
             ky, kx, kp_conf = kp
             if kp_conf > confidence_threshold:
                 cv2.circle(frame, (int(kx), int(ky)), 4, (0, 255, 0), -1)
-    
-    # Maakt een lineseqment tussen keypoints in het frame
+
     def draw_connections(self, frame, keypoints, confidence_threshold):
+        """ Draws connections between keypoints on the video """
         y, x, c = frame.shape
         shaped = np.squeeze(np.multiply(keypoints, [y, x, 1]))
 

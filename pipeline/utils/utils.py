@@ -3,7 +3,7 @@ import itertools
 import json
 import os
 import pickle
-from collections import abc
+import sys
 from random import *
 
 import numpy as np
@@ -14,6 +14,7 @@ from keras.layers import Dense
 
 from classes import joint
 from classes import pose
+from pipeline.utils.deprecated import deprecated
 
 
 class Utils:
@@ -21,31 +22,32 @@ class Utils:
     def __init__(self) -> None:
         self.name = "Utils"
         self.jsonfile = "testing.json"
-        # self.yamlfile = "settings.yaml"
         self.root_dir = os.getcwd()
         self.datafolder = os.sep.join(['data', 'production'])
 
-    # def getdict(self):
-    #     """" return the dictionary of all saved data """
-    #     with open(self.jsonfile, "r") as f:
-    #         a = json.load(f)
-    #     return a
+    @deprecated
+    def getdict(self):
+        """" return the dictionary of all saved data """
+        with open(self.jsonfile, "r") as f:
+            a = json.load(f)
+        return a
+
     @staticmethod
-    def saveObject(object, filename: str) -> None:  # wat is object
+    def saveObject(obj: object, filename: str) -> None:  # wat is object
         """" saves object to (pickle) file"""
         with open(filename, 'wb') as fp:
             print(f"saving object {filename}")
-            pickle.dump(object, fp)
-
+            pickle.dump(obj, fp)
 
     @staticmethod
-    def openObject(filename):
+    def openObject(filename: str) -> object:
+        """" returns object from (pickle) file"""
         with open(filename, 'rb') as inputfile:
             obj = pickle.load(inputfile)
         return obj
-    
-    #@staticmethod
-    #def openObject(filename: str) -> np.ndarray | abc.Iterable | int | float:  # return object
+
+    # @staticmethod
+    # def openObject(filename: str) -> np.ndarray | abc.Iterable | int | float:  # return object
     #    """" opens object from (pickle) file"""
     #    with open(filename, 'rb') as fp:
     #        object = pickle.load(fp)
@@ -66,8 +68,7 @@ class Utils:
     #     if not os.path.exists(self.yamlfile):
     #         with open(self.yamlfile, "x") as f:
     #             f.write("")
-    
-    # functie om de joints te creëren die samen een dummy pose vormen
+
     def generatePose(self) -> pose.Pose:
         """"returns dummy random generated pose"""
         # TODO gezicht weghalen
@@ -82,7 +83,6 @@ class Utils:
         return pose.Pose(joints)
 
     @staticmethod
-    # Genereert random joints welke gebruikt worden om de pose te maken
     def generateJoint(name: str) -> joint.Joint:  # wat is joint
         """"returns dummy random generated Joint"""
 
@@ -93,15 +93,13 @@ class Utils:
         z = random.randint(0, maxInt + 1)
         likelihood = random.randint(0, maxInt + 1)
         join = joint.Joint(x=x / maxInt * 100, y=y / maxInt * 100, z=z / maxInt * 100, likelihood=likelihood / maxInt,
-                      name=name)
+                           name=name)
         return join
 
-    # Generereert een lijst van poses die samen een squat vormen
-    def generatePoseList(self, frames, poses) -> list[list[int]]:
+    def generatePoseList(self, frames: int, poses: int) -> list[list[int]]:
+        """"generates a random list of poses that are a squat"""
         random = Random()
-
         squat = []
-
         for _ in range(frames):
             pose = []
             for i in range(poses * 3):
@@ -115,75 +113,72 @@ class Utils:
             squat.append(pose)
         return squat
 
-
-
-    # Slaat de meegeleverde dictionary op in een json file
     def save(self, _dict: dict) -> None:
         """saves dictionary to disk"""
         with open(self.jsonfile, "w+") as f:
             json.dump(_dict, f, indent=4)
 
-    # Functie om een bestand te verwijderem
     @staticmethod
     def deletefile(filename: str) -> None:
         """deletes file from system"""
         if os.path.exists(filename):
             os.remove(filename)
         else:
-            print("The file does not exist")
+            raise FileNotFoundError("The file does not exist")
 
-    # def ensure_pythonhashseed(self, seed):
-    #     """makes sure to run application with given pythonhashseed so outputs is not random """
-    #     current_seed = os.environ.get("PYTHONHASHSEED")
-    #
-    #     seed = str(seed)
-    #     if current_seed is None or current_seed != seed:
-    #         print(f'Setting PYTHONHASHSEED="{seed}"')
-    #         os.environ["PYTHONHASHSEED"] = seed
-    #         # restart the current process
-    #         os.execl(sys.executable, sys.executable, *sys.argv)
+    @deprecated
+    def ensure_pythonhashseed(self, seed):
+        """makes sure to run application with given pythonhashseed so outputs is not random """
+        current_seed = os.environ.get("PYTHONHASHSEED")
 
-    # FUnctie om het model op te slaan
+        seed = str(seed)
+        if current_seed is None or current_seed != seed:
+            print(f'Setting PYTHONHASHSEED="{seed}"')
+            os.environ["PYTHONHASHSEED"] = seed
+            # restart the current process
+            os.execl(sys.executable, sys.executable, *sys.argv)
+
     @staticmethod
     def save_model(model: object, modelname: str) -> None:
         """saves machine learning model"""
+
+        # TODO: folder veranderen
         filename = modelname + '.sav'
         pickle.dump(model, open(filename, 'wb'))
 
-    # Functie om het model te laden
     @staticmethod
     def load_model(filename: str):  # return type model inzien, is een list of set
         """loads given machine loading model"""
         filename += ".sav"
+        # TODO: folder veranderen
         loaded_model = pickle.load(open(filename, 'rb'))
         return loaded_model
 
-    # def load_yaml(self):
-    #     """laods yamlfile """
-    #     """returns settings type of dictionary"""
-    #     with open(self.yamlfile, "r") as f:
-    #         data = yaml.load(f, Loader=yaml.FullLoader)
-    #     return data
+    @deprecated
+    def load_yaml(self):
+        """laods yamlfile """
+        """returns settings type of dictionary"""
+        with open(self.yamlfile, "r") as f:
+            data = yaml.load(f, Loader=yaml.FullLoader)
+        return data
 
-    #
-    # def save_yaml(self, data):
-    #     """saves data to a yaml file"""
-    #     with open(self.yamlfile, "w") as f:
-    #         yaml.dump_all(data, f)
-    # propably not needed ^^
-    
-    #Funcie om de instellingen te laden
+    @deprecated
+    def save_yaml(self, data):
+        """saves data to a yaml file"""
+        with open(self.yamlfile, "w") as f:
+            yaml.dump_all(data, f)
+
     @staticmethod
     def load_settings() -> dict:
-        """loads yamlfile """
-        """returns settings type of dictionary"""
+        """loads yamlfile and returns settings type of dictionary"""
         with open("settings.yaml", "r") as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data["settings"]
 
-    # Functie om de squats te vergroten
     @staticmethod
     def augmentation(squat: list, spread: int) -> list[list[int]]:
+        """augmentation of the squats to make more squats"""
+        # TODO: random spread toevoegen
         random_x = [i for i in range(-spread // 2, spread // 2 + 1) if i != 0]
         random_y = [i for i in range(-spread // 2, spread // 2 + 1) if i != 0]
         c = list(itertools.product(random_x, random_y))
@@ -203,13 +198,14 @@ class Utils:
 
     @staticmethod
     def changeFileName(filename: str, newname: str) -> str:
+        """changes the filename of a file"""
         path = os.sep.join(filename.split(os.sep)[:-1])
         output_source = os.sep.join([path, newname])
         return output_source
 
-    #Sequential model definiëren
     @staticmethod
     def define_model() -> Sequential:
+        """defines sequential model"""
         # input1 = Input(shape=(137, 99, 1))  # take the reshape last two values, see "data = np.reshape(data,(137,
         # 99,1))" which is "data/batch-size, row, column"
         #
@@ -233,6 +229,7 @@ class Utils:
 
     # Functie om met de training data te spelen
     def playground(self):
+        """"playground function. Meant for saving dummy code for testing or demonstrating"""
         # define model for simple BI-LSTM + DNN based binary classifier
 
         train_data = Utils().openObject("400 squats")
