@@ -15,7 +15,7 @@ from keras.layers import Dense
 from classes import joint
 from classes import pose
 from pipeline.utils.deprecated import deprecated
-
+from pipeline.models.model import Model
 
 class Utils:
 
@@ -40,8 +40,33 @@ class Utils:
             pickle.dump(obj, fp)
 
     @staticmethod
+    def saveSquatEmbedding(squats: list[list[int]], filename: str) -> None:  # wat is object
+        """" saves object to (pickle) file"""
+        save_location = os.sep.join(["data", "embedded", filename])
+        print(save_location)
+        with open(save_location, 'wb') as fp:
+            print(f"saving object {filename}")
+            pickle.dump(squats, fp)
+
+
+
+    @staticmethod
+    def saveModel(model: Model) -> None:  # wat is object
+        """" saves object to (pickle) file"""
+        with open(model.name, 'wb') as fp:
+            print(f"saving object {model.name}")
+            pickle.dump(model, fp)
+
+    @staticmethod
     def openObject(filename: str) -> object:
         """" returns object from (pickle) file"""
+        with open(filename, 'rb') as inputfile:
+            obj = pickle.load(inputfile)
+        return obj
+
+    @staticmethod
+    def openEmbedding(filename: str) -> list[list[int]]:
+        """"returns object from (pickle) file"""
         with open(filename, 'rb') as inputfile:
             obj = pickle.load(inputfile)
         return obj

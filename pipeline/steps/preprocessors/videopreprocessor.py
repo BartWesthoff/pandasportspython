@@ -19,9 +19,10 @@ used to preprocess video material
 class VideoPreProcessor(Step):
     """" class for video preprocessing """
 
-    def process(self, data: list[CloudFile]):
+    def process(self, data: list[CloudFile]) -> list[CloudFile]:
         """" processes given data"""
-        return self._preprocessVideo(data)
+        # return self._preprocessVideo(data)
+        return data
 
     def _preprocessVideo(self, data: list[CloudFile]) -> list[CloudFile]:
         """" preprocesses video """

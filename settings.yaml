@@ -22,7 +22,7 @@ settings:
 #    - 'lightning_float16.tflite'
 #    - 'thunder_float16.tflite'
 #    - 'lightning.tflite'
-  baseline_model:
-    - "SVM"
+  baseline_model: "SVM"
+  amount: 10
 
 

@@ -23,8 +23,9 @@ class Pipeline:
         if not isinstance(self.steps[0], Input):
             raise ValueError("First step must be Input")
         for step in self.steps:
-            if type(step) == type(Input):
+            if issubclass(type(step), Input):
                 data = step.process()
             else:
+                print("Processing step: " + step.name)
                 data = step.process(data)
         return data

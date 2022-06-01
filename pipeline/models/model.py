@@ -17,3 +17,7 @@ class Model:
 
     def fit(self, x_train, y_train):
         pass
+
+    @property
+    def name(self):
+        return self.__class__.__name__

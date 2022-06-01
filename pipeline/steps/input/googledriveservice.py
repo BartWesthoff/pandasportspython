@@ -19,8 +19,9 @@ class GoogleDriveService(Input):
     def __init__(self):
         """" Instantiate the GoogleDriveService class """
         super().__init__()
-        self.service = self.get_gdrive_service()
         self.scopes = ['https://www.googleapis.com/auth/drive']  # read,write,update,delete permission
+        self.service = self.get_gdrive_service()
+
 
     def get_gdrive_service(self) -> object:
         """" instantiate a Google Drive service object """
@@ -48,13 +49,20 @@ class GoogleDriveService(Input):
     def process(self) -> list[CloudFile]:
         """given items returned by Google Drive API"""
         folder = self.get_files_in_folder("videos minor ai")
+        print(f"found {len(folder)} files")
         for cloudfile in folder:
             if not os.path.exists(Utils().datafolder + os.sep + cloudfile.name):
-                # TODO check if cloudfile.name is str
                 self.download_file(cloudfile)
                 if self.settings['testing']:
                     break
-        return folder
+
+        if self.settings['amount'] <= 0:
+            return folder
+        else:
+            print(f"returning {self.settings['amount']} files")
+            return folder[:self.settings['amount']]
+
+
 
     def get_files_in_folder(self, foldername: str) -> list[CloudFile]:
         """given items returned by Google Drive API"""

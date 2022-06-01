@@ -3,6 +3,7 @@ import os
 import cv2
 import mediapipe as mp
 
+from classes.cloudfile import CloudFile
 from pipeline.steps.embedder.videoembedder import Embedder
 from pipeline.utils.utils import Utils
 
@@ -49,10 +50,19 @@ landmarks_config = {
 
 
 class MPEmbedder(Embedder):
+    # lijst van een pose (list[float])
+    # meerdere poses vormen een squat (list[list[float]])
+    # meerdere sqats vormen een alle data (list[list[list[float]]])
 
-    def process(self, data) -> list[list[float]]:
+    # misschien niks terug geven en ophalen vanuit directory
+    def process(self, data: list[CloudFile]) -> list[list[list[float]]]:
         """ Processes the data """
-        points = self.embed(data)
+        points = []
+        for file in data:
+            print(f"embedding  {file.name}")
+            squat = self.embed(file.name)
+            points.append(squat)
+
         return points
 
     def embed(self, data: str) -> list[list[float]]:
@@ -60,7 +70,11 @@ class MPEmbedder(Embedder):
         # dit moet nog worden bijgewerkt
         """ Embeds the data """
         # haalt de default waarde van de landmarks op
-        cap = cv2.VideoCapture(data)
+        video_location = f"{Utils().datafolder}{os.sep}{data}"
+        embedded_location = os.sep.join(["data", "embedded", data.split('.')[0]])
+        if os.path.exists(video_location):
+            return Utils.openEmbedding(embedded_location)
+        cap = cv2.VideoCapture(video_location)
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
         mp_pose = mp.solutions.pose
@@ -121,13 +135,6 @@ class MPEmbedder(Embedder):
             cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
         cap.release()
 
-        # TODO even naar kijken of het nog nodig is
-        name = "voorbeeld"
-        if os.path.isfile(name):
-            frames = Utils.openObject(name)
-            frames.append(allframes)
-            Utils.saveObject(frames, name)
-        else:
-            Utils().saveObject([allframes], name)
+        Utils().saveObject([allframes], embedded_location)
 
         return allframes

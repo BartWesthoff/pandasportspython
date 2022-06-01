@@ -2,8 +2,10 @@ from abc import abstractmethod
 
 import yaml
 
+from pipeline.steps.step import Step
 
-class Input:
+
+class Input(Step):
     """" Class for the input step"""
     """" should be the first step in the pipeline """
 
@@ -20,7 +22,6 @@ class Input:
         """ Return the name of the step """
         return self.__class__.__name__
 
-    @abstractmethod
     def process(self) -> object:
         """"abstract method for using the data of the step."""
         pass
