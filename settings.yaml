@@ -15,7 +15,6 @@ settings:
   testing: False
   normalize_landmarks: False
   model_name: "KNN_model"
-  
   tf_lite_model: "thunder_float16.tflite"
 #    - 'thunder.tflite'
 #    - 'thunder_int8.tflite'
@@ -23,5 +22,7 @@ settings:
 #    - 'lightning_float16.tflite'
 #    - 'thunder_float16.tflite'
 #    - 'lightning.tflite'
+  baseline_model:
+    - "SVM"
 
 

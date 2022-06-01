@@ -15,5 +15,5 @@ class Model:
         self.model_kwargs = model_kwargs
         self.model_specific = model_specific
 
-    def fit(self):
+    def fit(self, x_train, y_train):
         pass

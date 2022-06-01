@@ -9,15 +9,15 @@ from pipeline.utils.utils import Utils
 class VideoPrediction(Step):
     """" Class for the video prediction step"""
 
-    def process(self, data):
+    def process(self, data) -> list[int]:
         """
         :param data: 1-d List of Strings
         :return: dictionary of 1-d List of Strings (but even spaced so they can be inferred correctly)
             and original queries
         """
         # voorbeeld data np.array(Utils().generatePoseList(10, 10)).reshape(1, 900))[0]][0]
-        model = Utils.openObject(self.settings['model_name'])
-        model.predict(data)
+        model = Utils.openObject(self.settings['baseline_model'])
+        prediction = model.predict(data)
 
         # eventueel voting classifier gebruiken
-        return data
+        return prediction
