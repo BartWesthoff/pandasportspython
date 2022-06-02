@@ -12,6 +12,7 @@ from keras import Sequential
 from keras.applications.densenet import layers
 from keras.layers import Dense
 
+
 from classes import joint
 from classes import pose
 from pipeline.utils.deprecated import deprecated
@@ -65,9 +66,9 @@ class Utils:
         return obj
 
     @staticmethod
-    def openEmbedding(filename: str) -> list[list[int]]:
+    def openEmbedding(filename: str) -> np.ndarray:
         """"returns object from (pickle) file"""
-        with open(filename, 'rb') as inputfile:
+        with open(os.sep.join(["data", "embedded", filename]), 'rb') as inputfile:
             obj = pickle.load(inputfile)
         return obj
 

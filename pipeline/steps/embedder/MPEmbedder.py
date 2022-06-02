@@ -2,6 +2,8 @@ import os
 
 import cv2
 import mediapipe as mp
+import numpy as np
+from numpy import ndarray
 
 from classes.cloudfile import CloudFile
 from pipeline.steps.embedder.videoembedder import Embedder
@@ -65,25 +67,27 @@ class MPEmbedder(Embedder):
 
         return points
 
-    def embed(self, data: str) -> list[list[float]]:
+    def embed(self, data: str) -> list[list[int]] | ndarray:
         # -> Set[sizeOf(results.pose_landmarks.landmark)]
         # dit moet nog worden bijgewerkt
         """ Embeds the data """
         # haalt de default waarde van de landmarks op
         video_location = f"{Utils().datafolder}{os.sep}{data}"
         embedded_location = os.sep.join(["data", "embedded", data.split('.')[0]])
-        if os.path.exists(video_location):
-            return Utils.openEmbedding(embedded_location)
+        if os.path.exists(embedded_location):
+            return Utils.openEmbedding(data.split('.')[0])
+
+        # TODO niet laten zien van de video
         cap = cv2.VideoCapture(video_location)
+        width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float `width`
+        height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
+        print("width: ", width)
+        print("height: ", height)
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
         mp_pose = mp.solutions.pose
         pose = mp_pose.Pose()
 
-        width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float `width`
-        height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
-        print("width: ", width)
-        print("height: ", height)
         allframes = []
         while cap.isOpened():
             success, image = cap.read()
@@ -96,9 +100,9 @@ class MPEmbedder(Embedder):
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             results = pose.process(image)
 
-            # Teken de pose annotation op de afbeelding.
-            image.flags.writeable = True
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            # # Teken de pose annotation op de afbeelding.
+            # image.flags.writeable = True
+            # image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
             currentframe = []
 
@@ -114,7 +118,7 @@ class MPEmbedder(Embedder):
                         # Als settings staat op 'normalize_landmarks' voeg de data points to aan de list
                         # "currentframe" Voor alle andere settings worden de data punten eerste aangepast en daarna
                         # toegevoegd aan de list "currentframe"
-                        print(landmarks_config[index], ": ", data_point.x, data_point.y, data_point.z)
+                        # print(landmarks_config[index], ": ", data_point.x, data_point.y, data_point.z)
                         if self.settings['normalize_landmarks']:
                             currentframe.append(data_point.x)
                             currentframe.append(data_point.y)
@@ -127,14 +131,17 @@ class MPEmbedder(Embedder):
 
             allframes.append(currentframe)
 
-            mp_drawing.draw_landmarks(
-                image,
-                results.pose_landmarks,
-                mp_pose.POSE_CONNECTIONS,
-                landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
-            cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
+            # mp_drawing.draw_landmarks(
+            #     image,
+            #     results.pose_landmarks,
+            #     mp_pose.POSE_CONNECTIONS,
+            #     landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
+            # cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
         cap.release()
+        squat = np.array(allframes)
+        if self.settings['flat_array']:
+            Utils().saveObject(squat.flatten(), embedded_location)
+        else:
+            Utils().saveObject(squat, embedded_location + "_Nonflat")
 
-        Utils().saveObject([allframes], embedded_location)
-
-        return allframes
+        return squat
