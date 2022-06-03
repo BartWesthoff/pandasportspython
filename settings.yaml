@@ -23,7 +23,7 @@ settings:
 #    - 'thunder_float16.tflite'
 #    - 'lightning.tflite'
   baseline_model: "SVM"
-  amount: 5
+  amount: 11
   flat_array: True
 
 

@@ -22,6 +22,21 @@ class GoogleDriveService(Input):
         self.scopes = ['https://www.googleapis.com/auth/drive']  # read,write,update,delete permission
         self.service = self.get_gdrive_service()
 
+    def process(self) -> list[CloudFile]:
+        """given items returned by Google Drive API"""
+        folder = self.get_files_in_folder("videos minor ai")
+        print(f"found {len(folder)} files")
+        for cloudfile in folder:
+            if not os.path.exists(Utils().datafolder + os.sep + cloudfile.name):
+                self.download_file(cloudfile)
+                if self.settings['testing']:
+                    break
+
+        if self.settings['amount'] <= 0:
+            return folder
+        else:
+            print(f"returning {self.settings['amount']} files")
+            return folder[:self.settings['amount']]
 
     def get_gdrive_service(self) -> object:
         """" instantiate a Google Drive service object """
@@ -45,24 +60,6 @@ class GoogleDriveService(Input):
                 pickle.dump(creds, token)
         # return Google Drive API service
         return build('drive', 'v3', credentials=creds)
-
-    def process(self) -> list[CloudFile]:
-        """given items returned by Google Drive API"""
-        folder = self.get_files_in_folder("videos minor ai")
-        print(f"found {len(folder)} files")
-        for cloudfile in folder:
-            if not os.path.exists(Utils().datafolder + os.sep + cloudfile.name):
-                self.download_file(cloudfile)
-                if self.settings['testing']:
-                    break
-
-        if self.settings['amount'] <= 0:
-            return folder
-        else:
-            print(f"returning {self.settings['amount']} files")
-            return folder[:self.settings['amount']]
-
-
 
     def get_files_in_folder(self, foldername: str) -> list[CloudFile]:
         """given items returned by Google Drive API"""

@@ -8,11 +8,8 @@ class VideoTrainer(Step):
 
     def process(self, data: list) -> object:
         """" process the data of the step """
-        model = None
-        if self.settings['baseline_model'] == "SVM":
-            model = SVMModel('')
-
-        fitted_model = model.fit()
+        model = self.model
+        fitted_model = model.fit(data[0], data[1])
         Utils.saveObject(fitted_model, f"{self.settings['baseline_model']}_fitted")
         return data
 

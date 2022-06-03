@@ -59,7 +59,7 @@ class Utils:
             pickle.dump(model, fp)
 
     @staticmethod
-    def openObject(filename: str) -> object:
+    def openObject(filename: str) -> object | Model:
         """" returns object from (pickle) file"""
         with open(filename, 'rb') as inputfile:
             obj = pickle.load(inputfile)

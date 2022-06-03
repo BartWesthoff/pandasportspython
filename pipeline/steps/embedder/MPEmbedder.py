@@ -81,6 +81,7 @@ class MPEmbedder(Embedder):
         cap = cv2.VideoCapture(video_location)
         width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float `width`
         height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         print("width: ", width)
         print("height: ", height)
         mp_drawing = mp.solutions.drawing_utils
@@ -89,6 +90,7 @@ class MPEmbedder(Embedder):
         pose = mp_pose.Pose()
 
         allframes = []
+        percentage = 0
         while cap.isOpened():
             success, image = cap.read()
             if not success:
@@ -113,6 +115,7 @@ class MPEmbedder(Embedder):
                 for index, data_point in enumerate(results.pose_landmarks.landmark):
                     # print('x is', data_point.x, 'y is', data_point.y, 'z is', data_point.z,
                     #       'visibility is', data_point.visibility)
+
                     if landmarks_config[index] in self.settings["landmarks_to_pick"]:
 
                         # Als settings staat op 'normalize_landmarks' voeg de data points to aan de list
@@ -127,9 +130,11 @@ class MPEmbedder(Embedder):
                             currentframe.append(data_point.x * width)
                             currentframe.append(data_point.y * height)
                             currentframe.append(data_point.z)
+                        percentage += 1
                         # print(index, data_point.x * width, data_point.y * height)
-
+            print('{:.2f} %'.format(round(percentage/frame_count*10, 2)))
             allframes.append(currentframe)
+
 
             # mp_drawing.draw_landmarks(
             #     image,

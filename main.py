@@ -1,5 +1,6 @@
 import numpy as np
 
+from pipeline.models.SVMmodel import SVMModel
 from pipeline.steps.embedder.MPEmbedder import MPEmbedder
 from pipeline.steps.evaluation.videoevaluation import VideoEvaluation
 from pipeline.steps.input.googledriveservice import GoogleDriveService
@@ -10,13 +11,9 @@ from pipeline.steps.training.videotraining import VideoTrainer
 from pipeline.utils.utils import Utils
 
 if __name__ == "__main__":
-    # pipeline = Pipeline(GoogleDriveService(),  MPEmbedder(), VideoTrainer(), VideoPrediction(), VideoEvaluation())
-    # pipeline.process()
+    pipeline = Pipeline(steps=[GoogleDriveService(),  MPEmbedder(), VideoTrainer(), VideoPrediction(), VideoEvaluation()], model=SVMModel(''))
+    pipeline.process()
 
-    squat = Utils.openEmbedding("bart_squat_52")
-    print(squat.shape)
-    squat = Utils.openEmbedding("bart_squat_51")
-    print(squat.shape)
 
 
 

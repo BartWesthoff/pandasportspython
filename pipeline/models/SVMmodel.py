@@ -11,6 +11,8 @@ from pipeline.utils.utils import Utils
 
 class SVMModel(Model):
 
+
+
     def fit(self, x_train=None, y_train=None):  # tijdelijk omdat we nog geen data hebben
         X = [np.array(Utils().generatePoseList(10, 10)).reshape(1, 900)[0] for _ in range(0, 40)]
         # X = [np.array(Utils().generatePoseList(10, 10)).flatten() for _ in range(0, 40)]
@@ -24,3 +26,6 @@ class SVMModel(Model):
 
         return clf
     # TODO bij predicten kijken of aantal features gelijk is aan aantal features in de training set
+
+    def predict(self, x_test):
+        return self.model.predict(x_test)
