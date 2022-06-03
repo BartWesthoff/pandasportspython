@@ -19,7 +19,7 @@ class GoogleDriveService(Input):
     def __init__(self):
         """" Instantiate the GoogleDriveService class """
         super().__init__()
-        self.scopes = ['https://www.googleapis.com/auth/drive']  # read,write,update,delete permission
+        self.scopes = ['https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/drive.readonly'][1]  # read,write,update,delete permission
         self.service = self.get_gdrive_service()
 
     def process(self) -> list[CloudFile]:
