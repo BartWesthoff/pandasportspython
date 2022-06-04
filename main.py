@@ -12,8 +12,7 @@ from pipeline.steps.training.videotraining import VideoTrainer
 from pipeline.utils.utils import Utils
 
 if __name__ == "__main__":
-    DropBoxService().process()
-
-
+    files = DropBoxService().process()
+    print(files)
 
 

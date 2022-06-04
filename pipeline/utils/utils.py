@@ -33,6 +33,9 @@ class Utils:
             a = json.load(f)
         return a
 
+
+
+
     @staticmethod
     def saveObject(obj: object, filename: str) -> None:  # wat is object
         """" saves object to (pickle) file"""

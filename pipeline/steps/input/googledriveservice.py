@@ -19,7 +19,8 @@ class GoogleDriveService(Input):
     def __init__(self):
         """" Instantiate the GoogleDriveService class """
         super().__init__()
-        self.scopes = ['https://www.googleapis.com/auth/drive','https://www.googleapis.com/auth/drive.readonly'][1]  # read,write,update,delete permission
+        self.scopes = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/drive.readonly'][
+            1]  # read,write,update,delete permission
         self.service = self.get_gdrive_service()
 
     def process(self) -> list[CloudFile]:
@@ -35,7 +36,7 @@ class GoogleDriveService(Input):
         if self.settings['amount'] <= 0:
             return folder
         else:
-            print(f"returning {self.settings['amount']} files")
+            print(f"returning {min(self.settings['amount'], len(folder))} file(s)")
             return folder[:self.settings['amount']]
 
     def get_gdrive_service(self) -> object:
