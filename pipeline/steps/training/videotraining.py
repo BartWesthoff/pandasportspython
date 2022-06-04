@@ -1,4 +1,7 @@
-from pipeline.models.SVMmodel import SVMModel
+from random import randint
+
+import numpy as np
+
 from pipeline.steps.step import Step
 from pipeline.utils.utils import Utils
 
@@ -9,7 +12,11 @@ class VideoTrainer(Step):
     def process(self, data: list) -> object:
         """" process the data of the step """
         model = self.model
-        fitted_model = model.fit(data[0], data[1])
+        X = [np.array(Utils().generatePoseList(10, 10)).reshape(1, 900)[0] for _ in range(0, 40)]
+        # X = [np.array(Utils().generatePoseList(10, 10)).flatten() for _ in range(0, 40)]
+        # TODO kijken of het werkt
+        y = [randint(0, 100) for _ in range(0, 40)]
+        fitted_model = model.fit(X, y)
         Utils.saveObject(fitted_model, f"{self.settings['baseline_model']}_fitted")
         return data
 

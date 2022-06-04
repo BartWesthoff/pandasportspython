@@ -8,7 +8,17 @@ from pipeline.steps.embedder.videoembedder import Embedder
 
 
 class TFEmbedder(Embedder):
+    """"
+    possible embedders:
+    - 'thunder_float16.tflite'
+    - 'thunder.tflite'
+    - 'thunder_int8.tflite'
+    - 'lightning_int8.tflite'
+    - 'lightning_float16.tflite'
+    - 'thunder_float16.tflite'
+    - 'lightning.tflite'
 
+    """
     def __init__(self):
         super().__init__()
         self.edges = {

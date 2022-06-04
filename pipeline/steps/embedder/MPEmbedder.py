@@ -61,7 +61,6 @@ class MPEmbedder(Embedder):
         """ Processes the data """
         points = []
         for file in data:
-            print(f"embedding  {file.name}")
             squat = self.embed(file.name)
             points.append(squat)
 
@@ -76,7 +75,7 @@ class MPEmbedder(Embedder):
         embedded_location = os.sep.join(["data", "embedded", data.split('.')[0]])
         if os.path.exists(embedded_location):
             return Utils.openEmbedding(data.split('.')[0])
-
+        print(f"embedding  {data}")
         # TODO niet laten zien van de video
         cap = cv2.VideoCapture(video_location)
         width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float `width`

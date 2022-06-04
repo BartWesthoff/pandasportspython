@@ -1,29 +1,20 @@
 settings:
-  use_local: 0
-
-  landmarks_to_pick:
-    - "left_shoulder"
-    - "right_shoulder"
-    - "left_hip"
-    - "right_hip"
-    - "left_knee"
-    - "right_knee"
-    - "left_ankle"
-    - "right_ankle"
-    - "left_foot_index"
-    - "right_foot_index"
-  testing: False
-  normalize_landmarks: False
-  model_name: "KNN_model"
-  tf_lite_model: "thunder_float16.tflite"
-#    - 'thunder.tflite'
-#    - 'thunder_int8.tflite'
-#    - 'lightning_int8.tflite'
-#    - 'lightning_float16.tflite'
-#    - 'thunder_float16.tflite'
-#    - 'lightning.tflite'
-  baseline_model: "SVM"
   amount: 11
-  flat_array: True
-
-
+  baseline_model: SVC
+  flat_array: true
+  landmarks_to_pick:
+  - left_shoulder
+  - right_shoulder
+  - left_hip
+  - right_hip
+  - left_knee
+  - right_knee
+  - left_ankle
+  - right_ankle
+  - left_foot_index
+  - right_foot_index
+  model_name: KNN_model
+  normalize_landmarks: false
+  testing: false
+  tf_lite_model: thunder_float16.tflite
+  use_local: 0

@@ -16,7 +16,6 @@ from keras.layers import Dense
 from classes import joint
 from classes import pose
 from pipeline.utils.deprecated import deprecated
-from pipeline.models.model import Model
 
 class Utils:
 
@@ -24,6 +23,7 @@ class Utils:
         self.name = "Utils"
         self.jsonfile = "testing.json"
         self.root_dir = os.getcwd()
+        self.yamlfile = "settings.yaml"
         self.datafolder = os.sep.join(['data', 'production'])
 
     @deprecated
@@ -55,14 +55,14 @@ class Utils:
 
 
     @staticmethod
-    def saveModel(model: Model) -> None:  # wat is object
+    def saveModel(model) -> None:  # wat is object
         """" saves object to (pickle) file"""
-        with open(model.name, 'wb') as fp:
-            print(f"saving object {model.name}")
+        with open(model.__str__(), 'wb') as fp:
+            print(f"saving object {model.__str__()}")
             pickle.dump(model, fp)
 
     @staticmethod
-    def openObject(filename: str) -> object | Model:
+    def openObject(filename: str) -> object:
         """" returns object from (pickle) file"""
         with open(filename, 'rb') as inputfile:
             obj = pickle.load(inputfile)
@@ -191,16 +191,19 @@ class Utils:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data
 
-    @deprecated
+
     def save_yaml(self, data):
         """saves data to a yaml file"""
         with open(self.yamlfile, "w") as f:
-            yaml.dump_all(data, f)
+            yaml.dump(data, f)
 
-    @staticmethod
-    def load_settings() -> dict:
+    def save_current_model(self, model: object) -> None:
+        settings = self.load_settings()
+        settings['baseline_model'] = model.__str__().split('(')[0]
+        self.save_yaml({'settings': settings})
+    def load_settings(self) -> dict:
         """loads yamlfile and returns settings type of dictionary"""
-        with open("settings.yaml", "r") as f:
+        with open(self.yamlfile, "r") as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data["settings"]
 

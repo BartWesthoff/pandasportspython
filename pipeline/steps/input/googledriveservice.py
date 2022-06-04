@@ -19,8 +19,7 @@ class GoogleDriveService(Input):
     def __init__(self):
         """" Instantiate the GoogleDriveService class """
         super().__init__()
-        self.scopes = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/drive.readonly'][
-            1]  # read,write,update,delete permission
+        self.scopes = ['https://www.googleapis.com/auth/drive.readonly']  # read,write,update,delete permission
         self.service = self.get_gdrive_service()
 
     def process(self) -> list[CloudFile]:
@@ -45,8 +44,9 @@ class GoogleDriveService(Input):
         # The file token.pickle stores the user's access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
-        if os.path.exists('token.pickle'):
-            with open('token.pickle', 'rb') as token:
+        token = os.sep.join(['data', 'credentials', 'token.pickle'])
+        if os.path.exists(token):
+            with open(token, 'rb') as token:
                 creds = pickle.load(token)
         # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
@@ -54,11 +54,11 @@ class GoogleDriveService(Input):
                 creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials.json', self.scopes)
+                    os.sep.join(['data', 'credentials', 'credentials.json']), self.scopes)
                 creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open('token.pickle', 'wb') as token:
-                pickle.dump(creds, token)
+            with open(os.sep.join(['data', 'credentials', 'token.pickle']), 'wb') as new_token:
+                pickle.dump(creds, new_token)
         # return Google Drive API service
         return build('drive', 'v3', credentials=creds)
 

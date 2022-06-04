@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 
 import yaml
 
-from pipeline.models.model import Model
 
 """
 step sub-classes must implement method process
@@ -11,7 +10,7 @@ step sub-classes must implement method process
 
 class Step(ABC):
 
-    def __init__(self, model: Model=None, class_type=None):
+    def __init__(self, model=None, class_type=None):
         """ Instantiate the Step class """
         # NOTE: issubclass(self.__class__, type) werkt niet
         if self.__class__ == class_type:
