@@ -1,7 +1,6 @@
 settings:
   amount: 11
-  baseline_model: SVC
-  flat_array: true
+  baseline_model: None
   landmarks_to_pick:
   - left_shoulder
   - right_shoulder

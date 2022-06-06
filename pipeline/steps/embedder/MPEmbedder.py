@@ -143,9 +143,8 @@ class MPEmbedder(Embedder):
             # cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
         cap.release()
         squat = np.array(allframes)
-        if self.settings['flat_array']:
-            Utils().saveObject(squat.flatten(), embedded_location)
-        else:
-            Utils().saveObject(squat, embedded_location + "_Nonflat")
+
+        Utils().saveObject(squat, embedded_location)
+
 
         return squat
