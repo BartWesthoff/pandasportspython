@@ -62,7 +62,7 @@ class VideoTrainer(Step):
         y_test, y_train = np.split(labels[1:], 2)
         ## build a simple RNN model
         model_rnn = Sequential()
-        model_rnn.add(LSTM(50, input_shape=x_train.shape[1:]))
+        model_rnn.add(LSTM(500, input_shape=x_train.shape[1:]))
         model_rnn.add(Dense(1, activation='sigmoid'))
 
         # most of the parameters come from the embedding layer
@@ -89,6 +89,9 @@ class VideoTrainer(Step):
         test_data = np.reshape(padded, (1, max_len, 30))
 
         test = model_rnn.predict(test_data)
+        rnn_name = f"RNN_model{random.randint(0,10000)}.h5"
+        print(f"saved model {rnn_name}")
+        model_rnn.save(rnn_name)
         print(test)
         print(labels[0])
 
