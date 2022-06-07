@@ -28,17 +28,17 @@ class DropBoxService(Input):
         folder = [CloudFile(name=file.name, parents=None, id=file.id) for file in folder]
 
         print(f"found {len(folder)} file(s)")
-        for entry in folder:
+        if self.settings['amount'] <0:
+            self.settings['amount'] = len(folder)
+        for entry in folder[:self.settings['amount']]:
 
             if not os.path.exists(Utils().datafolder + os.sep + entry.name):
                 self.download_file(entry.name)
                 if self.settings['testing']:
                     break
-        if self.settings['amount'] <= 0:
-            return folder
-        else:
-            print(f"returning {min(self.settings['amount'], len(folder))} file(s)")
-            return folder[:self.settings['amount']]
+
+        print(f"returning {min(self.settings['amount'], len(folder))} file(s)")
+        return folder[:self.settings['amount']]
 
     def get_token(self):
         with open(os.sep.join(['data', 'credentials', 'acces_token.pickle']), 'rb') as token:

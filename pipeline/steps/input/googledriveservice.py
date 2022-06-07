@@ -26,7 +26,8 @@ class GoogleDriveService(Input):
         """given items returned by Google Drive API"""
         folder = self.get_files_in_folder("videos minor ai")
         print(f"found {len(folder)} files")
-        for cloudfile in folder:
+
+        for cloudfile in folder[:self.settings['amount']]:
             if not os.path.exists(Utils().datafolder + os.sep + cloudfile.name):
                 self.download_file(cloudfile)
                 if self.settings['testing']:
