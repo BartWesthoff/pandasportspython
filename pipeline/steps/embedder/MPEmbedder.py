@@ -70,8 +70,14 @@ class MPEmbedder(Embedder):
         # -> Set[sizeOf(results.pose_landmarks.landmark)]
         # dit moet nog worden bijgewerkt
         """ Embeds the data """
+        folder = 'production'
+        if 'positive' in data:
+            folder = 'positive_squat'
+        elif 'negative' in data:
+            folder = 'negative_squat'
+
         # haalt de default waarde van de landmarks op
-        video_location = f"{Utils().datafolder}{os.sep}{data}"
+        video_location = os.sep.join(['data', folder, data])
         embedded_location = os.sep.join(["data", "embedded", data.split('.')[0]])
         if os.path.exists(embedded_location):
             return Utils.openEmbedding(data.split('.')[0])

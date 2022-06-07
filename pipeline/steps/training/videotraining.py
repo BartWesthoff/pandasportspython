@@ -1,3 +1,5 @@
+import os
+import random
 from random import randint
 
 import numpy as np
@@ -5,7 +7,7 @@ from keras import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.models import Sequential
-
+import tensorflow as tf
 from pipeline.steps.step import Step
 from pipeline.utils.utils import Utils
 
@@ -26,25 +28,38 @@ class VideoTrainer(Step):
 
     def process2(self):
         max_len = 0
+
+        list_of_vids = [i  for i in os.listdir(os.sep.join(['data', 'embedded']))]
+        random.shuffle(list_of_vids)
         ### get maximum length (amount of frames) of all videos
-        for i in range(43, 52 + 1):
-            squat = Utils().openEmbedding(f'bart_squat_{i}')
+        for i in list_of_vids:
+            squat = Utils().openEmbedding(i)
             if len(squat) > max_len:
                 max_len = len(squat)
             # print(squat.shape)
+        print(max_len)
         padded_inputs = []
 
         # pad all videos with zeros to the same length
-        for i in range(43, 52 + 1):
-            squat = Utils().openEmbedding(f'bart_squat_{i}')
+        for i in list_of_vids:
+            squat = Utils().openEmbedding(i)
             padded = np.zeros((max_len, squat.shape[1]))
             padded_inputs.append(padded)
+            print(padded.shape)
             # print(padded.shape)
         padded_inputs = np.array(padded_inputs)
         # print(padded_inputs.shape)
-
+        labels = np.array([])
+        for i in list_of_vids:
+            if 'positive' in i:
+                print('positive')
+                labels = np.append(labels, 1)
+            elif 'negative' in i:
+                labels = np.append(labels, 0)
+        print(labels)
         # split the data in training and test data
-        x_test, x_train = np.split(padded_inputs, 2)
+        x_test, x_train = np.split(padded_inputs[1:], 2)
+        y_test, y_train = np.split(labels[1:], 2)
         ## build a simple RNN model
         model_rnn = Sequential()
         model_rnn.add(LSTM(50, input_shape=x_train.shape[1:]))
@@ -59,22 +74,23 @@ class VideoTrainer(Step):
         # %%
 
         # LET OP: labels zijn fictief!!
-        test_labels = np.array([0, 0, 1, 0, 1])
-        train_labels = np.array([0, 0, 1, 0, 1])
-        fit_params = {'batch_size': 2, 'epochs': 2, 'validation_data': (x_test, test_labels)}
-        model_rnn.fit(x_train, train_labels, **fit_params)
+        # test_labels = np.array([0 for _ in x_test])
+        # train_labels = np.array([0 for _ in x_train])
+        fit_params = {'batch_size': 2, 'epochs': 100, 'validation_data': (x_test, y_test)}
+        model_rnn.fit(x_train, y_train, **fit_params)
 
         # predict op squat die nog niet gezien is door model
-        predict_squat = Utils().openEmbedding(f'20220330_111746_Trim2')
+        predict_squat = padded_inputs[0]
         # print(predict_squat.shape)
         padded = np.zeros((max_len, predict_squat.shape[1]))
         # print(padded.shape)
         # print(x_train[0].shape)
         # TODO vraag tony waarom reshape?
-        test_data = np.reshape(padded, (1, 667, 30))
+        test_data = np.reshape(padded, (1, max_len, 30))
 
         test = model_rnn.predict(test_data)
         print(test)
+        print(labels[0])
 
     # def process(self, data: list):
     #     """gets array of video's"""

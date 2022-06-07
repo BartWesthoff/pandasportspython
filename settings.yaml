@@ -1,5 +1,5 @@
 settings:
-  amount: 40
+  amount: -1
   baseline_model: None
   landmarks_to_pick:
   - left_shoulder

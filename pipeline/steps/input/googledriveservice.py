@@ -24,20 +24,26 @@ class GoogleDriveService(Input):
 
     def process(self) -> list[CloudFile]:
         """given items returned by Google Drive API"""
-        folder = self.get_files_in_folder("videos minor ai")
-        print(f"found {len(folder)} files")
+        files = self.get_files_in_folder("videos minor ai")
+        print(f"found {len(files)} files")
 
-        for cloudfile in folder[:self.settings['amount']]:
-            if not os.path.exists(Utils().datafolder + os.sep + cloudfile.name):
+        for idx, cloudfile in enumerate(files[:self.settings['amount']]):
+            folder = 'production'
+            if 'positive' in cloudfile.name:
+                folder = 'positive_squat'
+            elif 'negative' in cloudfile.name:
+                folder = 'negative_squat'
+            if not os.path.exists(os.sep.join(['data', folder, cloudfile.name])):
                 self.download_file(cloudfile)
+                print(f"downloaded {cloudfile.name} number {idx}")
                 if self.settings['testing']:
                     break
-
+        print(type(files))
         if self.settings['amount'] <= 0:
-            return folder
+            return files
         else:
-            print(f"returning {min(self.settings['amount'], len(folder))} file(s)")
-            return folder[:self.settings['amount']]
+            print(f"returning {min(self.settings['amount'], len(files))} file(s)")
+            return files[:self.settings['amount']]
 
     def get_gdrive_service(self) -> object:
         """" instantiate a Google Drive service object """
@@ -69,7 +75,7 @@ class GoogleDriveService(Input):
         results = self.service.files().list(pageSize=400,  # TODO kijken of je kan querying op folder ipv alle bestanden
                                             fields="nextPageToken, files(id, name, parents)").execute()
         # get the results
-        folderid = "1GO8kwJTL8x8Pg1Dy5AdhCOECz9rKoqOs"
+        folderid = "1WfSjXln7U1ihbTD2h_uhM8UlHt-LCEdo"
         items = results.get('files', [])
 
         if not items:
@@ -88,6 +94,7 @@ class GoogleDriveService(Input):
             if parents == [folderid]:
                 files_in_folder.append(CloudFile(id=item_id, name=name, parents=parents))
                 # files_in_folder.append({"name": name, "id": item_id})
+
         return files_in_folder
 
     @deprecated
@@ -122,7 +129,6 @@ class GoogleDriveService(Input):
         """" given a file, download it by its id """
         file_id = file.id
         name = file.name
-        print(f"downloading {name}")
         request = self.service.files().get_media(fileId=file_id)
         fh = io.BytesIO()
         downloader = MediaIoBaseDownload(fh, request)
@@ -131,6 +137,11 @@ class GoogleDriveService(Input):
             status, done = downloader.next_chunk()
             print(f"Download {int(status.progress() * 100)}")
         fh.seek(0)
+        folder = 'production'
+        if 'positive' in name:
+            folder = 'positive_squat'
+        elif 'negative' in name:
+            folder = 'negative_squat'
 
-        with open(f"{Utils().datafolder}{os.sep}{name}", 'wb') as f:
+        with open(os.sep.join(['data', folder,name]), 'wb') as f:
             f.write(fh.read())
