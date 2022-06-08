@@ -52,12 +52,15 @@ class VideoPreProcessor(Step):
         #             self.removesound(str(destination))
         for item in data:
             name = item.name
-            name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
+            # name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
+            name = os.sep.join(['data', 'production', name])
             name = self.cropVideo(name, "edited footage")
-            # self.grayvideo(name, name)
+            name = self.removesound(name, name)
+            if self.settings['color']:
+                self.grayvideo(name, name)
         return data
 
-    def removesound(self, source: str, output: str):
+    def removesound(self, source: str, output: str) -> str:
         """" Removes sound from video """
         videoclip = mpy.VideoFileClip(source)
         new_clip = videoclip.without_audio()
@@ -67,6 +70,7 @@ class VideoPreProcessor(Step):
 
         videoclip.reader.close()
         videoclip.audio.reader.close_proc()
+        return output
 
     def capFPS(self, source: str, output: str, fps: int) -> None:
         """" Cap FPS of video """

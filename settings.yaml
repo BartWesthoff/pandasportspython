@@ -15,3 +15,4 @@ settings:
   testing: false
   tf_lite_model: thunder_float16.tflite
   use_local: 0
+  color: false
