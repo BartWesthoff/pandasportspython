@@ -78,9 +78,13 @@ class MPEmbedder(Embedder):
 
         # haalt de default waarde van de landmarks op
         video_location = os.sep.join(['data', folder, data])
-        embedded_location = os.sep.join(["data", "embedded", data.split('.')[0]])
+        if self.settings['normalize_landmarks']:
+            extra = '_normalized'
+        else:
+            extra = ''
+        embedded_location = os.sep.join(["data", "embedded", data.split('.')[0]+extra])
         if os.path.exists(embedded_location):
-            return Utils.openEmbedding(data.split('.')[0])
+            return Utils.openEmbedding(data.split('.')[0]+extra)
         print(f"embedding  {data}")
         # TODO niet laten zien van de video
         cap = cv2.VideoCapture(video_location)
@@ -137,9 +141,8 @@ class MPEmbedder(Embedder):
                             currentframe.append(data_point.z)
                         percentage += 1
                         # print(index, data_point.x * width, data_point.y * height)
-            print('{:.2f} %'.format(round(percentage/frame_count*10, 2)))
+            print('{:.2f} %'.format(round(percentage / frame_count * 10, 2)))
             allframes.append(currentframe)
-
 
             # mp_drawing.draw_landmarks(
             #     image,
@@ -151,6 +154,5 @@ class MPEmbedder(Embedder):
         squat = np.array(allframes)
 
         Utils().saveObject(squat, embedded_location)
-
 
         return squat

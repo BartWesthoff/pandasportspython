@@ -17,7 +17,7 @@ class VideoEvaluation(Step):
         Is_better = True
         if Is_better:
             print("Better model found!")
-            Utils.saveObject(data[0], f"{self.settings['baseline_model']}_best")
+            # Utils.saveObject(data[0], f"{self.settings['baseline_model']}_best")
         self.evaluate(data)
 
 

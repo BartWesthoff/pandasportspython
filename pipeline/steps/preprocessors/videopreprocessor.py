@@ -63,7 +63,7 @@ class VideoPreProcessor(Step):
         new_clip = videoclip.without_audio()
         name = source.split(os.sep)[-1].split(".")[0]
         codec = name.split(os.sep)[-1].split(".")[-1]
-        new_clip.write_videofile(f"{output}_edit.{codec}")
+        new_clip.write_videofile(f"{output}_NS.{codec}")
 
         videoclip.reader.close()
         videoclip.audio.reader.close_proc()

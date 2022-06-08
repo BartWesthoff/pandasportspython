@@ -2,23 +2,24 @@
 PreProcessor class
 used to preprocess video material
 """
+import random as rnd
+
 import numpy as np
 
 from pipeline.steps.step import Step
-from pipeline.utils.utils import Utils
 
 
 class VideoPrediction(Step):
     """" Class for the video prediction step"""
 
-    def process(self, data) -> list[object, list[int]]:
-        """
-        :param data: n.t.b
-        :return: predictions of data 1-d list of ints
-        """
-        data = np.array(Utils().generatePoseList(10, 10)).reshape(1, -1)
-        model = Utils.openObject(f"{self.settings['baseline_model']}_fitted")
-        prediction = model.predict(data)
+    def process(self, data): # validation data
+        """ process the data of the step """
+        # print(predict_squat.shape)
 
-        # eventueel voting classifier gebruiken
-        return [model, prediction]
+        # print(padded.shape)
+        # print(x_train[0].shape)
+        # TODO vraag tony waarom reshape?
+        # predict_squat = predict_squat.reshape(predict_squat.shape[0], predict_squat.shape[1], 1)
+        test = self.model.predict(data[0])
+        print(test)
+        print(data[1])

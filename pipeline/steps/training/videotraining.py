@@ -1,13 +1,13 @@
 import os
 import random
-from random import randint
 
 import numpy as np
 from keras import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Embedding, Masking
 from keras.layers import LSTM
 from keras.models import Sequential
-import tensorflow as tf
+from sklearn.model_selection import train_test_split
+
 from pipeline.steps.step import Step
 from pipeline.utils.utils import Utils
 
@@ -15,21 +15,11 @@ from pipeline.utils.utils import Utils
 class VideoTrainer(Step):
     """" Class for the video training step"""
 
-    def process(self, data: list) -> object:
+    def process(self, data) -> object:
         """" process the data of the step """
-        model = self.model
-        X = [np.array(Utils().generatePoseList(10, 10)).reshape(1, 900)[0] for _ in range(0, 40)]
-        # X = [np.array(Utils().generatePoseList(10, 10)).flatten() for _ in range(0, 40)]
-        # TODO kijken of het werkt
-        y = [randint(0, 100) for _ in range(0, 40)]
-        fitted_model = model.fit(X, y)
-        Utils.saveObject(fitted_model, f"{self.settings['baseline_model']}_fitted")
-        return data
-
-    def process2(self):
         max_len = 0
 
-        list_of_vids = [i  for i in os.listdir(os.sep.join(['data', 'embedded']))]
+        list_of_vids = [i for i in os.listdir(os.sep.join(['data', 'embedded']))]
         random.shuffle(list_of_vids)
         ### get maximum length (amount of frames) of all videos
         for i in list_of_vids:
@@ -38,83 +28,62 @@ class VideoTrainer(Step):
                 max_len = len(squat)
             # print(squat.shape)
         print(max_len)
+
         padded_inputs = []
 
         # pad all videos with zeros to the same length
         for i in list_of_vids:
             squat = Utils().openEmbedding(i)
-            padded = np.zeros((max_len, squat.shape[1]))
+
+            padded = np.pad(squat, ((0, max_len - len(squat)), (0, 0)), 'constant', constant_values=0)
+            # padded = np.zeros((max_len, squat.shape[1]))
             padded_inputs.append(padded)
-            print(padded.shape)
+
             # print(padded.shape)
         padded_inputs = np.array(padded_inputs)
+        # print(padded_inputs[0])
+        for i in padded_inputs[0]:
+            print(i)
+            print(len(i))
+            print(type(i))
+            if np.array_equal(i, np.zeros(len(i))):
+            # if np.array_equal(i , np.array([0. for _ in range(30)])):
+                print('found')
+
+        # quit()
         # print(padded_inputs.shape)
         labels = np.array([])
         for i in list_of_vids:
             if 'positive' in i:
-                print('positive')
                 labels = np.append(labels, 1)
             elif 'negative' in i:
                 labels = np.append(labels, 0)
-        print(labels)
+
         # split the data in training and test data
-        x_test, x_train = np.split(padded_inputs[1:], 2)
-        y_test, y_train = np.split(labels[1:], 2)
+
+        X_train, X_test, y_train, y_test = train_test_split(padded_inputs, labels, test_size=0.2)
+
+        X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25)  # 0.25 x 0.8 = 0.2
+
         ## build a simple RNN model
-        model_rnn = Sequential()
-        model_rnn.add(LSTM(500, input_shape=x_train.shape[1:]))
-        model_rnn.add(Dense(1, activation='sigmoid'))
+        create_model = False
+        if create_model:
+            print(X_train.shape[2])
+            model_rnn = Sequential()
+            model_rnn.add(Masking(mask_value=np.zeros(30),  input_shape=X_train.shape[1:]))
+            model_rnn.add(LSTM(50, input_shape=X_train.shape[1:]))
+            model_rnn.add(Dense(5, activation='sigmoid'))
+            model_rnn.add(Dense(1, activation='sigmoid'))
 
-        # most of the parameters come from the embedding layer
-        model_rnn.summary()
+            # most of the parameters come from the embedding layer
+            model_rnn.summary()
 
-        compile_params = {'loss': 'binary_crossentropy', 'metrics': ['accuracy']}
+            compile_params = {'loss': 'binary_crossentropy', 'metrics': ['accuracy']}
 
-        model_rnn.compile(**compile_params)
-        # %%
-
-        # LET OP: labels zijn fictief!!
-        # test_labels = np.array([0 for _ in x_test])
-        # train_labels = np.array([0 for _ in x_train])
-        fit_params = {'batch_size': 2, 'epochs': 100, 'validation_data': (x_test, y_test)}
-        model_rnn.fit(x_train, y_train, **fit_params)
-
-        # predict op squat die nog niet gezien is door model
-        predict_squat = padded_inputs[0]
-        # print(predict_squat.shape)
-        padded = np.zeros((max_len, predict_squat.shape[1]))
-        # print(padded.shape)
-        # print(x_train[0].shape)
-        # TODO vraag tony waarom reshape?
-        test_data = np.reshape(padded, (1, max_len, 30))
-
-        test = model_rnn.predict(test_data)
-        rnn_name = f"RNN_model{random.randint(0,10000)}.h5"
-        print(f"saved model {rnn_name}")
-        model_rnn.save(rnn_name)
-        print(test)
-        print(labels[0])
-
-    # def process(self, data: list):
-    #     """gets array of video's"""
-    #     """return fitted model"""
-    #     labels = []
-    #     utils = Utils()
-    #     allFiles = os.listdir(utils.datafolder)
-    #
-    #     for file in allFiles:
-    #         kind = file.split('_')[0]
-    #         if kind in ["positive", "negative"]:
-    #             labels.append(kind)
-    #         else:
-    #             raise Exception("False names!")
-    #
-    #     if len(labels) != len(data):
-    #         raise Exception("Length of data and labels do not match!")
-    #     model = utils.define_model()
-    #     data = np.array(data)
-    #     data = np.reshape(data, (len(labels), 137, 99))
-    #     fitted = model.fit(data, np.array(labels), epochs=2, batch_size=2, verbose=1)
-    #     Utils.saveObject(fitted, "fittedSequentialTestModel")
-    #     print(type(fitted))
-    #     return fitted
+            model_rnn.compile(**compile_params)
+            fit_params = {'batch_size': 2, 'epochs': 200, 'validation_data': (X_val, y_val)}
+            model_rnn.fit(X_train, y_train, **fit_params)
+            rnn_name = f"RNN_model{random.randint(0, 10000)}.h5"
+            print(f"saved model {rnn_name}")
+            model_rnn.save(rnn_name)
+        return [X_test, y_test]

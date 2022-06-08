@@ -12,7 +12,6 @@ class Pipeline:
             raise ValueError("Pipeline steps are not specified")
         self.steps = steps
         self.model = model
-        Utils().save_current_model(model)
 
     # process -> take some data, modify it, output some data
     def process(self) -> object | None:  # nog onzeker over format van data

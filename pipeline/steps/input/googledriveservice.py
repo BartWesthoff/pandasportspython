@@ -38,7 +38,6 @@ class GoogleDriveService(Input):
                 print(f"downloaded {cloudfile.name} number {idx}")
                 if self.settings['testing']:
                     break
-        print(type(files))
         if self.settings['amount'] <= 0:
             return files
         else:

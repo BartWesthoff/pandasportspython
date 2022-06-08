@@ -11,11 +11,12 @@ import yaml
 from keras import Sequential
 from keras.applications.densenet import layers
 from keras.layers import Dense
-
+from numpy import ndarray
 
 from classes import joint
 from classes import pose
 from pipeline.utils.deprecated import deprecated
+
 
 class Utils:
 
@@ -33,9 +34,6 @@ class Utils:
             a = json.load(f)
         return a
 
-
-
-
     @staticmethod
     def saveObject(obj: object, filename: str) -> None:  # wat is object
         """" saves object to (pickle) file"""
@@ -44,15 +42,13 @@ class Utils:
             pickle.dump(obj, fp)
 
     @staticmethod
-    def saveSquatEmbedding(squats: list[list[int]], filename: str) -> None:  # wat is object
+    def saveSquatEmbedding(squat: ndarray, filename: str) -> None:  # wat is object
         """" saves object to (pickle) file"""
         save_location = os.sep.join(["data", "embedded", filename])
         print(save_location)
         with open(save_location, 'wb') as fp:
             print(f"saving object {filename}")
-            pickle.dump(squats, fp)
-
-
+            pickle.dump(squat, fp)
 
     @staticmethod
     def saveModel(model) -> None:  # wat is object
@@ -191,42 +187,47 @@ class Utils:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data
 
-
     def save_yaml(self, data):
         """saves data to a yaml file"""
         with open(self.yamlfile, "w") as f:
             yaml.dump(data, f)
 
-    def save_current_model(self, model: object) -> None:
-        settings = self.load_settings()
-        settings['baseline_model'] = model.__str__().split('(')[0]
-        self.save_yaml({'settings': settings})
     def load_settings(self) -> dict:
         """loads yamlfile and returns settings type of dictionary"""
         with open(self.yamlfile, "r") as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data["settings"]
 
-    @staticmethod
-    def augmentation(squat: list, spread: int) -> list[list[int]]:
+    def augmentation(self, squat: ndarray, spreadx: int = None, spready: int = None, width: int = None,
+                     height: int = None, amount:int=10, save:bool=False) -> ndarray:
         """augmentation of the squats to make more squats"""
         # TODO: random spread toevoegen
-        random_x = [i for i in range(-spread // 2, spread // 2 + 1) if i != 0]
-        random_y = [i for i in range(-spread // 2, spread // 2 + 1) if i != 0]
+        if self.load_settings()['normalize_landmarks'] and (spreadx is None or spready is None):
+            raise ValueError("spreadx and spready must be given if normalize_landmarks is True")
+        if spreadx is None:
+            spreadx = randint(5, 20)
+        if spready is None:
+            spready = randint(5, 20)
+        random_x = [i for i in range(-spreadx // 2, spreadx // 2 + 1) if i != 0]
+        random_y = [i for i in range(-spready // 2, spready // 2 + 1) if i != 0]
         c = list(itertools.product(random_x, random_y))
         squats = []
-
         for combination in c:
             new_squat = []
             for frame in squat:
                 lenght = len(frame)
                 modified_array = copy.deepcopy(frame)
                 for i in range(0, lenght, 3):
-                    modified_array[i] += combination[0]
-                    modified_array[i + 1] += combination[1]
+                    modified_array[i] += combination[0] / 1 if width is None else combination[0] / width
+                    modified_array[i + 1] += combination[1] / 1 if height is None else combination[0] / height
                 new_squat.append(modified_array)
             squats.append(new_squat)
-        return squats
+        shuffle(squats)
+        random_squats = np.array(squats)[:amount]
+        if save:
+            for idx, i in enumerate(random_squats):
+                Utils().saveSquatEmbedding(i, f'negative_squat_1_augmented{idx+1}')
+        return random_squats
 
     @staticmethod
     def changeFileName(filename: str, newname: str) -> str:
