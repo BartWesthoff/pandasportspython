@@ -2,10 +2,12 @@ import os
 import random
 
 import numpy as np
-from keras import Sequential
-from keras.layers import Dense, Embedding, Masking
+import tensorflow as tf
+from keras import Sequential, Input
+from keras.applications.densenet import layers
+from keras.layers import Dense, Masking, Dropout, RepeatVector
 from keras.layers import LSTM
-from keras.models import Sequential
+from keras.models import Sequential, Model
 from sklearn.model_selection import train_test_split
 
 from pipeline.steps.step import Step
@@ -15,40 +17,37 @@ from pipeline.utils.utils import Utils
 class VideoTrainer(Step):
     """" Class for the video training step"""
 
-    def process(self, data) -> object:
+    def process(self, data) -> list:
         """" process the data of the step """
         max_len = 0
 
-        list_of_vids = [i for i in os.listdir(os.sep.join(['data', 'embedded']))]
+        list_of_vids = [i for i in os.listdir(os.sep.join(['data', 'embedded'])) if not 'normalized' in i]
         random.shuffle(list_of_vids)
+        if self.settings['amount'] <=0:
+            list_of_vids = list_of_vids[:len(list_of_vids)]
+        else:
+            list_of_vids = list_of_vids[:self.settings['amount']]
         ### get maximum length (amount of frames) of all videos
         for i in list_of_vids:
             squat = Utils().openEmbedding(i)
             if len(squat) > max_len:
                 max_len = len(squat)
             # print(squat.shape)
-        print(max_len)
 
-        padded_inputs = []
-
+        squats = np.array([Utils().openEmbedding(i) for i in list_of_vids])
+        padded_inputs = tf.keras.preprocessing.sequence.pad_sequences(
+            squats, padding="post", value=-44
+        )
         # pad all videos with zeros to the same length
-        for i in list_of_vids:
-            squat = Utils().openEmbedding(i)
+        # for i in list_of_vids:
+        #     squat = Utils().openEmbedding(i)
+        #     squat = np.pad(squat, ((0, max_len - len(squat)), (0, 0)), 'constant', constant_values=0)
+        #     # x = np.asarray(sq).astype('float32')
+        #     padded_inputs.append(squat)
 
-            padded = np.pad(squat, ((0, max_len - len(squat)), (0, 0)), 'constant', constant_values=0)
-            # padded = np.zeros((max_len, squat.shape[1]))
-            padded_inputs.append(padded)
-
-            # print(padded.shape)
-        padded_inputs = np.array(padded_inputs)
+        # print(padded.shape)
+        # padded_inputs = np.array(padded_inputs)
         # print(padded_inputs[0])
-        for i in padded_inputs[0]:
-            print(i)
-            print(len(i))
-            print(type(i))
-            if np.array_equal(i, np.zeros(len(i))):
-            # if np.array_equal(i , np.array([0. for _ in range(30)])):
-                print('found')
 
         # quit()
         # print(padded_inputs.shape)
@@ -66,24 +65,36 @@ class VideoTrainer(Step):
         X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25)  # 0.25 x 0.8 = 0.2
 
         ## build a simple RNN model
-        create_model = False
+
+        # print(X_train[0])
+        create_model = True
+        lstm_ae = None
+        random.seed(42)
+        # masking_layer = Masking(mask_value=-44, input_shape=X_train.shape[1:])
         if create_model:
-            print(X_train.shape[2])
-            model_rnn = Sequential()
-            model_rnn.add(Masking(mask_value=np.zeros(30),  input_shape=X_train.shape[1:]))
-            model_rnn.add(LSTM(50, input_shape=X_train.shape[1:]))
-            model_rnn.add(Dense(5, activation='sigmoid'))
-            model_rnn.add(Dense(1, activation='sigmoid'))
+            time_steps = max_len
+            n_features = 30
+            input_layer = Input(shape=X_train.shape[1:])
+            # I want to mask the timestep where all the feature values are 1 (usually we pad by 0)
+            x = layers.Masking(mask_value=-44)(input_layer)
+            x = LSTM(256, return_sequences=True)(x)
+            x = Dropout(0.5)(x)
+            x = LSTM(256, return_sequences=False)(x)
+            x = Dropout(0.5)(x)
+            x = layers.Dense(256, activation='relu')(x)
+            x = layers.Dense(1, activation='sigmoid')(x)
+            lstm_ae = Model(inputs=input_layer, outputs=x)
+            lstm_ae.compile(optimizer='adam', loss='mse')
+            print(lstm_ae.summary())
+            lstm_ae.fit(X_train, y_train, epochs=20, validation_data=(X_val, y_val), batch_size=4)
 
-            # most of the parameters come from the embedding layer
-            model_rnn.summary()
+            lstm_ae.save('lstm_ae.h5')
+        # unmasked_embedding = tf.cast(
+        #     tf.tile(tf.expand_dims(padded_inputs[:3], axis=-1), [1, 1, max_len, 30]), tf.float32
+        # )
 
-            compile_params = {'loss': 'binary_crossentropy', 'metrics': ['accuracy']}
+        # masked_embedding = masking_layer(unmasked_embedding)
+        # print(masked_embedding._keras_mask)
+        return [X_val, y_val, lstm_ae]
 
-            model_rnn.compile(**compile_params)
-            fit_params = {'batch_size': 2, 'epochs': 200, 'validation_data': (X_val, y_val)}
-            model_rnn.fit(X_train, y_train, **fit_params)
-            rnn_name = f"RNN_model{random.randint(0, 10000)}.h5"
-            print(f"saved model {rnn_name}")
-            model_rnn.save(rnn_name)
-        return [X_test, y_test]
+

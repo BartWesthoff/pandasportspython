@@ -20,6 +20,9 @@ class VideoPrediction(Step):
         # print(x_train[0].shape)
         # TODO vraag tony waarom reshape?
         # predict_squat = predict_squat.reshape(predict_squat.shape[0], predict_squat.shape[1], 1)
-        test = self.model.predict(data[0])
+        model = data[2]
+        if data[2] is None:
+            model = self.model
+        test = model.predict(data[0])
         print(test)
         print(data[1])

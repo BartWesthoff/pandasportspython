@@ -198,18 +198,18 @@ class Utils:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data["settings"]
 
-    def augmentation(self, squat: ndarray, spreadx: int = None, spready: int = None, width: int = None,
-                     height: int = None, amount:int=10, save:bool=False) -> ndarray:
+    def augmentation(self, name:str, squat: ndarray, spreadx: int = None, spready: int = None, width: int = None,
+                     height: int = None, amount: int = 10, save: bool = False) -> ndarray:
         """augmentation of the squats to make more squats"""
         # TODO: random spread toevoegen
         if self.load_settings()['normalize_landmarks'] and (spreadx is None or spready is None):
             raise ValueError("spreadx and spready must be given if normalize_landmarks is True")
         if spreadx is None:
-            spreadx = randint(5, 20)
+            spreadx = randint(10, 100)
         if spready is None:
-            spready = randint(5, 20)
-        random_x = [i for i in range(-spreadx // 2, spreadx // 2 + 1) if i != 0]
-        random_y = [i for i in range(-spready // 2, spready // 2 + 1) if i != 0]
+            spready = randint(10, 100)
+        random_x = [i for i in range(-spreadx // 2, spreadx // 2 + 1, 5) if i != 0]
+        random_y = [i for i in range(-spready // 2, spready // 2 + 1, 5) if i != 0]
         c = list(itertools.product(random_x, random_y))
         squats = []
         for combination in c:
@@ -226,7 +226,7 @@ class Utils:
         random_squats = np.array(squats)[:amount]
         if save:
             for idx, i in enumerate(random_squats):
-                Utils().saveSquatEmbedding(i, f'negative_squat_1_augmented{idx+1}')
+                Utils().saveSquatEmbedding(i, f'{name}_augmented{idx + 1}')
         return random_squats
 
     @staticmethod
