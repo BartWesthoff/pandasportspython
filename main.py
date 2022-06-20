@@ -8,6 +8,8 @@ from keras.layers import Masking
 from tensorflow import keras
 
 from pipeline.steps.embedder.MPEmbedder import MPEmbedder
+from pipeline.steps.evaluation.videoevaluation import VideoEvaluation
+from pipeline.steps.input.dropboxservice import DropBoxService
 from pipeline.steps.input.googledriveservice import GoogleDriveService
 from pipeline.steps.prediction.videoprediction import VideoPrediction
 from pipeline.steps.training.videotraining import VideoTrainer
@@ -16,7 +18,7 @@ from pipeline.utils.utils import Utils
 
 if __name__ == "__main__":
     random.seed(42)
-    model = keras.models.load_model('lstm_aebest.h5')
+    model = keras.models.load_model('lstm_ae.h5')
     # squat1 = Utils().openEmbedding('positive_squat_1')
     # squat2 = Utils().openEmbedding('positive_squat_2')
     # squat3 = Utils().openEmbedding('positive_squat_3')
@@ -24,9 +26,11 @@ if __name__ == "__main__":
     # print(squat1.shape)
     # out = model.predict([squat1])
 
-
-    pipeline = Pipeline(steps=[GoogleDriveService(), MPEmbedder(), VideoTrainer(), VideoPrediction()], model=model)
+    pipeline = Pipeline(
+        steps=[DropBoxService(), MPEmbedder(), VideoTrainer(), VideoPrediction(), VideoEvaluation()], model=model)
     pipeline.process()
+
+    # VideoEvaluation().process(None)
     #
     # squat1 = Utils().openEmbedding('positive_squat_1')
     # squat2 = Utils().openEmbedding('positive_squat_2')

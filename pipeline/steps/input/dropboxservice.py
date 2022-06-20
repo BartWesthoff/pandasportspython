@@ -41,8 +41,11 @@ class DropBoxService(Input):
         return folder[:self.settings['amount']]
 
     def get_token(self):
-        with open(os.sep.join(['data', 'credentials', 'acces_token.pickle']), 'rb') as token:
-            creds = pickle.load(token)
+        try:
+            with open(os.sep.join(['data', 'credentials', 'acces_token.pickle']), 'rb') as token:
+                creds = pickle.load(token)
+        except FileNotFoundError:
+            self.refresh_token()
         return creds
 
     def get_source(self) -> str:

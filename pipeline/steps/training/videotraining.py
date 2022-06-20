@@ -67,7 +67,7 @@ class VideoTrainer(Step):
         ## build a simple RNN model
 
         # print(X_train[0])
-        create_model = True
+        create_model = False
         lstm_ae = None
         random.seed(42)
         # masking_layer = Masking(mask_value=-44, input_shape=X_train.shape[1:])
