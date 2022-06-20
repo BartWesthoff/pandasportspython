@@ -27,7 +27,7 @@ if __name__ == "__main__":
     # out = model.predict([squat1])
 
     pipeline = Pipeline(
-        steps=[DropBoxService(), MPEmbedder(), VideoTrainer(), VideoPrediction(), VideoEvaluation()], model=model)
+        steps=[GoogleDriveService(), MPEmbedder(), VideoTrainer(), VideoPrediction(), VideoEvaluation()], model=model)
     pipeline.process()
 
     # VideoEvaluation().process(None)

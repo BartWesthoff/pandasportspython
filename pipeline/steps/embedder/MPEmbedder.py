@@ -99,6 +99,7 @@ class MPEmbedder(Embedder):
         pose = mp_pose.Pose()
 
         allframes = []
+        all_flipped_frames = []
         percentage = 0
         while cap.isOpened():
             success, image = cap.read()
@@ -116,6 +117,7 @@ class MPEmbedder(Embedder):
             # image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
             currentframe = []
+            current_flipped_frame = []
 
             if results.pose_landmarks is None:
                 print("No pose results.")
@@ -135,14 +137,22 @@ class MPEmbedder(Embedder):
                             currentframe.append(data_point.x)
                             currentframe.append(data_point.y)
                             currentframe.append(data_point.z)
+                            current_flipped_frame.append(width-data_point.x-1)
+                            current_flipped_frame.append(data_point.y)
+                            current_flipped_frame.append(data_point.z)
                         else:
                             currentframe.append(data_point.x * width)
                             currentframe.append(data_point.y * height)
-                            currentframe.append(data_point.z)
+                            currentframe.append(data_point.z * width)
+                            current_flipped_frame.append( (width - data_point.x - 1) * width)
+                            current_flipped_frame.append(data_point.y * height)
+                            current_flipped_frame.append(data_point.z * width)
                         percentage += 1
                         # print(index, data_point.x * width, data_point.y * height)
             print('{:.2f} %'.format(round(percentage / frame_count * 10, 2)))
             allframes.append(currentframe)
+            all_flipped_frames.append(current_flipped_frame)
+
 
             # mp_drawing.draw_landmarks(
             #     image,
@@ -152,7 +162,8 @@ class MPEmbedder(Embedder):
             # cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
         cap.release()
         squat = np.array(allframes)
-
+        flipped_squat = np.array(all_flipped_frames)
         Utils().saveObject(squat, embedded_location)
+        Utils().saveObject(flipped_squat, embedded_location+'_flipped')
 
         return squat
