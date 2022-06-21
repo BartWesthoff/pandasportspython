@@ -52,7 +52,7 @@ class VideoTrainer(Step):
             steps_per_epoch = len(train_squats_names) // epochs
             model.fit(self.train_generator(train_squats_names), steps_per_epoch=steps_per_epoch, epochs=epochs,
                       verbose=1)
-            model.save('model.h5')
+            model.save('model_scaled.h5')
         labels = [1 if "positive" in i else 0 for i in test_squats_names]
         print(f"amount of labels {len(labels)}")
 

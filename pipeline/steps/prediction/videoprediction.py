@@ -16,7 +16,8 @@ class VideoPrediction(Step):
         if data[2] is None:
             model = self.model
         y_pred = [model.predict(i) for i in data[0]]
-        y_pred = [1 if i > 0.5 else 0 for i in y_pred]
+        print(y_pred)
+        y_pred = [1 if i > 0.7 else 0 for i in y_pred]
         y_true = data[1]
 
         return [y_pred, y_true]
