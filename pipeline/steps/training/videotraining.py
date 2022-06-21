@@ -19,6 +19,12 @@ class VideoTrainer(Step):
     """" Class for the video training step"""
 
     def process(self, data):  # TODO even nog checken wat ie teruggeeft
+        # For debugging. Eliminates any randomness from the program
+        using_seed = True
+        if using_seed:
+            np.random.seed(69)
+            random.seed(42)
+            tf.random.set_seed(42)
         """" process the data of the step """
         list_of_vids = [i for i in os.listdir(os.sep.join(["data", "embedded"])) if not "normalized" in i]
         random.shuffle(list_of_vids)
@@ -33,12 +39,11 @@ class VideoTrainer(Step):
         test_squat2 = Utils().openEmbedding(test_squats_names[1])
         print(test_squat.shape)
         print(test_squat2.shape)
-        tf.random.set_seed(42)
         if create_model:
             model = Sequential()
 
-            model.add(LSTM(32, return_sequences=True, input_shape=(None, 30)))
-            model.add(LSTM(8, dropout=0.2, recurrent_dropout=0.2))
+            model.add(LSTM(64, return_sequences=True, input_shape=(None, 30)))
+            model.add(LSTM(16, dropout=0.2, recurrent_dropout=0.2))
             model.add(Dense(1, activation="sigmoid"))
 
             print(model.summary(90))
@@ -47,12 +52,15 @@ class VideoTrainer(Step):
             steps_per_epoch = len(train_squats_names) // epochs
             model.fit(self.train_generator(train_squats_names), steps_per_epoch=steps_per_epoch, epochs=epochs,
                       verbose=1)
+            model.save('model.h5')
         labels = [1 if "positive" in i else 0 for i in test_squats_names]
         print(f"amount of labels {len(labels)}")
 
         return [np.array([Utils().openEmbedding(i)]) for i in test_squats_names], np.array(labels), model
 
     def train_generator(self, listofvids):
+        np.random.seed(69)
+        tf.random.set_seed(42)
 
         for squat_name in listofvids:
             x_train = Utils().openEmbedding(squat_name)

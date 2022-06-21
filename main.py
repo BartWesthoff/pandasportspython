@@ -5,9 +5,10 @@ from pipeline.steps.input.googledriveservice import GoogleDriveService
 from pipeline.steps.prediction.videoprediction import VideoPrediction
 from pipeline.steps.preprocessors.videopreprocessor import VideoPreProcessor
 from pipeline.steps.training.videotraining import VideoTrainer
+import tensorflow as tf
 
 if __name__ == "__main__":
-    # model = model.load_model("model_best.h5")
+#    model = tf.keras.models.load_model("model.h5")
     pipeline = Pipeline(
         steps=[GoogleDriveService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
                VideoEvaluation()], model=None)

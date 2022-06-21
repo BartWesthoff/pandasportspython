@@ -3,6 +3,6 @@
 **/*.pyc
 **/__pycache__/
 .sav
-data/embedded/*.mp4
-data/positive_squat/*.mp4
-data/negative_squat/*.mp4
+data/embedded/*
+data/positive_squat/*
+data/negative_squat/*
