@@ -1,102 +1,60 @@
 import os
 import random
-from typing import Tuple
 
 import numpy as np
 import tensorflow as tf
-from keras import Sequential, Input
-from keras.applications.densenet import layers
-from keras.layers import Dense, Masking, Dropout, RepeatVector
+from keras import Sequential
+from keras.layers import Dense
 from keras.layers import LSTM
-from keras.models import Sequential, Model
-from numpy import ndarray
-from sklearn.model_selection import train_test_split
+from keras.models import Sequential
 
 from pipeline.steps.step import Step
 from pipeline.utils.utils import Utils
 
 
+# from sklearn.model_selection import train_test_split
+
+
 class VideoTrainer(Step):
     """" Class for the video training step"""
 
-    def process(self, data) : # TODO even nog checken wat ie teruggeeft
+    def process(self, data):  # TODO even nog checken wat ie teruggeeft
         """" process the data of the step """
-        # max_len = 0
-
-        list_of_vids = [i for i in os.listdir(os.sep.join(['data', 'embedded'])) if not 'normalized' in i]
+        list_of_vids = [i for i in os.listdir(os.sep.join(["data", "embedded"])) if not "normalized" in i]
         random.shuffle(list_of_vids)
-        if self.settings['amount'] <=0:
-            list_of_vids = list_of_vids[:len(list_of_vids)]
-        else:
-            list_of_vids = list_of_vids[:self.settings['amount']]
-        ### get maximum length (amount of frames) of all videos
-        # for i in list_of_vids:
-        #     squat = Utils().openEmbedding(i)
-        #     if len(squat) > max_len:
-        #         max_len = len(squat)
-            # print(squat.shape)
-
+        if self.settings["amount"] > 0:
+            list_of_vids = list_of_vids[:self.settings["amount"]]
         squats = np.array([Utils().openEmbedding(i) for i in list_of_vids])
-        # padded_inputs = tf.keras.preprocessing.sequence.pad_sequences(
-        #     squats, padding="post", value=-44
-        # )
-        # pad all videos with zeros to the same length
-        # for i in list_of_vids:
-        #     squat = Utils().openEmbedding(i)
-        #     squat = np.pad(squat, ((0, max_len - len(squat)), (0, 0)), 'constant', constant_values=0)
-        #     # x = np.asarray(sq).astype('float32')
-        #     padded_inputs.append(squat)
-
-        # print(padded.shape)
-        # padded_inputs = np.array(padded_inputs)
-        # print(padded_inputs[0])
-
-        # quit()
-        # print(padded_inputs.shape)
-        # labels = np.array([])
-        # for i in list_of_vids:
-        #     if 'positive' in i:
-        #         labels = np.append(labels, 1)
-        #     elif 'negative' in i:
-        #         labels = np.append(labels, 0)
-        #
-        # split the data in training and test data
-        #
-        # X_train, X_test, y_train, y_test = train_test_split(padded_inputs, labels, test_size=0.2)
-        #
-        # X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25)  # 0.25 x 0.8 = 0.2
-        #
-        ## build a simple RNN model
-
-        # print(X_train[0])
+        train_squats_names = list_of_vids[:int(len(squats) * 0.8)]
+        test_squats_names = list_of_vids[int(len(squats) * 0.8):]
         create_model = True
         model = None
-        random.seed(42)
-        # masking_layer = Masking(mask_value=-44, input_shape=X_train.shape[1:])
+        test_squat = Utils().openEmbedding(test_squats_names[0])
+        test_squat2 = Utils().openEmbedding(test_squats_names[1])
+        print(test_squat.shape)
+        print(test_squat2.shape)
+        tf.random.set_seed(42)
         if create_model:
             model = Sequential()
 
             model.add(LSTM(32, return_sequences=True, input_shape=(None, 30)))
-            model.add(LSTM(8))
-            model.add(Dense(1, activation='sigmoid'))
+            model.add(LSTM(8, dropout=0.2, recurrent_dropout=0.2))
+            model.add(Dense(1, activation="sigmoid"))
 
             print(model.summary(90))
-            model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+            model.compile(loss="binary_crossentropy", optimizer="adam", metrics=[tf.keras.metrics.Precision()])
             epochs = 2
-            steps_per_epoch = len(squats) // epochs
-            model.fit(self.train_generator(list_of_vids), steps_per_epoch=steps_per_epoch, epochs=epochs, verbose=1)
-        # unmasked_embedding = tf.cast(
-        #     tf.tile(tf.expand_dims(padded_inputs[:3], axis=-1), [1, 1, max_len, 30]), tf.float32
-        # )
+            steps_per_epoch = len(train_squats_names) // epochs
+            model.fit(self.train_generator(train_squats_names), steps_per_epoch=steps_per_epoch, epochs=epochs,
+                      verbose=1)
+        labels = [1 if "positive" in i else 0 for i in test_squats_names]
+        print(f"amount of labels {len(labels)}")
 
-        # masked_embedding = masking_layer(unmasked_embedding)
-        # print(masked_embedding._keras_mask)
-        return (np.array([squats[0]]), np.array([1]), model)
-    def train_generator(self, allsquats):
+        return [np.array([Utils().openEmbedding(i)]) for i in test_squats_names], np.array(labels), model
 
-        for squat_name in allsquats:
+    def train_generator(self, listofvids):
+
+        for squat_name in listofvids:
             x_train = Utils().openEmbedding(squat_name)
-            y_train = np.array([0 if 'negative' in squat_name else 1])
+            y_train = np.array([0 if "negative" in squat_name else 1])
             yield np.array([x_train]), y_train
-
-

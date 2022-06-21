@@ -14,7 +14,7 @@ class Step(ABC):
         """ Instantiate the Step class """
         # NOTE: issubclass(self.__class__, type) werkt niet
         if self.__class__ == class_type:
-            raise Exception('I am abstract!')
+            raise Exception("I am abstract!")
         self.model = model
 
     @property

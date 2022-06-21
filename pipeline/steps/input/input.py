@@ -15,7 +15,7 @@ class Input(Step):
         # NOTE: issubclass(self.__class__, type) werkt niet
         super().__init__()
         if self.__class__ == Input:
-            raise Exception('I am abstract!')
+            raise Exception("I am abstract!")
 
     @property
     def name(self) -> str:

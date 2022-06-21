@@ -10,7 +10,6 @@ from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
 from classes.cloudfile import CloudFile
 from pipeline.steps.input.input import Input
 from pipeline.utils.deprecated import deprecated
-from pipeline.utils.utils import Utils
 
 
 class GoogleDriveService(Input):
@@ -19,7 +18,7 @@ class GoogleDriveService(Input):
     def __init__(self):
         """" Instantiate the GoogleDriveService class """
         super().__init__()
-        self.scopes = ['https://www.googleapis.com/auth/drive.readonly']  # read,write,update,delete permission
+        self.scopes = ["https://www.googleapis.com/auth/drive.readonly"]  # read,write,update,delete permission
         self.service = self.get_gdrive_service()
 
     def process(self) -> list[CloudFile]:
@@ -27,32 +26,37 @@ class GoogleDriveService(Input):
         files = self.get_files_in_folder("videos minor ai")
         print(f"found {len(files)} files")
 
-        for idx, cloudfile in enumerate(files[:self.settings['amount']]):
-            folder = 'production'
-            if 'positive' in cloudfile.name:
-                folder = 'positive_squat'
-            elif 'negative' in cloudfile.name:
-                folder = 'negative_squat'
-            if not os.path.exists(os.sep.join(['data', folder, cloudfile.name])):
+        if self.settings["amount"] > 0:
+            files = files[:self.settings["amount"]]
+        for idx, cloudfile in enumerate(files):
+            folder = "production"
+            if "positive" in cloudfile.name:
+                folder = "positive_squat"
+            if "negative" in cloudfile.name:
+                folder = "negative_squat"
+                if '9' in cloudfile.name:
+                    print(cloudfile.name)
+
+            if not os.path.exists(os.sep.join(["data", folder, cloudfile.name])):
                 self.download_file(cloudfile)
                 print(f"downloaded {cloudfile.name} number {idx}")
-                if self.settings['testing']:
+                if self.settings["testing"]:
                     break
-        if self.settings['amount'] <= 0:
+        if self.settings["amount"] <= 0:
             return files
         else:
             print(f"returning {min(self.settings['amount'], len(files))} file(s)")
-            return files[:self.settings['amount']]
+            return files[:self.settings["amount"]]
 
     def get_gdrive_service(self) -> object:
         """" instantiate a Google Drive service object """
         creds = None
-        # The file token.pickle stores the user's access and refresh tokens, and is
+        # The file token.pickle stores the user"s access and refresh tokens, and is
         # created automatically when the authorization flow completes for the first
         # time.
-        token = os.sep.join(['data', 'credentials', 'token.pickle'])
+        token = os.sep.join(["data", "credentials", "token.pickle"])
         if os.path.exists(token):
-            with open(token, 'rb') as token:
+            with open(token, "rb") as token:
                 creds = pickle.load(token)
         # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
@@ -60,13 +64,13 @@ class GoogleDriveService(Input):
                 creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    os.sep.join(['data', 'credentials', 'credentials.json']), self.scopes)
+                    os.sep.join(["data", "credentials", "credentials.json"]), self.scopes)
                 creds = flow.run_local_server(port=0)
             # Save the credentials for the next run
-            with open(os.sep.join(['data', 'credentials', 'token.pickle']), 'wb') as new_token:
+            with open(os.sep.join(["data", "credentials", "token.pickle"]), "wb") as new_token:
                 pickle.dump(creds, new_token)
         # return Google Drive API service
-        return build('drive', 'v3', credentials=creds)
+        return build("drive", "v3", credentials=creds)
 
     def get_files_in_folder(self, foldername: str) -> list[CloudFile]:
         """given items returned by Google Drive API"""
@@ -75,11 +79,11 @@ class GoogleDriveService(Input):
                                             fields="nextPageToken, files(id, name, parents)").execute()
         # get the results
         folderid = "1WfSjXln7U1ihbTD2h_uhM8UlHt-LCEdo"
-        items = results.get('files', [])
+        items = results.get("files", [])
 
         if not items:
             # empty drive
-            print('No files found.')
+            print("No files found.")
             return []
 
         files_in_folder = []
@@ -101,8 +105,8 @@ class GoogleDriveService(Input):
         """
         Scale bytes to its proper byte format
         e.g:
-            1253656 => '1.20MB'
-            1253656678 => '1.17GB'
+            1253656 => "1.20MB"
+            1253656678 => "1.17GB"
         """
         for unit in ["", "K", "M", "G", "T", "P", "E", "Z"]:
             if b < factor:
@@ -112,17 +116,17 @@ class GoogleDriveService(Input):
 
     @deprecated
     def upload_file(self, parents: list[str], filename: str) -> None:
-        name = f'{filename}.mp4',
+        name = f"{filename}.mp4",
         file_metadata = {
-            'name': name,
-            'parents': parents
+            "name": name,
+            "parents": parents
         }
         media = MediaFileUpload(name,
-                                mimetype='video/mp4',
+                                mimetype="video/mp4",
                                 resumable=True)
         self.service.files().create(body=file_metadata,
                                     media_body=media,
-                                    fields='id').execute()
+                                    fields="id").execute()
 
     def download_file(self, file: CloudFile) -> None:
         """" given a file, download it by its id """
@@ -136,11 +140,11 @@ class GoogleDriveService(Input):
             status, done = downloader.next_chunk()
             print(f"Download {int(status.progress() * 100)}")
         fh.seek(0)
-        folder = 'production'
-        if 'positive' in name:
-            folder = 'positive_squat'
-        elif 'negative' in name:
-            folder = 'negative_squat'
+        folder = "production"
+        if "positive" in name:
+            folder = "positive_squat"
+        elif "negative" in name:
+            folder = "negative_squat"
 
-        with open(os.sep.join(['data', folder,name]), 'wb') as f:
+        with open(os.sep.join(["data", folder, name]), "wb") as f:
             f.write(fh.read())

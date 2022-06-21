@@ -82,9 +82,9 @@ class MPEmbedder(Embedder):
             extra = '_normalized'
         else:
             extra = ''
-        embedded_location = os.sep.join(["data", "embedded", data.split('.')[0]+extra])
+        embedded_location = os.sep.join(["data", "embedded", data.split('.')[0] + extra])
         if os.path.exists(embedded_location):
-            return Utils.openEmbedding(data.split('.')[0]+extra)
+            return Utils.openEmbedding(data.split('.')[0] + extra)
         print(f"embedding  {data}")
         # TODO niet laten zien van de video
         cap = cv2.VideoCapture(video_location)
@@ -137,14 +137,14 @@ class MPEmbedder(Embedder):
                             currentframe.append(data_point.x)
                             currentframe.append(data_point.y)
                             currentframe.append(data_point.z)
-                            current_flipped_frame.append(width-data_point.x-1)
+                            current_flipped_frame.append(width - data_point.x - 1)
                             current_flipped_frame.append(data_point.y)
                             current_flipped_frame.append(data_point.z)
                         else:
                             currentframe.append(data_point.x * width)
                             currentframe.append(data_point.y * height)
                             currentframe.append(data_point.z * width)
-                            current_flipped_frame.append( (width - data_point.x - 1) * width)
+                            current_flipped_frame.append((width - data_point.x - 1) * width)
                             current_flipped_frame.append(data_point.y * height)
                             current_flipped_frame.append(data_point.z * width)
                         percentage += 1
@@ -152,7 +152,6 @@ class MPEmbedder(Embedder):
             print('{:.2f} %'.format(round(percentage / frame_count * 10, 2)))
             allframes.append(currentframe)
             all_flipped_frames.append(current_flipped_frame)
-
 
             # mp_drawing.draw_landmarks(
             #     image,
@@ -164,6 +163,6 @@ class MPEmbedder(Embedder):
         squat = np.array(allframes)
         flipped_squat = np.array(all_flipped_frames)
         Utils().saveObject(squat, embedded_location)
-        Utils().saveObject(flipped_squat, embedded_location+'_flipped')
+        Utils().saveObject(flipped_squat, embedded_location + '_flipped')
 
         return squat

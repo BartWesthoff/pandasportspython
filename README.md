@@ -22,10 +22,10 @@
 
 ##### classes
 Hier komen alle losse niet-ML gerelateerde classes
-Denk aan de lichaam van een persoon, oefening of mogelijke foto's
+Denk aan de lichaam van een persoon, oefening of mogelijke foto"s
 
 ##### Data (mogelijk geschrapt)
-Hier komen alle video's in voor de training data
+Hier komen alle video"s in voor de training data
 //TODO van de cloud afhalen
 
 ##### Pipeline
@@ -58,11 +58,11 @@ Hier komen alle stappen die in een reeks uitgevoerd moeten worden.
 
 <pre>
 1.0 preprocessor
-    Maakt alle data 'gelijk' aan elkaar zodat er 
+    Maakt alle data "gelijk" aan elkaar zodat er 
     mee gewerkt kan worden.
 
 2.0 Embedder 
-    Zet data (video's) om naar data punten (x,y,z,likelihood).
+    Zet data (video"s) om naar data punten (x,y,z,likelihood).
 
 3.0 training 
     Een model dat wordt getrained om datapunten te herkennen.

@@ -30,7 +30,7 @@ class VideoPreProcessor(Step):
         #     print(i.name)
         # # idee is dat we deze video namen gebruiken om van gedownloaden data goede data te maken
         # # wordt bijvoorbeeld gedownload in een download mapje,
-        # # en daar sorteren we de video's en bewerken we ze
+        # # en daar sorteren we de video"s en bewerken we ze
         # # bewerkte data komt dan is positief of negatief
         # # kan ook in 1 mapje production
         #
@@ -44,7 +44,7 @@ class VideoPreProcessor(Step):
         #         # met production data folder of gewoon overwritten
         #         destination = folder + f"{name}_squat{index // 2}.mp4"
         #
-        #         # destination = folder.replace(f'{name}_squat', "production") + f"{name}_squat{index}.mp4"
+        #         # destination = folder.replace(f"{name}_squat", "production") + f"{name}_squat{index}.mp4"
         #
         #         # Video bestaat al zonder geluid
         #         if not os.path.exists(destination):
@@ -53,10 +53,10 @@ class VideoPreProcessor(Step):
         for item in data:
             name = item.name
             # name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
-            name = os.sep.join(['data', 'production', name])
+            name = os.sep.join(["data", "production", name])
             name = self.cropVideo(name, "edited footage")
             name = self.removesound(name, name)
-            if self.settings['color']:
+            if self.settings["color"]:
                 self.grayvideo(name, name)
         return data
 
@@ -117,8 +117,8 @@ class VideoPreProcessor(Step):
             cv2.rectangle(im, (x, y), (x + w, y + h), (128, 255, 0), 10)
 
             # output
-            codec = cv2.VideoWriter_fourcc(*'mp4v')
-            out = cv2.VideoWriter(f'{output}.mp4', codec, fps, (w, h))
+            codec = cv2.VideoWriter_fourcc(*"mp4v")
+            out = cv2.VideoWriter(f"{output}.mp4", codec, fps, (w, h))
 
             # Now we start
             cnt = 0
@@ -132,9 +132,9 @@ class VideoPreProcessor(Step):
                     out.write(cropped_frame)
                     # Percentage
                     xx = cnt * 100 / frames
-                    print(int(xx), '%')
-                    cv2.imshow('frame', frame1)
-                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                    print(int(xx), "%")
+                    cv2.imshow("frame", frame1)
+                    if cv2.waitKey(1) & 0xFF == ord("q"):
                         break
                 else:
                     break
@@ -142,7 +142,7 @@ class VideoPreProcessor(Step):
             cap.release()
             out.release()
             cv2.destroyAllWindows()
-            return f'{output}.mp4'
+            return f"{output}.mp4"
 
     def playVideo(self, source: str) -> None:
         """" plays video """
@@ -160,13 +160,13 @@ class VideoPreProcessor(Step):
             if ret:
 
                 # Display the resulting frame
-                cv2.imshow('Frame', frame)
+                cv2.imshow("Frame", frame)
 
                 # Press Q on keyboard to  exit
-                if cv2.waitKey(25) & 0xFF == ord('q'):
+                if cv2.waitKey(25) & 0xFF == ord("q"):
                     break
                 # Press S on keyboard to  exit
-                if cv2.waitKey(25) & 0xFF == ord('s'):
+                if cv2.waitKey(25) & 0xFF == ord("s"):
                     print("Saving" + str(randint(0, 100)))
 
             # Break the loop
@@ -198,10 +198,10 @@ class VideoPreProcessor(Step):
         x, y, w, h = 0, 0, frame_width, frame_height
 
         # Set up codec and output video settings
-        # codec = cv2.VideoWriter_fourcc('X', 'V', 'I', 'D')
-        codec = cv2.VideoWriter_fourcc(*'mp4v')
+        # codec = cv2.VideoWriter_fourcc("X", "V", "I", "D")
+        codec = cv2.VideoWriter_fourcc(*"mp4v")
         size = (frame_width, frame_height)
-        result = cv2.VideoWriter(f'{output}.mp4',
+        result = cv2.VideoWriter(f"{output}.mp4",
                                  codec,
                                  fps, size, isColor=False)
 
@@ -211,7 +211,7 @@ class VideoPreProcessor(Step):
                 cv2.imshow("Live", frame)
                 gray = cv2.cvtColor(frame[y:y + h, x:x + w], cv2.COLOR_BGR2GRAY)
                 result.write(gray)
-                if cv2.waitKey(1) & 0xFF == ord('s'):
+                if cv2.waitKey(1) & 0xFF == ord("s"):
                     break
             # Break the loop
             else:
@@ -224,8 +224,8 @@ class VideoPreProcessor(Step):
         print("The video was successfully saved")
 
     # def imageToVideo(self):
-    #     image_folder = 'images'
-    #     video_name = 'video.avi'
+    #     image_folder = "images"
+    #     video_name = "video.avi"
     #
     #     images = [i.name for i in sorted(Path(image_folder).iterdir(), key=os.path.getmtime)]
     #
@@ -258,11 +258,11 @@ class VideoPreProcessor(Step):
         compression = "slow"
 
         title = name
-        loadtitle = title + '.mp4'
+        loadtitle = title + ".mp4"
         savetitle = title
 
         # modify these start and end times for your subclips
-        cuts = [('00:00:00.000', '00:00:05.530')]
+        cuts = [("00:00:00.000", "00:00:05.530")]
 
         # load file
         video = mpy.VideoFileClip(loadtitle)

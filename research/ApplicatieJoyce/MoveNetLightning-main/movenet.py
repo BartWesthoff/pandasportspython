@@ -7,12 +7,12 @@ import cv2
 
 from pipeline.utils.utils import Utils
 
-interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_lightning_3.tflite')
-# interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_thunder_3.tflite') change 192 to 256
-# interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_thunder_tflite_int8_4.tflite') # unint type echt verschikkelijk traag
-# interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_lightning_tflite_int8_4.tflite') # 192 echt verschikkelijk traag
-# interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_lightning_tflite_float16_4.tflite') goed te doen 192 demensie
-# interpreter = tf.lite.Interpreter(model_path='lite-model_movenet_singlepose_thunder_tflite_float16_4.tflite') goed te doen 256 demensie
+interpreter = tf.lite.Interpreter(model_path="lite-model_movenet_singlepose_lightning_3.tflite")
+# interpreter = tf.lite.Interpreter(model_path="lite-model_movenet_singlepose_thunder_3.tflite") change 192 to 256
+# interpreter = tf.lite.Interpreter(model_path="lite-model_movenet_singlepose_thunder_tflite_int8_4.tflite") # unint type echt verschikkelijk traag
+# interpreter = tf.lite.Interpreter(model_path="lite-model_movenet_singlepose_lightning_tflite_int8_4.tflite") # 192 echt verschikkelijk traag
+# interpreter = tf.lite.Interpreter(model_path="lite-model_movenet_singlepose_lightning_tflite_float16_4.tflite") goed te doen 192 demensie
+# interpreter = tf.lite.Interpreter(model_path="lite-model_movenet_singlepose_thunder_tflite_float16_4.tflite") goed te doen 256 demensie
 interpreter.allocate_tensors()
 
 
@@ -27,24 +27,24 @@ def draw_keypoints(frame, keypoints, confidence_threshold):
 
 
 EDGES = {
-    (0, 1): 'm',
-    (0, 2): 'c',
-    (1, 3): 'm',
-    (2, 4): 'c',
-    (0, 5): 'm',
-    (0, 6): 'c',
-    (5, 7): 'm',
-    (7, 9): 'm',
-    (6, 8): 'c',
-    (8, 10): 'c',
-    (5, 6): 'y',
-    (5, 11): 'm',
-    (6, 12): 'c',
-    (11, 12): 'y',
-    (11, 13): 'm',
-    (13, 15): 'm',
-    (12, 14): 'c',
-    (14, 16): 'c'
+    (0, 1): "m",
+    (0, 2): "c",
+    (1, 3): "m",
+    (2, 4): "c",
+    (0, 5): "m",
+    (0, 6): "c",
+    (5, 7): "m",
+    (7, 9): "m",
+    (6, 8): "c",
+    (8, 10): "c",
+    (5, 6): "y",
+    (5, 11): "m",
+    (6, 12): "c",
+    (11, 12): "y",
+    (11, 13): "m",
+    (13, 15): "m",
+    (12, 14): "c",
+    (14, 16): "c"
 }
 
 
@@ -77,17 +77,17 @@ while cap.isOpened():
         output_details = interpreter.get_output_details()
 
         # Make predictions
-        interpreter.set_tensor(input_details[0]['index'], np.array(input_image))
+        interpreter.set_tensor(input_details[0]["index"], np.array(input_image))
         interpreter.invoke()
-        keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
+        keypoints_with_scores = interpreter.get_tensor(output_details[0]["index"])
         print(keypoints_with_scores)
         # Rendering
         draw_connections(frame, keypoints_with_scores, EDGES, 0.0)
         draw_keypoints(frame, keypoints_with_scores, 0.0)
 
-        cv2.imshow('MoveNet Lightning', frame)
+        cv2.imshow("MoveNet Lightning", frame)
 
-    if cv2.waitKey(10) & 0xFF == ord('q'):
+    if cv2.waitKey(10) & 0xFF == ord("q"):
         break
 
 cap.release()

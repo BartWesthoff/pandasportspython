@@ -25,7 +25,7 @@ class Utils:
         self.jsonfile = "testing.json"
         self.root_dir = os.getcwd()
         self.yamlfile = "settings.yaml"
-        self.datafolder = os.sep.join(['data', 'production'])
+        self.datafolder = os.sep.join(["data", "production"])
 
     @deprecated
     def getdict(self):
@@ -37,7 +37,7 @@ class Utils:
     @staticmethod
     def saveObject(obj: object, filename: str) -> None:  # wat is object
         """" saves object to (pickle) file"""
-        with open(filename, 'wb') as fp:
+        with open(filename, "wb") as fp:
             print(f"saving object {filename}")
             pickle.dump(obj, fp)
 
@@ -46,35 +46,35 @@ class Utils:
         """" saves object to (pickle) file"""
         save_location = os.sep.join(["data", "embedded", filename])
         print(save_location)
-        with open(save_location, 'wb') as fp:
+        with open(save_location, "wb") as fp:
             print(f"saving object {filename}")
             pickle.dump(squat, fp)
 
     @staticmethod
     def saveModel(model) -> None:  # wat is object
         """" saves object to (pickle) file"""
-        with open(model.__str__(), 'wb') as fp:
+        with open(model.__str__(), "wb") as fp:
             print(f"saving object {model.__str__()}")
             pickle.dump(model, fp)
 
     @staticmethod
     def openObject(filename: str) -> object:
         """" returns object from (pickle) file"""
-        with open(filename, 'rb') as inputfile:
+        with open(filename, "rb") as inputfile:
             obj = pickle.load(inputfile)
         return obj
 
     @staticmethod
     def openEmbedding(filename: str) -> np.ndarray:
         """"returns object from (pickle) file"""
-        with open(os.sep.join(["data", "embedded", filename]), 'rb') as inputfile:
+        with open(os.sep.join(["data", "embedded", filename]), "rb") as inputfile:
             obj = pickle.load(inputfile)
         return obj
 
     # @staticmethod
     # def openObject(filename: str) -> np.ndarray | abc.Iterable | int | float:  # return object
     #    """" opens object from (pickle) file"""
-    #    with open(filename, 'rb') as fp:
+    #    with open(filename, "rb") as fp:
     #        object = pickle.load(fp)
     #    return object
 
@@ -86,7 +86,7 @@ class Utils:
     #
     #     with open(self.jsonfile, "r") as f:
     #         text = f.read()
-    #         if len(text) == 0 or text[0] != '{':
+    #         if len(text) == 0 or text[0] != "{":
     #             with open(self.jsonfile, "w+") as f:
     #                 f.write("{}")
     #
@@ -158,7 +158,7 @@ class Utils:
 
         seed = str(seed)
         if current_seed is None or current_seed != seed:
-            print(f'Setting PYTHONHASHSEED="{seed}"')
+            print(f"Setting PYTHONHASHSEED={seed}")
             os.environ["PYTHONHASHSEED"] = seed
             # restart the current process
             os.execl(sys.executable, sys.executable, *sys.argv)
@@ -168,15 +168,15 @@ class Utils:
         """saves machine learning model"""
 
         # TODO: folder veranderen
-        filename = modelname + '.sav'
-        pickle.dump(model, open(filename, 'wb'))
+        filename = modelname + ".sav"
+        pickle.dump(model, open(filename, "wb"))
 
     @staticmethod
     def load_model(filename: str):  # return type model inzien, is een list of set
         """loads given machine loading model"""
         filename += ".sav"
         # TODO: folder veranderen
-        loaded_model = pickle.load(open(filename, 'rb'))
+        loaded_model = pickle.load(open(filename, "rb"))
         return loaded_model
 
     @deprecated
@@ -202,7 +202,7 @@ class Utils:
                      height: int = None, amount: int = 10, save: bool = False) -> ndarray:
         """augmentation of the squats to make more squats"""
         # TODO: random spread toevoegen
-        if self.load_settings()['normalize_landmarks'] and (spreadx is None or spready is None):
+        if self.load_settings()["normalize_landmarks"] and (spreadx is None or spready is None):
             raise ValueError("spreadx and spready must be given if normalize_landmarks is True")
         if spreadx is None:
             spreadx = randint(10, 100)
@@ -226,7 +226,7 @@ class Utils:
         random_squats = np.array(squats)[:amount]
         if save:
             for idx, i in enumerate(random_squats):
-                Utils().saveSquatEmbedding(i, f'{name}_augmented{idx + 1}')
+                Utils().saveSquatEmbedding(i, f"{name}_augmented{idx + 1}")
         return random_squats
 
     @staticmethod
@@ -256,7 +256,7 @@ class Utils:
         model.add(Dense(64, activation="relu"))
         model.add(Dense(1, activation="sigmoid"))
         # compile the model
-        model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
         # model.summary()
         return model
 

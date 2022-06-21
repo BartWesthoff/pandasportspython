@@ -1,17 +1,17 @@
 settings:
-  amount: 10
+  amount: -1
   baseline_model: None
   landmarks_to_pick:
-  - left_shoulder
-  - right_shoulder
-  - left_hip
-  - right_hip
-  - left_knee
-  - right_knee
-  - left_ankle
-  - right_ankle
-  - left_foot_index
-  - right_foot_index
+    - left_shoulder
+    - right_shoulder
+    - left_hip
+    - right_hip
+    - left_knee
+    - right_knee
+    - left_ankle
+    - right_ankle
+    - left_foot_index
+    - right_foot_indexó
   normalize_landmarks: false
   testing: false
   tf_lite_model: thunder_float16.tflite

@@ -25,31 +25,31 @@ class DropBoxService(Input):
         folder = self.get_files_in_folder()
 
         # convert every file from folder to a CloudFile object
-        folder = [CloudFile(name=file.name, parents=None, id=file.id) for file in folder]
+        folder = [CloudFile(name=file.name, parents='', id=file.id) for file in folder]
 
         print(f"found {len(folder)} file(s)")
-        if self.settings['amount'] <0:
-            self.settings['amount'] = len(folder)
-        for entry in folder[:self.settings['amount']]:
+        if self.settings["amount"] <0:
+            self.settings["amount"] = len(folder)
+        for entry in folder[:self.settings["amount"]]:
 
             if not os.path.exists(Utils().datafolder + os.sep + entry.name):
                 self.download_file(entry.name)
-                if self.settings['testing']:
+                if self.settings["testing"]:
                     break
 
         print(f"returning {min(self.settings['amount'], len(folder))} file(s)")
-        return folder[:self.settings['amount']]
+        return folder[:self.settings["amount"]]
 
     def get_token(self):
         try:
-            with open(os.sep.join(['data', 'credentials', 'acces_token.pickle']), 'rb') as token:
+            with open(os.sep.join(["data", "credentials", "acces_token.pickle"]), "rb") as token:
                 creds = pickle.load(token)
         except FileNotFoundError:
             self.refresh_token()
         return creds
 
     def get_source(self) -> str:
-        with open(os.sep.join(['data', 'credentials', 'source.pickle']), 'rb') as token:
+        with open(os.sep.join(["data", "credentials", "source.pickle"]), "rb") as token:
             source = pickle.load(token)
         return source
 
@@ -80,7 +80,7 @@ class DropBoxService(Input):
         print(authorization_url)
 
         # get the authorization code from the user:
-        authorization_code = input('Enter the code:\n')
+        authorization_code = input("Enter the code:\n")
 
         # exchange the authorization code for an access token:
         token_url = "https://api.dropboxapi.com/oauth2/token"
@@ -92,4 +92,4 @@ class DropBoxService(Input):
         }
         r = requests.post(token_url, data=params)
         res = json.loads(r.text)
-        Utils().saveObject(res['access_token'], "data/credentials/acces_token.pickle")
+        Utils().saveObject(res["access_token"], "data/credentials/acces_token.pickle")
