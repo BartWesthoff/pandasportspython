@@ -83,8 +83,8 @@ class MPEmbedder(Embedder):
         else:
             extra = ''
         embedded_location = os.sep.join(["data", "embedded", data.split('.')[0] + extra])
-#        if os.path.exists(embedded_location):
-#            return Utils.openEmbedding(data.split('.')[0] + extra)
+        if os.path.exists(embedded_location):
+            return Utils.openEmbedding(data.split('.')[0] + extra)
         print(f"embedding  {data}")
         # TODO niet laten zien van de video
         cap = cv2.VideoCapture(video_location)
@@ -164,15 +164,14 @@ class MPEmbedder(Embedder):
         flipped_squat = np.array(all_flipped_frames)
         Utils().saveObject(squat, embedded_location)
         Utils().saveObject(flipped_squat, embedded_location + '_flipped')
-        newSquat = self.scaleSquat(squat) 
+        newSquat = self.scaleSquat(squat)
         return newSquat
-
 
     def scaleValue(self, val, minMaxValues):
         # Give the appropriate dimension in the values
         returnTuple = (val - minMaxValues['min']) / (minMaxValues['max'] - minMaxValues['min'])
         return returnTuple
-    
+
     def scaleSquat(self, squat):
         minMaxValues = self.minMaxVals(squat)
         iterator = 1
@@ -188,14 +187,12 @@ class MPEmbedder(Embedder):
             iterator = 1
         return squat
 
-
     def minMaxVals(self, squat):
         iterator = 1
         current = ''
         xVals = {'min': None, 'max': None}
         yVals = {'min': None, 'max': None}
         zVals = {'min': None, 'max': None}
-
 
         def setVals(vals, value):
             if vals['min'] == None or vals['min'] > value:
@@ -215,6 +212,6 @@ class MPEmbedder(Embedder):
                 elif iterator % 3 == 0:
                     zVals = setVals(zVals, coordinate)
                     current = 'z'
-                iterator += 1 
-            iterator = 1 
+                iterator += 1
+            iterator = 1
         return (xVals, yVals, zVals)
