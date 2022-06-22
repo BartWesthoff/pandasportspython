@@ -11,7 +11,7 @@ settings:
     - left_ankle
     - right_ankle
     - left_foot_index
-    - right_foot_indexó
+    - right_foot_index
   normalize_landmarks: false
   testing: false
   tf_lite_model: thunder_float16.tflite
