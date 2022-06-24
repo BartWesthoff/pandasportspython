@@ -45,7 +45,9 @@ class VideoTrainer(Step):
 
             model.add(LSTM(440, return_sequences=True, dropout=0.8, input_shape=(None, 30)))
             model.add(LSTM(220, dropout=0.5, recurrent_dropout=0.5, return_sequences=True))
-            model.add(LSTM(110, dropout=0.5, recurrent_dropout=0.5 ))
+            model.add(LSTM(110, dropout=0.5, recurrent_dropout=0.5, return_sequences=True))
+            model.add(LSTM(110, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
+            model.add(LSTM(110))
             model.add(Dense(50, activation="sigmoid"))
             model.add(Dense(1, activation="sigmoid"))
 
