@@ -98,7 +98,7 @@ class MPEmbedder(Embedder):
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
         mp_pose = mp.solutions.pose
-        pose = mp_pose.Pose()
+        pose = mp_pose.Pose(model_complexity=2)
 
         allframes = []
         all_flipped_frames = []
