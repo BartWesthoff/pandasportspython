@@ -198,7 +198,7 @@ class Utils:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data["settings"]
 
-    def augmentation(self, name:str, squat: ndarray, spreadx: int = None, spready: int = None, width: int = None,
+    def augmentation(self, name: str, squat: ndarray, spreadx: int = None, spready: int = None, width: int = None,
                      height: int = None, amount: int = 10, save: bool = False) -> ndarray:
         """augmentation of the squats to make more squats"""
         # TODO: random spread toevoegen
@@ -259,6 +259,57 @@ class Utils:
         model.compile(loss="binary_crossentropy", optimizer="adam", metrics=["accuracy"])
         # model.summary()
         return model
+
+    def data_augmentation_normalized(self, name: str, squat: ndarray, spreadx: int = None, spready: int = None,
+                                     amount: int = 10, save: bool = False) -> ndarray:
+        """augmentation of the squats to make more squats (normalized)"""
+        low_x = 1
+        low_y = 1
+        high_x = 0
+        high_y = 0
+        for frame in squat:
+            lenght = len(frame)
+            for i in range(0, lenght, 3):
+                ## kijkt steeds of hoogste y (bijv 0.76 lager is dan 1 of vorige waarde)
+                ## kijkt steeds of hoogste x (bijv 0.80 lager is dan 1 of vorige waarde)
+
+                low_x = frame[i] if frame[i] < low_x else low_x
+                low_y = frame[i + 1] if frame[i + 1] < low_y else low_y
+                high_x = frame[i] if frame[i] > high_x else high_x
+                high_y = frame[i + 1] if frame[i + 1] > high_y else high_y
+
+        # om getatl tussen de 0 en 100 te krijgen voor de randint
+        low_x = low_x * 100
+        low_y = low_y * 100
+        high_x = high_x * 100
+        high_y = high_y * 100
+        spready = randint(int(low_y), int(high_y)) if spready is None else spready
+        spreadx = randint(int(low_x), int(high_x)) if spreadx is None else spreadx
+
+        # hier weer omzetten naar %
+        random_x = [i / 100 for i in range(-spreadx // 2, spreadx // 2 + 1) if i != 0]
+        random_y = [i / 100 for i in range(-spready // 2, spready // 2 + 1) if i != 0]
+        c = list(itertools.product(random_x, random_y))
+        shuffle(c)
+
+        squats = []
+
+        for combination in c[:amount]:
+            new_squat = []
+            for frame in squat:
+                lenght = len(frame)
+                modified_array = copy.deepcopy(frame)
+                for i in range(0, lenght, 3):
+                    modified_array[i] += combination[0]
+                    modified_array[i + 1] += combination[1]
+                new_squat.append(modified_array)
+            squats.append(new_squat)
+
+        random_squats = np.array(squats)
+        if save:
+            for idx, squat in enumerate(random_squats):
+                Utils().saveSquatEmbedding(squat, f"{name}_augmented{idx + 1}_normalized")
+        return random_squats
 
     # Functie om met de training data te spelen
     def playground(self):
