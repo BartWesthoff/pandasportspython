@@ -37,19 +37,24 @@ class VideoTrainer(Step):
         model = None
         test_squat = Utils().openEmbedding(test_squats_names[0])
         test_squat2 = Utils().openEmbedding(test_squats_names[1])
-        print(test_squat.shape)
-        print(test_squat2.shape)
+        #print(test_squat.shape)
+        #print(test_squat2.shape)
         if create_model:
             model = Sequential()
 
-            model.add(LSTM(64, return_sequences=True, input_shape=(None, 30)))
-            model.add(LSTM(16, dropout=0.2, recurrent_dropout=0.2))
+
+            model.add(LSTM(440, return_sequences=True, dropout=0.8, input_shape=(None, 30)))
+            model.add(LSTM(220, dropout=0.5, recurrent_dropout=0.5, return_sequences=True))
+            model.add(LSTM(110, dropout=0.5, recurrent_dropout=0.5 ))
+            model.add(Dense(50, activation="sigmoid"))
             model.add(Dense(1, activation="sigmoid"))
 
             print(model.summary(90))
             model.compile(loss="binary_crossentropy", optimizer="adam", metrics=[tf.keras.metrics.Precision()])
-            epochs = 2
+            epochs = 8
+#            steps_per_epoch = 1
             steps_per_epoch = len(train_squats_names) // epochs
+#            steps_per_epoch = len(train_squats_names) // 10
             model.fit(self.train_generator(train_squats_names), steps_per_epoch=steps_per_epoch, epochs=epochs,
                       verbose=1)
             model.save('model_scaled.h5')
