@@ -46,6 +46,10 @@ class Utils:
         """" saves object to (pickle) file"""
         save_location = os.sep.join(["data", "embedded", filename])
         print(save_location)
+
+        if os.path.exists(save_location):
+            print(f"{save_location} already exists")
+            return
         with open(save_location, "wb") as fp:
             print(f"saving object {filename}")
             pickle.dump(squat, fp)
@@ -310,7 +314,7 @@ class Utils:
         random_squats = np.array(squats)
         if save:
             for idx, squat in enumerate(random_squats):
-                Utils().saveSquatEmbedding(squat, f"{name}_augmented{idx + 1}_normalized")
+                Utils().saveSquatEmbedding(squat, f"{name}_augmented{idx + 1}")
         return random_squats
 
     # Functie om met de training data te spelen

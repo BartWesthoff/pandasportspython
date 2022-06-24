@@ -22,4 +22,10 @@ if __name__ == "__main__":
                VideoEvaluation()], model=None)
     pipeline.process()
 
+    # for i in os.listdir(os.sep.join(["data", "embedded"])):
+    #     if "normalized" in i:
+    #         squat = Utils().openEmbedding(i)
+    #         squats = Utils().data_augmentation_normalized(amount=10, name=i, squat=squat, save=True)
+    #         print(squats.shape)
+
 
