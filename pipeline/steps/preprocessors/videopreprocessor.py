@@ -24,7 +24,7 @@ class VideoPreProcessor(Step):
         # return self._preprocessVideo(data)
         return data
 
-    def _preprocessVideo(self, data: list[CloudFile]) -> list[CloudFile]:
+    def _preprocessVideo(self, data: list[str]) -> list[str]:
         """" preprocesses video """
         # for i in data:
         #     print(i.name)
@@ -50,12 +50,13 @@ class VideoPreProcessor(Step):
         #         if not os.path.exists(destination):
         #             os.rename(source, destination)
         #             self.removesound(str(destination))
-        for item in data:
-            name = item.name
+        production_videos = os.listdir(os.sep.join(["data", "production"]))
+        for video in production_videos:
+            output = video.split(".")[0] + "edited" + ".mp4"
             # name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
-            name = os.sep.join(["data", "production", name])
-            name = self.cropVideo(name, "edited footage")
-            name = self.removesound(name, name)
+            # name = os.sep.join(["data", "production", name])
+            name = self.cropVideo(source=video, newname=output)
+            name = self.removesound(source=name, output=name)
             if self.settings["color"]:
                 self.grayvideo(name, name)
         return data
@@ -80,7 +81,7 @@ class VideoPreProcessor(Step):
 
     def cropVideo(self, source: str, newname: str) -> str:
         """" changed width and height of video """
-        output = Utils().changeFileName(source, newname)
+        Utils().changeFileName(source, newname)
         cap = cv2.VideoCapture(source)
         fps = cap.get(cv2.CAP_PROP_FPS)
 
@@ -142,7 +143,7 @@ class VideoPreProcessor(Step):
             cap.release()
             out.release()
             cv2.destroyAllWindows()
-            return f"{output}.mp4"
+            return newname
 
     def playVideo(self, source: str) -> None:
         """" plays video """

@@ -233,6 +233,8 @@ class Utils:
     def changeFileName(filename: str, newname: str) -> str:
         """changes the filename of a file"""
         path = os.sep.join(filename.split(os.sep)[:-1])
+        if '.mp4' not in newname:
+            newname += '.mp4'
         output_source = os.sep.join([path, newname])
         return output_source
 

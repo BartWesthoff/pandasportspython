@@ -5,7 +5,6 @@ import mediapipe as mp
 import numpy as np
 from numpy import ndarray
 
-from classes.cloudfile import CloudFile
 from pipeline.steps.embedder.videoembedder import Embedder
 from pipeline.utils.utils import Utils
 
@@ -57,11 +56,11 @@ class MPEmbedder(Embedder):
     # meerdere sqats vormen een alle data (list[list[list[float]]])
 
     # misschien niks terug geven en ophalen vanuit directory
-    def process(self, data: list[CloudFile]) -> list[list[list[float]]]:
+    def process(self, data: list[str]) -> list[list[list[float]]]:
         """ Processes the data """
         points = []
         for file in data:
-            squat = self.embed(file.name)
+            squat = self.embed(file)
             points.append(squat)
 
         return points
@@ -195,9 +194,9 @@ class MPEmbedder(Embedder):
         zVals = {'min': None, 'max': None}
 
         def setVals(vals, value):
-            if vals['min'] == None or vals['min'] > value:
+            if vals['min'] is None or vals['min'] > value:
                 vals['min'] = value
-            if vals['max'] == None or vals['max'] < value:
+            if vals['max'] is None or vals['max'] < value:
                 vals['max'] = value
             return vals
 
@@ -214,4 +213,4 @@ class MPEmbedder(Embedder):
                     current = 'z'
                 iterator += 1
             iterator = 1
-        return (xVals, yVals, zVals)
+        return xVals, yVals, zVals
