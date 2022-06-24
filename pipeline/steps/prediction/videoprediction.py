@@ -24,6 +24,7 @@ class VideoPrediction(Step):
         return [y_pred, y_true]
 
     def correlationChecker(self, labels, y_pred):
+        """Evaluates the model outcomes by finding a middleground between the lowest and highest score and classifying the results on that boundary"""
         y_pred_sorted = y_pred.copy()
         y_pred_sorted.sort()
         #print(y_pred_sorted)

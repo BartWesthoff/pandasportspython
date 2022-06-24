@@ -20,7 +20,7 @@ class VideoTrainer(Step):
 
     def process(self, data):  # TODO even nog checken wat ie teruggeeft
         # For debugging. Eliminates any randomness from the program
-        using_seed = True
+        using_seed = False
         if using_seed:
             np.random.seed(69)
             random.seed(42)
@@ -43,17 +43,17 @@ class VideoTrainer(Step):
             model = Sequential()
 
 
-            model.add(LSTM(440, return_sequences=True, dropout=0.8, input_shape=(None, 30)))
+            model.add(LSTM(1000, return_sequences=True, dropout=0.8, input_shape=(None, 30)))
             model.add(LSTM(220, dropout=0.5, recurrent_dropout=0.5, return_sequences=True))
             model.add(LSTM(110, dropout=0.5, recurrent_dropout=0.5, return_sequences=True))
             model.add(LSTM(110, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
-            model.add(LSTM(110))
-            model.add(Dense(50, activation="sigmoid"))
+            model.add(LSTM(50, dropout=0.2, recurrent_dropout=0.2))
+            model.add(Dense(20, activation="sigmoid"))
             model.add(Dense(1, activation="sigmoid"))
 
             print(model.summary(90))
             model.compile(loss="binary_crossentropy", optimizer="adam", metrics=[tf.keras.metrics.Precision()])
-            epochs = 8
+            epochs = 7
 #            steps_per_epoch = 1
             steps_per_epoch = len(train_squats_names) // epochs
 #            steps_per_epoch = len(train_squats_names) // 10
