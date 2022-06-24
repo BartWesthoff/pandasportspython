@@ -76,17 +76,20 @@ class MPEmbedder(Embedder):
             folder = 'negative_squat'
 
         # haalt de default waarde van de landmarks op
-        video_location = os.sep.join(['data', folder, data])
+        video_location = data
         if self.settings['normalize_landmarks']:
             extra = '_normalized'
         else:
             extra = ''
-        embedded_location = os.sep.join(["data", "embedded", data.split('.')[0] + extra])
+        video_title = data.split(os.sep)[-1].split('.')[0] + extra
+
+        print(video_title)
+        embedded_location = os.sep.join(["data", "embedded", video_title ])
         if os.path.exists(embedded_location):
-            return Utils.openEmbedding(data.split('.')[0] + extra)
-        print(f"embedding  {data}")
-        # TODO niet laten zien van de video
+            return Utils.openEmbedding(video_title)
+        print(f"embedding: {data}")
         cap = cv2.VideoCapture(video_location)
+        print(f"video_location: {video_location}")
         width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float `width`
         height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -136,8 +139,8 @@ class MPEmbedder(Embedder):
                             currentframe.append(data_point.x)
                             currentframe.append(data_point.y)
                             currentframe.append(data_point.z)
-                            current_flipped_frame.append(width - data_point.x - 1)
-                            current_flipped_frame.append(data_point.y)
+                            current_flipped_frame.append(1- data_point.x)
+                            current_flipped_frame.append(1- data_point.x)
                             current_flipped_frame.append(data_point.z)
                         else:
                             currentframe.append(data_point.x * width)

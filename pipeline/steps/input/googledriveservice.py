@@ -31,10 +31,10 @@ class GoogleDriveService(Input):
         for idx, cloudfile in enumerate(files):
             folder = "production"
 
-            kind = cloudfile.name.split("_")[0]
-
-            if ["positive", "negative"] in cloudfile.name:
-                folder = f"{kind}_squat"
+            if "positive" in cloudfile.name:
+                folder = "positive_squat"
+            if "negative" in cloudfile.name:
+                folder = "negative_squat"
 
             if not os.path.exists(os.sep.join(["data", folder, cloudfile.name])):
                 self.download_file(cloudfile)
