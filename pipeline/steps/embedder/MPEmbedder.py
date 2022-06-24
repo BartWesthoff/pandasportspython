@@ -5,7 +5,6 @@ import mediapipe as mp
 import numpy as np
 from numpy import ndarray
 
-from classes.cloudfile import CloudFile
 from pipeline.steps.embedder.videoembedder import Embedder
 from pipeline.utils.utils import Utils
 
@@ -57,11 +56,13 @@ class MPEmbedder(Embedder):
     # meerdere sqats vormen een alle data (list[list[list[float]]])
 
     # misschien niks terug geven en ophalen vanuit directory
-    def process(self, data: list[CloudFile]) -> list[list[list[float]]]:
+    def process(self, data: list[str]) -> list[list[list[float]]]:
         """ Processes the data """
         points = []
+        data = os.listdir(os.sep.join(["data", "positive_squat"]))
+        data += os.listdir(os.sep.join(["data", "negative_squat"]))
         for file in data:
-            squat = self.embed(file.name)
+            squat = self.embed(file)
             points.append(squat)
 
         return points
@@ -76,18 +77,20 @@ class MPEmbedder(Embedder):
         elif 'negative' in data:
             folder = 'negative_squat'
 
+        video_title = data.split('.')[0]
         # haalt de default waarde van de landmarks op
-        video_location = os.sep.join(['data', folder, data])
+        video_location = os.sep.join(["data", folder, data])
         if self.settings['normalize_landmarks']:
             extra = '_normalized'
         else:
             extra = ''
-        embedded_location = os.sep.join(["data", "embedded", data.split('.')[0] + extra])
+        print(video_title)
+        embedded_location = os.sep.join(["data", "embedded", video_title + extra])
         if os.path.exists(embedded_location):
-            return Utils.openEmbedding(data.split('.')[0] + extra)
-        print(f"embedding  {data}")
-        # TODO niet laten zien van de video
+            return Utils.openEmbedding(video_title + extra)
+        print(f"embedding: {data}")
         cap = cv2.VideoCapture(video_location)
+        print(f"video_location: {video_location}")
         width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float `width`
         height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -96,7 +99,7 @@ class MPEmbedder(Embedder):
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
         mp_pose = mp.solutions.pose
-        pose = mp_pose.Pose()
+        pose = mp_pose.Pose(model_complexity=2)
 
         allframes = []
         all_flipped_frames = []
@@ -137,8 +140,8 @@ class MPEmbedder(Embedder):
                             currentframe.append(data_point.x)
                             currentframe.append(data_point.y)
                             currentframe.append(data_point.z)
-                            current_flipped_frame.append(width - data_point.x - 1)
-                            current_flipped_frame.append(data_point.y)
+                            current_flipped_frame.append(1- data_point.x)
+                            current_flipped_frame.append(1- data_point.x)
                             current_flipped_frame.append(data_point.z)
                         else:
                             currentframe.append(data_point.x * width)
@@ -195,9 +198,9 @@ class MPEmbedder(Embedder):
         zVals = {'min': None, 'max': None}
 
         def setVals(vals, value):
-            if vals['min'] == None or vals['min'] > value:
+            if vals['min'] is None or vals['min'] > value:
                 vals['min'] = value
-            if vals['max'] == None or vals['max'] < value:
+            if vals['max'] is None or vals['max'] < value:
                 vals['max'] = value
             return vals
 
@@ -214,4 +217,4 @@ class MPEmbedder(Embedder):
                     current = 'z'
                 iterator += 1
             iterator = 1
-        return (xVals, yVals, zVals)
+        return xVals, yVals, zVals

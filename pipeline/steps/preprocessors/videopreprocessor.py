@@ -1,11 +1,11 @@
 import os
+import shutil
 from random import *
 
 import cv2
 import moviepy.editor as mpy
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
-from classes.cloudfile import CloudFile
 from pipeline.steps.step import Step
 from pipeline.utils.deprecated import deprecated
 from pipeline.utils.utils import Utils
@@ -19,68 +19,69 @@ used to preprocess video material
 class VideoPreProcessor(Step):
     """" class for video preprocessing """
 
-    def process(self, data: list[CloudFile]) -> list[CloudFile]:
+    def process(self, data: list[str]) -> list[str]:
         """" processes given data"""
-        # return self._preprocessVideo(data)
-        return data
+        return self._preprocessVideo(data)
+        # return data
 
-    def _preprocessVideo(self, data: list[CloudFile]) -> list[CloudFile]:
+    def _preprocessVideo(self, data: list[str]) -> list[str]:
         """" preprocesses video """
-        # for i in data:
-        #     print(i.name)
-        # # idee is dat we deze video namen gebruiken om van gedownloaden data goede data te maken
-        # # wordt bijvoorbeeld gedownload in een download mapje,
-        # # en daar sorteren we de video"s en bewerken we ze
-        # # bewerkte data komt dan is positief of negatief
-        # # kan ook in 1 mapje production
-        #
-        # for name in ["positive", "negative"]:
-        #     folder = Utils().root_dir + os.sep + "data" + os.sep + f"{name}_squat" + os.sep
-        #     for index, file_name in enumerate(os.listdir(folder)):
-        #         # Construct old file name
-        #         source = folder + file_name
-        #
-        #         # Adding the count to the new file name and extension
-        #         # met production data folder of gewoon overwritten
-        #         destination = folder + f"{name}_squat{index // 2}.mp4"
-        #
-        #         # destination = folder.replace(f"{name}_squat", "production") + f"{name}_squat{index}.mp4"
-        #
-        #         # Video bestaat al zonder geluid
-        #         if not os.path.exists(destination):
-        #             os.rename(source, destination)
-        #             self.removesound(str(destination))
-        for item in data:
-            name = item.name
-            # name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
-            name = os.sep.join(["data", "production", name])
-            name = self.cropVideo(name, "edited footage")
-            name = self.removesound(name, name)
-            if self.settings["color"]:
-                self.grayvideo(name, name)
-        return data
+        proccessed_data = []
+        path = os.sep.join(["data", "negative_squat"])
 
-    def removesound(self, source: str, output: str) -> str:
+        path2 = os.sep.join(["data", "positive_squat"])
+
+        for root, directories, files in os.walk(path, topdown=False):
+            for name in files:
+                source = os.path.join(root, name)
+                name = self.cropVideo(source)
+                if self.settings["color"]:
+                    name = self.grayvideo(name)
+                proccessed_data.append(name)
+
+        for root, directories, files in os.walk(path2, topdown=False):
+            for name in files:
+                name = self.cropVideo(os.path.join(root, name))
+                if self.settings["color"]:
+                    name = self.grayvideo(name)
+                proccessed_data.append(name)
+
+        return proccessed_data
+
+    def _getnewname(self, fullsource: str, appendix: str) -> str:
+        name = fullsource.split(os.sep)[-1].split(".")[0]
+        source = os.sep.join(fullsource.split(os.sep)[:-1])
+        new_name = f"{source}{os.sep}{name}_{appendix}.mp4"
+        return new_name
+
+    def removesound(self, source: str) -> str:
         """" Removes sound from video """
+        new_name = self._getnewname(source, "NS")
+        if os.path.exists(new_name):
+            return new_name
+
         videoclip = mpy.VideoFileClip(source)
         new_clip = videoclip.without_audio()
-        name = source.split(os.sep)[-1].split(".")[0]
-        codec = name.split(os.sep)[-1].split(".")[-1]
-        new_clip.write_videofile(f"{output}_edit.{codec}")
-
+        new_clip.write_videofile(new_name)
         videoclip.reader.close()
         videoclip.audio.reader.close_proc()
-        return output
+        return new_name
 
+    @deprecated
     def capFPS(self, source: str, output: str, fps: int) -> None:
         """" Cap FPS of video """
         video = mpy.VideoFileClip(source)
         video.write_videofile(output, fps=fps)
         video.close()
 
-    def cropVideo(self, source: str, newname: str) -> str:
+    def cropVideo(self, source: str):
         """" changed width and height of video """
-        output = Utils().changeFileName(source, newname)
+        new_name = self._getnewname(source, "NB")
+        # check if file exists
+        if "_NB" in source:
+            return new_name
+
+
         cap = cv2.VideoCapture(source)
         fps = cap.get(cv2.CAP_PROP_FPS)
 
@@ -93,32 +94,21 @@ class VideoPreProcessor(Step):
             width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
             height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-            # Convert image to grayscale
-            im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+            gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+            _, thresh = cv2.threshold(gray, 1, 255, cv2.THRESH_BINARY)
+            contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cnt = contours[0]
+            x, y, w, h = cv2.boundingRect(cnt)
+            print(x, y, w, h)
 
-            # make binary image
-            im = cv2.threshold(im, 5, 255, cv2.THRESH_BINARY)[1]
-
-            # draw black border around image to better detect blobs:
-            cv2.rectangle(im, (0, 0), (width, height), 0, thickness=width // 25)
-
-            # Invert the black and white colors
-            im = ~im
-
-            # Find contours and sort them by width
-            cnts, _ = cv2.findContours(im, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-            list(cnts).sort(key=lambda x: cv2.boundingRect(x)[2], reverse=True)
-
-            # Change the type and channels of image copies
-            im = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR)
-
-            x, y, w, h = cv2.boundingRect(cnts[1])
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (128, 0, 255), 10)
-            cv2.rectangle(im, (x, y), (x + w, y + h), (128, 255, 0), 10)
-
+            # no contour or too small
+            if w == width or h == height or x == 0 or y == 0 or w < 20 or h < 20:
+                return new_name
+            print("cropping video")
             # output
-            codec = cv2.VideoWriter_fourcc(*"mp4v")
-            out = cv2.VideoWriter(f"{output}.mp4", codec, fps, (w, h))
+            shutil.copyfile(source, new_name)
+            codec = cv2.VideoWriter_fourcc(*'mp4v')
+            out = cv2.VideoWriter(new_name, codec, fps, (w, h))
 
             # Now we start
             cnt = 0
@@ -132,17 +122,18 @@ class VideoPreProcessor(Step):
                     out.write(cropped_frame)
                     # Percentage
                     xx = cnt * 100 / frames
-                    print(int(xx), "%")
-                    cv2.imshow("frame", frame1)
-                    if cv2.waitKey(1) & 0xFF == ord("q"):
-                        break
+                    print(int(xx), '%')
+                    if self.settings['testing']:
+                        cv2.imshow('frame', frame1)
+                        if cv2.waitKey(1) & 0xFF == ord('q'):
+                            break
                 else:
                     break
 
             cap.release()
             out.release()
             cv2.destroyAllWindows()
-            return f"{output}.mp4"
+            return new_name
 
     def playVideo(self, source: str) -> None:
         """" plays video """
@@ -181,9 +172,12 @@ class VideoPreProcessor(Step):
         cv2.destroyAllWindows()
 
     # alleen voor vergelijken gebruiken
-    def grayvideo(self, source: str, newname: str):
+    def grayvideo(self, source: str) -> str:
         """" Convert video to black/white """
-        output = Utils().changeFileName(source, newname)
+        new_name = self._getnewname(source, "BW")
+        if os.path.exists(new_name):
+            return new_name
+        output = Utils().changeFileName(source, new_name)
         video = cv2.VideoCapture(source)
         fps = video.get(cv2.CAP_PROP_FPS)
         # We need to check if camera
@@ -222,6 +216,7 @@ class VideoPreProcessor(Step):
         cv2.destroyAllWindows()
 
         print("The video was successfully saved")
+        return new_name
 
     # def imageToVideo(self):
     #     image_folder = "images"

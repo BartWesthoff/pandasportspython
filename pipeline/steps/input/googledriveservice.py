@@ -21,7 +21,7 @@ class GoogleDriveService(Input):
         self.scopes = ["https://www.googleapis.com/auth/drive.readonly"]  # read,write,update,delete permission
         self.service = self.get_gdrive_service()
 
-    def process(self) -> list[CloudFile]:
+    def process(self) -> list[str]:
         """given items returned by Google Drive API"""
         files = self.get_files_in_folder("videos minor ai")
         print(f"found {len(files)} files")
@@ -30,23 +30,20 @@ class GoogleDriveService(Input):
             files = files[:self.settings["amount"]]
         for idx, cloudfile in enumerate(files):
             folder = "production"
+
             if "positive" in cloudfile.name:
                 folder = "positive_squat"
             if "negative" in cloudfile.name:
                 folder = "negative_squat"
-                if '9' in cloudfile.name:
-                    print(cloudfile.name)
 
             if not os.path.exists(os.sep.join(["data", folder, cloudfile.name])):
                 self.download_file(cloudfile)
                 print(f"downloaded {cloudfile.name} number {idx}")
-                if self.settings["testing"]:
-                    break
         if self.settings["amount"] <= 0:
-            return files
+            return [file.name for file in files]
         else:
             print(f"returning {min(self.settings['amount'], len(files))} file(s)")
-            return files[:self.settings["amount"]]
+            return [file.name for file in files][:self.settings["amount"]]
 
     def get_gdrive_service(self) -> object:
         """" instantiate a Google Drive service object """
