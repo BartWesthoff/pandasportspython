@@ -1,5 +1,7 @@
 import os
 
+import numpy as np
+
 from pipeline.pipeline import Pipeline
 from pipeline.steps.embedder.MPEmbedder import MPEmbedder
 from pipeline.steps.evaluation.videoevaluation import VideoEvaluation
@@ -8,8 +10,10 @@ from pipeline.steps.prediction.videoprediction import VideoPrediction
 from pipeline.steps.preprocessors.videopreprocessor import VideoPreProcessor
 from pipeline.steps.training.videotraining import VideoTrainer
 import tensorflow as tf
-
+import cv2
+import numpy as np
 from pipeline.utils.utils import Utils
+
 
 if __name__ == "__main__":
     # model = tf.keras.models.load_model("model.h5")
@@ -17,4 +21,5 @@ if __name__ == "__main__":
         steps=[GoogleDriveService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
                VideoEvaluation()], model=None)
     pipeline.process()
+
 

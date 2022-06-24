@@ -4,7 +4,6 @@ from random import *
 
 import cv2
 import moviepy.editor as mpy
-import numpy as np
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
 from pipeline.steps.step import Step
@@ -79,14 +78,10 @@ class VideoPreProcessor(Step):
         """" changed width and height of video """
         new_name = self._getnewname(source, "NB")
         # check if file exists
-        if os.path.exists(new_name):
+        if "_NB" in source:
             return new_name
-        if os.path.exists(source):
-           return source
-        print("cropping video")
 
-        # Utils().changeFileName(source, new_name)
-        shutil.copyfile(source, new_name)
+
         cap = cv2.VideoCapture(source)
         fps = cap.get(cv2.CAP_PROP_FPS)
 
@@ -99,43 +94,19 @@ class VideoPreProcessor(Step):
             width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
             height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-            # Convert image to grayscale
-            im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-
-            # remove noise
-            im = cv2.GaussianBlur(im, (21, 21), 21)
-            im = cv2.erode(im, np.ones((5, 5)))
-
-            # remove horizantal line
-            im = cv2.GaussianBlur(im, (5, 0), 21)
-            blr = im.copy()
-
-            # make binary image
-            im = cv2.threshold(im, 5, 255, cv2.THRESH_BINARY)[1]
-
-            # draw black border around image to better detect blobs:
-            cv2.rectangle(im, (0, 0), (width,height), 0, thickness=width // 25)
-            bw = im.copy()
-
-            # Invert the black and white colors
-            im = ~im
-
-            # Find contours and sort them by width
-            cnts, _ = cv2.findContours(im, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-            cnts.sort(key=lambda x: cv2.boundingRect(x)[2], reverse=True)
-
-            # Change the type and channels of image copies
-            im = cv2.cvtColor(im, cv2.COLOR_GRAY2BGR)
-            bw = cv2.cvtColor(bw, cv2.COLOR_GRAY2BGR)
-            blr = cv2.cvtColor(blr, cv2.COLOR_GRAY2BGR)
-
-            # Find the second biggest blob
-            x, y, w, h = cv2.boundingRect(cnts[1])
-            cv2.rectangle(org, (x, y), (x + w, y + h), (128, 0, 255), 10)
-            cv2.rectangle(im, (x, y), (x + w, y + h), (128, 255, 0), 10)
+            gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+            _, thresh = cv2.threshold(gray, 1, 255, cv2.THRESH_BINARY)
+            contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            cnt = contours[0]
+            x, y, w, h = cv2.boundingRect(cnt)
             print(x, y, w, h)
 
+            # no contour or too small
+            if w == width or h == height or x == 0 or y == 0 or w < 20 or h < 20:
+                return new_name
+            print("cropping video")
             # output
+            shutil.copyfile(source, new_name)
             codec = cv2.VideoWriter_fourcc(*'mp4v')
             out = cv2.VideoWriter(new_name, codec, fps, (w, h))
 

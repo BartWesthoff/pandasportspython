@@ -59,6 +59,8 @@ class MPEmbedder(Embedder):
     def process(self, data: list[str]) -> list[list[list[float]]]:
         """ Processes the data """
         points = []
+        data = os.listdir(os.sep.join(["data", "positive_squat"]))
+        data += os.listdir(os.sep.join(["data", "negative_squat"]))
         for file in data:
             squat = self.embed(file)
             points.append(squat)
@@ -75,18 +77,17 @@ class MPEmbedder(Embedder):
         elif 'negative' in data:
             folder = 'negative_squat'
 
+        video_title = data.split('.')[0]
         # haalt de default waarde van de landmarks op
-        video_location = data
+        video_location = os.sep.join(["data", folder, data])
         if self.settings['normalize_landmarks']:
             extra = '_normalized'
         else:
             extra = ''
-        video_title = data.split(os.sep)[-1].split('.')[0] + extra
-
         print(video_title)
-        embedded_location = os.sep.join(["data", "embedded", video_title ])
+        embedded_location = os.sep.join(["data", "embedded", video_title + extra])
         if os.path.exists(embedded_location):
-            return Utils.openEmbedding(video_title)
+            return Utils.openEmbedding(video_title + extra)
         print(f"embedding: {data}")
         cap = cv2.VideoCapture(video_location)
         print(f"video_location: {video_location}")
