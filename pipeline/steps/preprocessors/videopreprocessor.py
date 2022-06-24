@@ -99,7 +99,7 @@ class VideoPreProcessor(Step):
             contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             cnt = contours[0]
             x, y, w, h = cv2.boundingRect(cnt)
-            print(x, y, w, h)
+            # print(x, y, w, h)
 
             # no contour or too small
             if w == width or h == height or x == 0 or y == 0 or w < 20 or h < 20:

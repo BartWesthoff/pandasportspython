@@ -84,7 +84,6 @@ class MPEmbedder(Embedder):
             extra = '_normalized'
         else:
             extra = ''
-        print(video_title)
         embedded_location = os.sep.join(["data", "embedded", video_title + extra])
         if os.path.exists(embedded_location):
             return Utils.openEmbedding(video_title + extra)
