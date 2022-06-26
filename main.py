@@ -9,10 +9,10 @@ from pipeline.steps.preprocessors.videopreprocessor import VideoPreProcessor
 from pipeline.steps.training.videotraining import VideoTrainer
 
 if __name__ == "__main__":
-    # model = tf.keras.models.load_model("model.h5")
+    model = tf.keras.models.load_model("custommodel.h5")
     pipeline = Pipeline(
         steps=[GoogleDriveService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
-               VideoEvaluation()], model=None)
+               VideoEvaluation()], model=model)
     pipeline.process()
 
     # count_positive = 0

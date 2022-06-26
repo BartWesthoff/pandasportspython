@@ -19,13 +19,14 @@ class VideoTrainer(Step):
     """" Class for the video training step"""
 
     def process(self, data):  # TODO even nog checken wat ie teruggeeft
+        """" process the data of the step """
         # For debugging. Eliminates any randomness from the program
         using_seed = True
         if using_seed:
             np.random.seed(69)
             random.seed(42)
             tf.random.set_seed(42)
-        """" process the data of the step """
+
         list_of_vids = [i for i in os.listdir(os.sep.join(["data", "embedded"]))]
         if self.settings["normalize_landmarks"]:
             list_of_vids = [i for i in list_of_vids if "normalized" in i]
@@ -35,7 +36,7 @@ class VideoTrainer(Step):
             list_of_vids = list_of_vids[:self.settings["amount"]]
         squats = np.array([Utils().openEmbedding(i) for i in list_of_vids], dtype=object)
         train_squats_names = list_of_vids[:int(len(squats) * 0.8)]
-        test_squats_names = list_of_vids
+        test_squats_names = list_of_vids[int(len(squats) * 0.8):]
         create_model = self.model is None
         model = None
         if create_model:
