@@ -20,7 +20,7 @@ class VideoTrainer(Step):
 
     def process(self, data):  # TODO even nog checken wat ie teruggeeft
         # For debugging. Eliminates any randomness from the program
-        using_seed = False
+        using_seed = True
         if using_seed:
             np.random.seed(69)
             random.seed(42)
@@ -30,26 +30,22 @@ class VideoTrainer(Step):
         if self.settings["normalize_landmarks"]:
             list_of_vids = [i for i in list_of_vids if "normalized" in i]
 
-
         random.shuffle(list_of_vids)
         if self.settings["amount"] > 0:
             list_of_vids = list_of_vids[:self.settings["amount"]]
         squats = np.array([Utils().openEmbedding(i) for i in list_of_vids], dtype=object)
         train_squats_names = list_of_vids[:int(len(squats) * 0.8)]
-        test_squats_names = list_of_vids[int(len(squats) * 0.8):]
-        create_model = True
+        test_squats_names = list_of_vids
+        create_model = self.model is None
         model = None
         if create_model:
             model = Sequential()
 
-            model.add(LSTM(32, return_sequences=True, input_shape=(None, 30)))
-            model.add(Dense(64, activation="relu"))
-            model.add(LSTM(16, dropout=0.6))
-            model.add(Dense(80, activation="relu"))
+            model.add(LSTM(4, input_shape=(None, 30)))
             model.add(Dense(1, activation="sigmoid"))
 
             print(model.summary(90))
-            model.compile(loss="binary_crossentropy", optimizer="adam", metrics=[tf.keras.metrics.Precision()])
+            model.compile(loss="binary_crossentropy", optimizer="adam")
             epochs = 50
             steps_per_epoch = len(train_squats_names) // epochs
             model.fit(self.train_generator(train_squats_names), steps_per_epoch=steps_per_epoch, epochs=epochs,

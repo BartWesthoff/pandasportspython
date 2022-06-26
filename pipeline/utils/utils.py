@@ -293,8 +293,8 @@ class Utils:
         spreadx = randint(int(low_x), int(high_x)) if spreadx is None else spreadx
 
         # hier weer omzetten naar %
-        random_x = [i / 100 for i in range(-spreadx // 2, spreadx // 2 + 1) if i != 0]
-        random_y = [i / 100 for i in range(-spready // 2, spready // 2 + 1) if i != 0]
+        random_x = [i // 100 for i in range(-spreadx // 2, spreadx // 2 + 1) if i != 0]
+        random_y = [i // 100 for i in range(-spready // 2, spready // 2 + 1) if i != 0]
         c = list(itertools.product(random_x, random_y))
         shuffle(c)
 
@@ -308,6 +308,7 @@ class Utils:
                 for i in range(0, lenght, 3):
                     modified_array[i] += combination[0]
                     modified_array[i + 1] += combination[1]
+
                 new_squat.append(modified_array)
             squats.append(new_squat)
 
@@ -343,3 +344,30 @@ class Utils:
         test_data = np.reshape(test_data, (1, 137, 99))
         pred = model.predict(test_data)
         print("predicted sigmoid output => ", pred)
+
+    def check_invalid_squats(self):
+        checked = []
+        for current in list(os.listdir(os.sep.join(["data", "embedded"]))):
+            current_squat = Utils().openEmbedding(current)
+            if current in checked:
+                pass
+            else:
+                checked.append(current_squat)
+                for example in os.listdir(os.sep.join(["data", "embedded"])):
+                    if current != example:
+                        checked.append(example)
+                        example_squat = Utils().openEmbedding(example)
+                        if np.array_equal(current_squat, example_squat):
+                            print(f"{current} and {example} are the same")
+                            os.remove(os.sep.join(["data", "embedded", current]))
+                            break
+                        if example_squat.shape[1] != 30:
+                            print(f"{example} has wrong shape")
+                            os.remove(os.sep.join(["data", "embedded", example]))
+                            break
+                        for frame in example_squat:
+                            for idx, coordinaat in enumerate(frame):
+                                if (coordinaat < 0 or coordinaat > 1) and (idx + 1) % 3 != 0:
+                                    os.remove(os.sep.join(["data", "embedded", current]))
+                                    print(f"Removed {current}")
+                                    break

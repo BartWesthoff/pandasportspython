@@ -21,9 +21,7 @@ class Pipeline:
         """
         data = None
 
-        # if first item in array is not of type step
-        if not isinstance(self.steps[0], Input):
-            raise ValueError("First step must be Input")
+
 
         for step in self.steps:
             if issubclass(type(step), Input):

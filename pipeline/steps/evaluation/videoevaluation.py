@@ -27,17 +27,26 @@ class VideoEvaluation(Step):
 
         y_true = data[1]
         y_pred = data[0]
-        print(y_true)
-        print(y_pred)
+        # print(y_true)
+        # total positive and negative examples
+        total_positive = sum(y_true)
+        total_negative = len(y_true) - total_positive
+        print("Total positive:", total_positive)
+        print("Total negative:", total_negative)
+        # print(y_pred)
         cm = confusion_matrix(y_true, y_pred)
+        tn, fp, fn, tp = cm.ravel()
+        specificity = tn / (tn + fp)
         precision = precision_score(y_true, y_pred)
         accuracy = accuracy_score(y_true, y_pred)
         recall = recall_score(y_true, y_pred)
         f1 = f1_score(y_true, y_pred)
+
         print(f"precision: {precision}")
         print(f"accuracy: {accuracy}")
         print(f"recall: {recall}")
         print(f"f1: {f1}")
+        print(f"specificity: {specificity}")
 
         # save current model to name 'model_best.h5' if model is better
         is_better = False
