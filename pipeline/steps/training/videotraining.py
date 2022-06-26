@@ -34,26 +34,24 @@ class VideoTrainer(Step):
         random.shuffle(list_of_vids)
         if self.settings["amount"] > 0:
             list_of_vids = list_of_vids[:self.settings["amount"]]
-        squats = np.array([Utils().openEmbedding(i) for i in list_of_vids])
+        squats = np.array([Utils().openEmbedding(i) for i in list_of_vids], dtype=object)
         train_squats_names = list_of_vids[:int(len(squats) * 0.8)]
         test_squats_names = list_of_vids[int(len(squats) * 0.8):]
         create_model = True
         model = None
-        test_squat = Utils().openEmbedding(test_squats_names[0])
-        test_squat2 = Utils().openEmbedding(test_squats_names[1])
         if create_model:
             model = Sequential()
 
-            model.add(LSTM(64, return_sequences=True, input_shape=(None, 30)))
-            model.add(LSTM(16, dropout=0.2))
+            model.add(LSTM(32, return_sequences=True, input_shape=(None, 30)))
+            model.add(Dense(64, activation="relu"))
+            model.add(LSTM(16, dropout=0.6))
+            model.add(Dense(80, activation="relu"))
             model.add(Dense(1, activation="sigmoid"))
 
             print(model.summary(90))
             model.compile(loss="binary_crossentropy", optimizer="adam", metrics=[tf.keras.metrics.Precision()])
-            epochs = 7
-#            steps_per_epoch = 1
+            epochs = 50
             steps_per_epoch = len(train_squats_names) // epochs
-#            steps_per_epoch = len(train_squats_names) // 10
             model.fit(self.train_generator(train_squats_names), steps_per_epoch=steps_per_epoch, epochs=epochs,
                       verbose=1)
             model.save('model_scaled.h5')

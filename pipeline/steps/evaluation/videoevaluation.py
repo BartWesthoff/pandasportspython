@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 from sklearn.metrics import precision_score
-
+from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import accuracy_score
 from pipeline.steps.step import Step
 
 """
@@ -29,7 +31,14 @@ class VideoEvaluation(Step):
         print(y_pred)
         cm = confusion_matrix(y_true, y_pred)
         precision = precision_score(y_true, y_pred)
-        print(precision)
+        accuracy = accuracy_score(y_true, y_pred)
+        recall = recall_score(y_true, y_pred)
+        f1 = f1_score(y_true, y_pred)
+        print(f"precision: {precision}")
+        print(f"accuracy: {accuracy}")
+        print(f"recall: {recall}")
+        print(f"f1: {f1}")
+
         # save current model to name 'model_best.h5' if model is better
         is_better = False
         # TODO nog even kijken of model echt beter is en dan die opslaan
