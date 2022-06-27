@@ -17,9 +17,6 @@ class VideoPrediction(Step):
             model = self.model
         y_pred = [model.predict(i) for i in data[0]]
         # correct, y_pred = self.correlationChecker(data[1], y_pred)
-        # print("Percent correctly guessed:", correct)
-        print(y_pred)
-        y_pred = [1 if i > 0.5 else 0 for i in y_pred]
         y_true = data[1]
 
         return [y_pred, y_true]

@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import f1_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
-from sklearn.metrics import f1_score
-from sklearn.metrics import accuracy_score
+
 from pipeline.steps.step import Step
 
 """
@@ -27,20 +28,18 @@ class VideoEvaluation(Step):
 
         y_true = data[1]
         y_pred = data[0]
-        # print(y_true)
-        # total positive and negative examples
+        y_pred_hard = [1 if i > 0.5 else 0 for i in y_pred]
         total_positive = sum(y_true)
         total_negative = len(y_true) - total_positive
         print("Total positive:", total_positive)
         print("Total negative:", total_negative)
-        # print(y_pred)
-        cm = confusion_matrix(y_true, y_pred)
+        cm = confusion_matrix(y_true, y_pred_hard)
         tn, fp, fn, tp = cm.ravel()
         specificity = tn / (tn + fp)
-        precision = precision_score(y_true, y_pred)
-        accuracy = accuracy_score(y_true, y_pred)
-        recall = recall_score(y_true, y_pred)
-        f1 = f1_score(y_true, y_pred)
+        precision = precision_score(y_true, y_pred_hard)
+        accuracy = accuracy_score(y_true, y_pred_hard)
+        recall = recall_score(y_true, y_pred_hard)
+        f1 = f1_score(y_true, y_pred_hard)
 
         print(f"precision: {precision}")
         print(f"accuracy: {accuracy}")
@@ -48,15 +47,26 @@ class VideoEvaluation(Step):
         print(f"f1: {f1}")
         print(f"specificity: {specificity}")
 
-        # save current model to name 'model_best.h5' if model is better
-        is_better = False
-        # TODO nog even kijken of model echt beter is en dan die opslaan
-        if is_better:
-            print("Better model found!")
-            # Utils.saveObject(data[0], f"{self.settings["baseline_model"]}_best")
+        x = [i for i in range(len(y_true))]
 
-        f = sns.heatmap(cm, annot=True, fmt="d")
-        f.set_xlabel("Predicted labels")
-        f.set_ylabel("True labels")
-        f.set_title("Confusion matrix")
+        f, (ax1, ax2) = plt.subplots(1, 2)
+        ax2 = sns.heatmap(cm, annot=True, fmt="d")
+        ax2.set_xlabel("Predicted labels")
+        ax2.set_ylabel("Actual labels")
+        ax2.set_title("Confusion matrix")
+
+        zipped = zip(x, y_true, y_pred_hard)
+
+        # create scatter plot with a red dot if the prediction is correct and green if it is wrong
+        # for i in zipped:
+        #     if i[1] == i[2]:
+        #         ax1.scatter(i[0], i[1], color="red")
+        #     else:
+        #         ax1.scatter(i[0], i[1], color="green")
+        #     print(i)
+        ax1.scatter(x, y_pred, c=["green" if i[1] == i[2] else "red" for i in list(zipped)], label="Predicted labels")
+        ax1.scatter(x, [0.5 for i in x], linewidths=0.5, color="black", label="Threshold", alpha=0.3, marker="_")
+        ax1.set_title('Predicted y values')
+        f.tight_layout()
+        f.show()
         plt.show()

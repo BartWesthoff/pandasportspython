@@ -58,9 +58,6 @@ class VideoTrainer(Step):
         return [np.array([Utils().openEmbedding(i)]) for i in test_squats_names], np.array(labels), model
 
     def train_generator(self, listofvids):
-        np.random.seed(69)
-        tf.random.set_seed(42)
-
         for squat_name in listofvids:
             x_train = Utils().openEmbedding(squat_name)
             y_train = np.array([0 if "negative" in squat_name else 1])
