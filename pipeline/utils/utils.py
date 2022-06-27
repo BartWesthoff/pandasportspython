@@ -21,6 +21,7 @@ from pipeline.utils.deprecated import deprecated
 class Utils:
 
     def __init__(self) -> None:
+        """initializes the Utils class"""
         self.name = "Utils"
         self.jsonfile = "testing.json"
         self.root_dir = os.getcwd()
@@ -72,6 +73,13 @@ class Utils:
     def openEmbedding(filename: str) -> np.ndarray:
         """"returns object from (pickle) file"""
         with open(os.sep.join(["data", "embedded", filename]), "rb") as inputfile:
+            obj = pickle.load(inputfile)
+        return obj
+
+    @staticmethod
+    def openTestEmbedding(filename: str) -> np.ndarray:
+        """"returns object from (pickle) file"""
+        with open(os.sep.join(["data", "testdata", filename]), "rb") as inputfile:
             obj = pickle.load(inputfile)
         return obj
 
@@ -348,26 +356,21 @@ class Utils:
     def check_invalid_squats(self):
         checked = []
         for current in list(os.listdir(os.sep.join(["data", "embedded"]))):
-            current_squat = Utils().openEmbedding(current)
-            if current in checked:
-                pass
-            else:
-                checked.append(current_squat)
-                for example in os.listdir(os.sep.join(["data", "embedded"])):
-                    if current != example:
-                        checked.append(example)
-                        example_squat = Utils().openEmbedding(example)
-                        if np.array_equal(current_squat, example_squat):
-                            print(f"{current} and {example} are the same")
+
+            # # if np.array_equal(current_squat, example_squat):
+            # #     print(f"{current} and {example} are the same")
+            # #     os.remove(os.sep.join(["data", "embedded", current]))
+            # #     break
+            # # if example_squat.shape[1] != 30:
+            # #     print(f"{example} has wrong shape")
+            # #     os.remove(os.sep.join(["data", "embedded", example]))
+            # #     break
+            # if os.path.exists(os.sep.join(["data", "embedded", current])):
+            squat = self.openEmbedding(current)
+            for frame in squat:
+                for idx, coordinaat in enumerate(frame):
+                    if (coordinaat < 0 or coordinaat > 1) and (idx + 1) % 3 != 0:
+                        if os.path.exists(os.sep.join(["data", "embedded", current])):
                             os.remove(os.sep.join(["data", "embedded", current]))
+                            print(f"{current} is invalid")
                             break
-                        if example_squat.shape[1] != 30:
-                            print(f"{example} has wrong shape")
-                            os.remove(os.sep.join(["data", "embedded", example]))
-                            break
-                        for frame in example_squat:
-                            for idx, coordinaat in enumerate(frame):
-                                if (coordinaat < 0 or coordinaat > 1) and (idx + 1) % 3 != 0:
-                                    os.remove(os.sep.join(["data", "embedded", current]))
-                                    print(f"Removed {current}")
-                                    break

@@ -17,13 +17,11 @@ from sklearn.metrics import confusion_matrix
 class VideoEvaluation(Step):
 
     def process(self, data: list[list[int]]) -> None:
-        # data is hier predicted labels
-        # hier komt dus een metrics uit of plot
-        # TODO: Hoe moeten we de echte labels erbij hebben?
-        # TODO: als model beter is dan vorige opslaan
+        """Process the data of the step"""
         self.evaluate(data)
 
     def evaluate(self, data: list[list[int]]) -> None:
+        """Evaluates the model outcomes and classifying the results"""
         print("Evaluation")
 
         y_true = data[1]
@@ -54,19 +52,28 @@ class VideoEvaluation(Step):
         ax2.set_xlabel("Predicted labels")
         ax2.set_ylabel("Actual labels")
         ax2.set_title("Confusion matrix")
-
-        zipped = zip(x, y_true, y_pred_hard)
+        zipped = zip(x, y_true, y_pred)
 
         # create scatter plot with a red dot if the prediction is correct and green if it is wrong
-        # for i in zipped:
-        #     if i[1] == i[2]:
-        #         ax1.scatter(i[0], i[1], color="red")
-        #     else:
-        #         ax1.scatter(i[0], i[1], color="green")
-        #     print(i)
-        ax1.scatter(x, y_pred, c=["green" if i[1] == i[2] else "red" for i in list(zipped)], label="Predicted labels")
-        ax1.scatter(x, [0.5 for i in x], linewidths=0.5, color="black", label="Threshold", alpha=0.3, marker="_")
+        list_good_index = []
+        list_bad_index = []
+        list_bad_prediction = []
+        list_good_prediction = []
+        for i in zipped:
+
+            if i[1] == int(i[2] > 0.5):
+                list_good_index.append(i[0])
+                list_good_prediction.append(i[2])
+            else:
+                list_bad_index.append(i[0])
+                list_bad_prediction.append(i[2])
+        ax1.scatter(list_bad_index, list_bad_prediction, c="red", label="Wrong predicted labels")
+        ax1.scatter(list_good_index, list_good_prediction, c="green", label="Correct predicted labels")
+        ax1.scatter(x, [0.5 for i in x], linewidths=0.5, color="black", alpha=0.3, marker="_")
         ax1.set_title('Predicted y values')
+        ax1.set_xlabel('index')
+        ax1.set_ylabel('Predicted y value')
+        ax1.legend()
         f.tight_layout()
         f.show()
         plt.show()

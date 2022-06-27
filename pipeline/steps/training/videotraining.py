@@ -27,37 +27,52 @@ class VideoTrainer(Step):
             random.seed(42)
             tf.random.set_seed(42)
 
-        list_of_vids = [i for i in os.listdir(os.sep.join(["data", "embedded"]))]
+        list_of_train_embeds = [i for i in os.listdir(os.sep.join(["data", "embedded"]))]
         if self.settings["normalize_landmarks"]:
-            list_of_vids = [i for i in list_of_vids if "normalized" in i]
+            list_of_train_embeds = [i for i in list_of_train_embeds if "normalized" in i]
 
-        random.shuffle(list_of_vids)
+        random.shuffle(list_of_train_embeds)
         if self.settings["amount"] > 0:
-            list_of_vids = list_of_vids[:self.settings["amount"]]
-        squats = np.array([Utils().openEmbedding(i) for i in list_of_vids], dtype=object)
-        train_squats_names = list_of_vids[:int(len(squats) * 0.8)]
-        test_squats_names = list_of_vids[int(len(squats) * 0.8):]
+            list_of_train_embeds = list_of_train_embeds[:self.settings["amount"]]
+
+        list_of_test_embeds = [i for i in os.listdir(os.sep.join(["data", "testdata"]))]
+        if self.settings["normalize_landmarks"]:
+            list_of_test_embeds = [i for i in list_of_test_embeds if "normalized" in i]
+
+        random.shuffle(list_of_test_embeds)
+        if self.settings["amount"] > 0:
+            list_of_test_embeds = list_of_test_embeds[:self.settings["amount"]]
+
+
+
+
+        # squats = np.array([Utils().openEmbedding(i) for i in list_of_vids], dtype=object)
+
         create_model = self.model is None
         model = None
         if create_model:
             model = Sequential()
 
-            model.add(LSTM(4, input_shape=(None, 30)))
+            model.add(LSTM(32, return_sequences=True, input_shape=(None, 30)))
+            model.add(Dense(64, activation="relu"))
+            model.add(LSTM(16, dropout=0.6))
+            model.add(Dense(80, activation="relu"))
             model.add(Dense(1, activation="sigmoid"))
 
             print(model.summary(90))
             model.compile(loss="binary_crossentropy", optimizer="adam")
             epochs = 50
-            steps_per_epoch = len(train_squats_names) // epochs
-            model.fit(self.train_generator(train_squats_names), steps_per_epoch=steps_per_epoch, epochs=epochs,
+            steps_per_epoch = len(list_of_train_embeds) // epochs
+            model.fit(self.train_generator(list_of_train_embeds), steps_per_epoch=steps_per_epoch, epochs=epochs,
                       verbose=1)
-            model.save('model_scaled.h5')
-        labels = [1 if "positive" in i else 0 for i in test_squats_names]
+            model.save('custommodel42000train.h5')
+        labels = [1 if "positive" in i else 0 for i in list_of_test_embeds]
         print(f"amount of labels {len(labels)}")
 
-        return [np.array([Utils().openEmbedding(i)]) for i in test_squats_names], np.array(labels), model
+        return [np.array([Utils().openTestEmbedding(i)]) for i in list_of_test_embeds], np.array(labels), model
 
     def train_generator(self, listofvids):
+        """Generates batches (1 piece) of data for training"""
         for squat_name in listofvids:
             x_train = Utils().openEmbedding(squat_name)
             y_train = np.array([0 if "negative" in squat_name else 1])
