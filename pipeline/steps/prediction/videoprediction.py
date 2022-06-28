@@ -2,8 +2,12 @@
 PreProcessor class
 used to preprocess video material
 """
+import os
+
+import numpy as np
 
 from pipeline.steps.step import Step
+from pipeline.utils.utils import Utils
 
 
 class VideoPrediction(Step):
@@ -15,9 +19,16 @@ class VideoPrediction(Step):
 
         if data[2] is None:
             model = self.model
-        y_pred = [model.predict(i) for i in data[0]]
-        # correct, y_pred = self.correlationChecker(data[1], y_pred)
+        data_to_predict = data[0]
         y_true = data[1]
+        if self.testdata is None:
+            data_to_predict = os.listdir(os.sep.join(["data", "embedded_test"]))
+            y_true = [1 if "positive" in i else 0 for i in data_to_predict]
+            data_to_predict = [np.array([Utils().open_embedded_test(i)]) for i in data_to_predict]
+
+
+        y_pred = [model.predict(i) for i in data_to_predict]
+        # correct, y_pred = self.correlationChecker(data[1], y_pred)
 
         return [y_pred, y_true]
 

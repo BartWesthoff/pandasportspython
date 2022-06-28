@@ -10,12 +10,13 @@ step sub-classes must implement method process
 
 class Step(ABC):
 
-    def __init__(self, model=None, class_type=None):
+    def __init__(self, model=None, class_type=None, testdata=None):
         """ Instantiate the Step class """
         # NOTE: issubclass(self.__class__, type) werkt niet
         if self.__class__ == class_type:
             raise Exception("I am abstract!")
         self.model = model
+        self.testdata=testdata
 
     @property
     def name(self) -> str:
@@ -33,3 +34,6 @@ class Step(ABC):
         with open("settings.yaml", "r") as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data["settings"]
+
+
+

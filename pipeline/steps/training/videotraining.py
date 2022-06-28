@@ -36,8 +36,8 @@ class VideoTrainer(Step):
             list_of_train_embeds = list_of_train_embeds[:self.settings["amount"]]
 
         list_of_test_embeds = [i for i in os.listdir(os.sep.join(["data", "testdata"]))]
-        if self.settings["normalize_landmarks"]:
-            list_of_test_embeds = [i for i in list_of_test_embeds if "normalized" in i]
+        # if self.settings["normalize_landmarks"]:
+        #     list_of_test_embeds = [i for i in list_of_test_embeds if "normalized" in i]
 
         random.shuffle(list_of_test_embeds)
         if self.settings["amount"] > 0:
@@ -53,10 +53,7 @@ class VideoTrainer(Step):
         if create_model:
             model = Sequential()
 
-            model.add(LSTM(32, return_sequences=True, input_shape=(None, 30)))
-            model.add(Dense(64, activation="relu"))
-            model.add(LSTM(16, dropout=0.6))
-            model.add(Dense(80, activation="relu"))
+            model.add(LSTM(4, input_shape=(None, 30)))
             model.add(Dense(1, activation="sigmoid"))
 
             print(model.summary(90))
@@ -65,11 +62,13 @@ class VideoTrainer(Step):
             steps_per_epoch = len(list_of_train_embeds) // epochs
             model.fit(self.train_generator(list_of_train_embeds), steps_per_epoch=steps_per_epoch, epochs=epochs,
                       verbose=1)
-            model.save('custommodel42000train.h5')
+            model.save('baselinemodel42000NG9train.h5')
         labels = [1 if "positive" in i else 0 for i in list_of_test_embeds]
         print(f"amount of labels {len(labels)}")
-
-        return [np.array([Utils().openTestEmbedding(i)]) for i in list_of_test_embeds], np.array(labels), model
+        test_data = None
+        if self.testdata is not None:
+            test_data = [np.array([Utils().openTestEmbedding(i)]) for i in list_of_test_embeds]
+        return test_data, np.array(labels), model
 
     def train_generator(self, listofvids):
         """Generates batches (1 piece) of data for training"""

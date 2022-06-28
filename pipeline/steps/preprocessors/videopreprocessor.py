@@ -19,17 +19,18 @@ used to preprocess video material
 class VideoPreProcessor(Step):
     """" class for video preprocessing """
 
-    def process(self, data: list[str]) -> list[str]:
+    def process(self, data: list[str]) -> None:
         """" processes given data"""
-        return self._preprocessVideo(data)
+        # self._preprocessVideo()
+        return
         # return data
 
-    def _preprocessVideo(self, data: list[str]) -> list[str]:
+    def _preprocessVideo(self) -> None:
         """" preprocesses video """
         proccessed_data = []
-        path = os.sep.join(["data", "negative_squat"])
+        path = os.sep.join(["data", "production"])
 
-        path2 = os.sep.join(["data", "positive_squat"])
+        # path2 = os.sep.join(["data", "positive_squat"])
 
         for root, directories, files in os.walk(path, topdown=False):
             for name in files:
@@ -37,14 +38,25 @@ class VideoPreProcessor(Step):
                 name = self.cropVideo(source)
                 if self.settings["color"]:
                     name = self.grayvideo(name)
+                name_of_file = name.split(os.sep)[-1]
+                if "negative" in name_of_file:
+                    if not os.path.exists(os.sep.join(["data", "negative_squat", name_of_file])):
+
+                        os.rename(name, os.sep.join(["data", "negative_squat", name_of_file]))
+                elif "positive" in name_of_file:
+                    if not os.path.exists(os.sep.join(["data", "positive_squat", name_of_file])):
+                        os.rename(name, os.sep.join(["data", "positive_squat", name_of_file]))
+                else:
+                    os.rename(name, os.sep.join(["data", "production", name_of_file]))
+                # os.remove(source)
                 proccessed_data.append(name)
 
-        for root, directories, files in os.walk(path2, topdown=False):
-            for name in files:
-                name = self.cropVideo(os.path.join(root, name))
-                if self.settings["color"]:
-                    name = self.grayvideo(name)
-                proccessed_data.append(name)
+        # for root, directories, files in os.walk(path2, topdown=False):
+        #     for name in files:
+        #         name = self.cropVideo(os.path.join(root, name))
+        #         if self.settings["color"]:
+        #             name = self.grayvideo(name)
+        #         proccessed_data.append(name)
 
         return proccessed_data
 
@@ -81,7 +93,6 @@ class VideoPreProcessor(Step):
         if "_NB" in source:
             return new_name
 
-
         cap = cv2.VideoCapture(source)
         fps = cap.get(cv2.CAP_PROP_FPS)
 
@@ -103,7 +114,7 @@ class VideoPreProcessor(Step):
 
             # no contour or too small
             if w == width or h == height or x == 0 or y == 0 or w < 20 or h < 20:
-                return new_name
+                return source
             print("cropping video")
             # output
             shutil.copyfile(source, new_name)
@@ -294,6 +305,5 @@ class VideoPreProcessor(Step):
         """ crop video by given start and end time """
         name = os.sep.join([Utils().datafolder, source])
         output = os.sep.join([Utils().datafolder, output])
-
         str = f"ffmpeg -i {name}.mp4 -ss  {start} -to {end} -c copy {output}.mp4"
         self.runBash(str)

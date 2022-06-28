@@ -61,9 +61,15 @@ class MPEmbedder(Embedder):
         points = []
         data = os.listdir(os.sep.join(["data", "positive_squat"]))
         data += os.listdir(os.sep.join(["data", "negative_squat"]))
+        testdata = os.listdir(os.sep.join(["data", "production"]))
+
         for file in data:
             squat = self.embed(file)
             points.append(squat)
+
+        if self.testdata is None:
+            for file in testdata:
+                squat = self.embed_test_squat(file)
 
         return points
 
@@ -72,11 +78,12 @@ class MPEmbedder(Embedder):
         # dit moet nog worden bijgewerkt
         """ Embeds the data """
         folder = 'production'
+        print(data)
         if 'positive' in data:
             folder = 'positive_squat'
-        elif 'negative' in data:
+        elif 'negative' in data and ('production' not in data):
             folder = 'negative_squat'
-
+        print(f"folder is first time {folder}")
         video_title = data.split('.')[0]
         # haalt de default waarde van de landmarks op
         video_location = os.sep.join(["data", folder, data])
@@ -85,6 +92,9 @@ class MPEmbedder(Embedder):
         else:
             extra = ''
         embedded_location = os.sep.join(["data", "embedded", video_title + extra])
+        if folder == 'production':
+            print("videp is production")
+            embedded_location = os.sep.join(["data", "embedded_test", video_title])
         if os.path.exists(embedded_location):
             return Utils.openEmbedding(video_title + extra)
         print(f"embedding: {data}")
@@ -165,7 +175,9 @@ class MPEmbedder(Embedder):
         squat = np.array(allframes)
         flipped_squat = np.array(all_flipped_frames)
         Utils().saveObject(squat, embedded_location)
-        Utils().saveObject(flipped_squat, embedded_location + '_flipped')
+        print(f"this is folder {folder}")
+        if folder != 'production':
+            Utils().saveObject(flipped_squat, embedded_location + '_flipped')
         newSquat = self.scaleSquat(squat)
         return newSquat
 
@@ -217,3 +229,89 @@ class MPEmbedder(Embedder):
                 iterator += 1
             iterator = 1
         return xVals, yVals, zVals
+
+
+    def embed_test_squat(self, data):
+        # -> Set[sizeOf(results.pose_landmarks.landmark)]
+        # dit moet nog worden bijgewerkt
+        """ Embeds the data """
+        folder = 'production'
+        video_title = data.split('.')[0]
+        # haalt de default waarde van de landmarks op
+        video_location = os.sep.join(["data", folder, data])
+        embedded_location = os.sep.join(["data", "embedded_test", video_title])
+        if os.path.exists(embedded_location):
+            return Utils.open_embedded_test(video_title)
+        print(f"embedding: {data}")
+        cap = cv2.VideoCapture(video_location)
+        print(f"video_location: {video_location}")
+        width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float `width`
+        height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        print("width: ", width)
+        print("height: ", height)
+        mp_pose = mp.solutions.pose
+        pose = mp_pose.Pose(model_complexity=2)
+
+        allframes = []
+        percentage = 0
+        while cap.isOpened():
+            success, image = cap.read()
+            if not success:
+                break
+
+            # Om de prestaties te verbeteren, is de afbeelding gemarkeerd als niet beschrijfbaar
+            # pass by reference.
+            image.flags.writeable = False
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            results = pose.process(image)
+
+            # # Teken de pose annotation op de afbeelding.
+            # image.flags.writeable = True
+            # image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+            currentframe = []
+            current_flipped_frame = []
+
+            if results.pose_landmarks is None:
+                print("No pose results.")
+                # currentframe.append(image)
+            else:
+                for index, data_point in enumerate(results.pose_landmarks.landmark):
+                    # print('x is', data_point.x, 'y is', data_point.y, 'z is', data_point.z,
+                    #       'visibility is', data_point.visibility)
+
+                    if landmarks_config[index] in self.settings["landmarks_to_pick"]:
+
+                        # Als settings staat op 'normalize_landmarks' voeg de data points to aan de list
+                        # "currentframe" Voor alle andere settings worden de data punten eerste aangepast en daarna
+                        # toegevoegd aan de list "currentframe"
+                        # print(landmarks_config[index], ": ", data_point.x, data_point.y, data_point.z)
+                        if self.settings['normalize_landmarks']:
+                            currentframe.append(data_point.x)
+                            currentframe.append(data_point.y)
+                            currentframe.append(data_point.z)
+
+                        else:
+                            currentframe.append(data_point.x * width)
+                            currentframe.append(data_point.y * height)
+                            currentframe.append(data_point.z * width)
+
+                        percentage += 1
+                        # print(index, data_point.x * width, data_point.y * height)
+            print('{:.2f} %'.format(round(percentage / frame_count * 10, 2)))
+            allframes.append(currentframe)
+
+            # mp_drawing.draw_landmarks(
+            #     image,
+            #     results.pose_landmarks,
+            #     mp_pose.POSE_CONNECTIONS,
+            #     landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
+            # cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
+        cap.release()
+        squat = np.array(allframes)
+        Utils().saveObject(squat, embedded_location)
+        print(f"this is folder {folder}")
+        newSquat = self.scaleSquat(squat)
+        return newSquat
+

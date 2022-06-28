@@ -32,8 +32,8 @@ class VideoEvaluation(Step):
         print("Total positive:", total_positive)
         print("Total negative:", total_negative)
         cm = confusion_matrix(y_true, y_pred_hard)
-        tn, fp, fn, tp = cm.ravel()
-        specificity = tn / (tn + fp)
+        # tn, fp, fn, tp = cm.ravel()
+        # specificity = tn / (tn + fp)
         precision = precision_score(y_true, y_pred_hard)
         accuracy = accuracy_score(y_true, y_pred_hard)
         recall = recall_score(y_true, y_pred_hard)
@@ -43,7 +43,7 @@ class VideoEvaluation(Step):
         print(f"accuracy: {accuracy}")
         print(f"recall: {recall}")
         print(f"f1: {f1}")
-        print(f"specificity: {specificity}")
+        # print(f"specificity: {specificity}")
 
         x = [i for i in range(len(y_true))]
 
@@ -69,7 +69,7 @@ class VideoEvaluation(Step):
                 list_bad_prediction.append(i[2])
         ax1.scatter(list_bad_index, list_bad_prediction, c="red", label="Wrong predicted labels")
         ax1.scatter(list_good_index, list_good_prediction, c="green", label="Correct predicted labels")
-        ax1.scatter(x, [0.5 for i in x], linewidths=0.5, color="black", alpha=0.3, marker="_")
+        ax1.scatter(x, [0.5 for _ in x], linewidths=0.5, color="black", alpha=0.3, marker="_")
         ax1.set_title('Predicted y values')
         ax1.set_xlabel('index')
         ax1.set_ylabel('Predicted y value')

@@ -77,6 +77,13 @@ class Utils:
         return obj
 
     @staticmethod
+    def open_embedded_test(filename: str) -> np.ndarray:
+        """"returns object from (pickle) file"""
+        with open(os.sep.join(["data", "embedded_test", filename]), "rb") as inputfile:
+            obj = pickle.load(inputfile)
+        return obj
+
+    @staticmethod
     def openTestEmbedding(filename: str) -> np.ndarray:
         """"returns object from (pickle) file"""
         with open(os.sep.join(["data", "testdata", filename]), "rb") as inputfile:
