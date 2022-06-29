@@ -249,7 +249,7 @@ class VideoPreProcessor(Step):
     @deprecated
     def trimvideo(self, name: str, start_time: float, end_time: float):
         """" Trim video """
-        name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
+        name = os.sep.join(["data", "production", name])
         ffmpeg_extract_subclip(f"{name}.mp4", start_time, end_time, targetname=f"{name}_short.mp4")
 
     # deprecated waarschijnlijk
@@ -257,7 +257,7 @@ class VideoPreProcessor(Step):
     def trimvideo2(self, name: str):
         """" 2nd Trim video method """
         vcodec = "libx264"
-        name = Utils().root_dir + os.sep + "data" + os.sep + "production" + os.sep + name
+        name = os.sep.join(["data", "production", name])
         videoquality = "30"
 
         # slow, ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow

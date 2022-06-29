@@ -23,8 +23,6 @@ class Utils:
     def __init__(self) -> None:
         """initializes the Utils class"""
         self.name = "Utils"
-        self.jsonfile = "testing.json"
-        self.root_dir = os.getcwd()
         self.yamlfile = "settings.yaml"
         self.datafolder = os.sep.join(["data", "production"])
 
@@ -360,6 +358,8 @@ class Utils:
         pred = model.predict(test_data)
         print("predicted sigmoid output => ", pred)
 
+
+    @deprecated
     def check_invalid_squats(self):
         checked = []
         for current in list(os.listdir(os.sep.join(["data", "embedded"]))):
@@ -383,7 +383,7 @@ class Utils:
                             break
 
     def check_directories(self):
-        dirs = ['credentials', 'embedded', 'embedded_test', 'embedders', 'negative_squat', 'positive_squat', 'production']
+        dirs = ['credentials', 'embedded', 'embedded_test', 'embedders', 'negative_squat', 'positive_squat', 'production', 'testdata']
 
         for dir in dirs:
             if not os.path.exists(os.sep.join(["data", dir])):

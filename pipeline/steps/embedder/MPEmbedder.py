@@ -91,8 +91,8 @@ class MPEmbedder(Embedder):
             extra = ''
         embedded_location = os.sep.join(["data", "embedded", video_title + extra])
         if folder == 'production':
-            print("videp is production")
-            embedded_location = os.sep.join(["data", "embedded_test", video_title])
+            print("video is production")
+            embedded_location = os.sep.join(["data", "embedded_test", video_title + extra])
         if os.path.exists(embedded_location):
             return Utils.openEmbedding(video_title + extra)
         print(f"embedding: {data}")

@@ -1,5 +1,5 @@
 settings:
-  amount: 40
+  amount: -1
   baseline_model: None
   landmarks_to_pick:
     - left_shoulder
@@ -12,8 +12,7 @@ settings:
     - right_ankle
     - left_foot_index
     - right_foot_index
-  normalize_landmarks: true
+  normalize_landmarks: false
   testing: false
   tf_lite_model: thunder_float16.tflite
-  use_local: 0
   color: false
