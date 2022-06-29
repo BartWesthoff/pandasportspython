@@ -68,7 +68,7 @@ class VideoTrainer(Step):
         labels = [1 if "positive" in i else 0 for i in list_of_test_embeds]
         print(f"amount of labels {len(labels)}")
         test_data = None
-        if self.trainmode is not False:
+        if self.settings["trainmode"] is not False:
             test_data = [np.array([Utils().openEmbedding(i, "testdata")]) for i in list_of_test_embeds]
         return test_data, np.array(labels), model
 

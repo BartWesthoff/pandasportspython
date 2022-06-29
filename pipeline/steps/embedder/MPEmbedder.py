@@ -67,7 +67,7 @@ class MPEmbedder(Embedder):
         #     squat = self.embed(file)
         #     points.append(squat)
 
-        if not self.trainmode:
+        if not self.settings["trainmode"]:
             for file in testdata:
                 squat = self.embed_test_squat(file)
 
