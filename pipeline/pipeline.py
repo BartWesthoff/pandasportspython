@@ -6,7 +6,7 @@ from pipeline.utils.utils import Utils
 class Pipeline:
     # What is a Pipeline?
     # A Pipeline is a set of instructions
-    def __init__(self, steps: list[Step], model) -> None:
+    def __init__(self, steps: list[Step], model=None) -> None:
         """ Instantiate the Pipeline class by recieving a list of steps """
         if steps == ():
             raise ValueError("Pipeline steps are not specified")

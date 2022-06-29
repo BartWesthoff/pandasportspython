@@ -1,5 +1,5 @@
 settings:
-  amount: -1
+  amount: 2600
   landmarks_to_pick:
     - left_shoulder
     - right_shoulder
@@ -13,4 +13,4 @@ settings:
     - right_foot_index
   tf_lite_model: thunder_float16.tflite
   color: false
-  trainmode: false
+  trainmode: true

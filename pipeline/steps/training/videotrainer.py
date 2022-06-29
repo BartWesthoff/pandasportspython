@@ -1,13 +1,12 @@
-from cgi import test
 import os
 import random
 
 import numpy as np
 import tensorflow as tf
-from keras import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.models import Sequential
+from keras.optimizers import SGD
 
 from pipeline.steps.step import Step
 from pipeline.utils.utils import Utils
@@ -27,37 +26,31 @@ class VideoTrainer(Step):
             np.random.seed(69)
             random.seed(42)
             tf.random.set_seed(42)
-
+        list_of_train_embeds = [i for i in os.listdir(os.sep.join(["data", "embedded"]))]
         random.shuffle(list_of_train_embeds)
         if self.settings["amount"] > 0:
             list_of_train_embeds = list_of_train_embeds[:self.settings["amount"]]
 
         list_of_test_embeds = [i for i in os.listdir(os.sep.join(["data", "testdata"]))]
-        # if self.settings["normalize_landmarks"]:
-        #     list_of_test_embeds = [i for i in list_of_test_embeds if "normalized" in i]
-
         random.shuffle(list_of_test_embeds)
         if self.settings["amount"] > 0:
             list_of_test_embeds = list_of_test_embeds[:self.settings["amount"]]
 
 
 
-
-        # squats = np.array([Utils().openEmbedding(i) for i in list_of_vids], dtype=object)
-
         create_model = self.model is None
         model = None
         if create_model:
-            model = Sequential()
-
-            model.add(LSTM(4, input_shape=(None, 30)))
-            model.add(Dense(1, activation="sigmoid"))
+            model = Sequential([
+                LSTM(12, input_shape=(None,30), activation="relu"),
+                Dense(1, activation="sigmoid")
+            ])
 
             print(model.summary(90))
-            model.compile(loss="binary_crossentropy", optimizer="adam")
-            epochs = 50
-            if self.settings["amount"] < epochs:
-                epochs = self.settings["amount"]
+            model.compile(SGD(lr=0.003), "binary_crossentropy", metrics=["accuracy"])
+            epochs = 2
+            # if self.settings["amount"] < epochs:
+            #     epochs = self.settings["amount"]
             steps_per_epoch = len(list_of_train_embeds) // epochs
             model.fit(self.train_generator(list_of_train_embeds), steps_per_epoch=steps_per_epoch, epochs=epochs,
                       verbose=1)
@@ -69,8 +62,6 @@ class VideoTrainer(Step):
             test_data = [np.array([Utils().openEmbedding(i, "testdata")]) for i in list_of_test_embeds]
         dictionary = {"test_data": test_data, "labels": np.array(labels), "model": model}
         return dictionary
-
-       
 
     def train_generator(self, listofvids):
         """Generates batches (1 piece) of data for training"""

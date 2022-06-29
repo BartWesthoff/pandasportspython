@@ -15,12 +15,13 @@ class VideoPrediction(Step):
 
     def process(self, data):  # validation data
         """ process the data of the step """
-        model = data[2]
+        # {"test_data": test_data, "labels": np.array(labels), "model": model}
+        model = data["model"]
 
-        if data[2] is None:
+        if model is None:
             model = self.model
-        data_to_predict = data[0]
-        y_true = data[1]
+        data_to_predict = data["test_data"]
+        y_true = data["labels"]
         if not self.settings["trainmode"]:
             data_to_predict = os.listdir(os.sep.join(["data", "embedded_test"]))
             y_true = [1 if "positive" in i else 0 for i in data_to_predict]
