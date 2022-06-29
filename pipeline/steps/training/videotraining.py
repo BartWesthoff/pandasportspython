@@ -69,12 +69,12 @@ class VideoTrainer(Step):
         print(f"amount of labels {len(labels)}")
         test_data = None
         if self.trainmode is not False:
-            test_data = [np.array([Utils().openTestEmbedding(i)]) for i in list_of_test_embeds]
+            test_data = [np.array([Utils().openEmbedding(i, "testdata")]) for i in list_of_test_embeds]
         return test_data, np.array(labels), model
 
     def train_generator(self, listofvids):
         """Generates batches (1 piece) of data for training"""
         for squat_name in listofvids:
-            x_train = Utils().openEmbedding(squat_name)
+            x_train = Utils().openEmbedding(squat_name, "embedded")
             y_train = np.array([0 if "negative" in squat_name else 1])
             yield np.array([x_train]), y_train

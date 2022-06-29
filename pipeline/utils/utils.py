@@ -68,23 +68,9 @@ class Utils:
         return obj
 
     @staticmethod
-    def openEmbedding(filename: str) -> np.ndarray:
+    def openEmbedding(filename: str, folder: str) -> np.ndarray:
         """"returns object from (pickle) file"""
-        with open(os.sep.join(["data", "embedded", filename]), "rb") as inputfile:
-            obj = pickle.load(inputfile)
-        return obj
-
-    @staticmethod
-    def open_embedded_test(filename: str) -> np.ndarray:
-        """"returns object from (pickle) file"""
-        with open(os.sep.join(["data", "embedded_test", filename]), "rb") as inputfile:
-            obj = pickle.load(inputfile)
-        return obj
-
-    @staticmethod
-    def openTestEmbedding(filename: str) -> np.ndarray:
-        """"returns object from (pickle) file"""
-        with open(os.sep.join(["data", "testdata", filename]), "rb") as inputfile:
+        with open(os.sep.join(["data", folder, filename]), "rb") as inputfile:
             obj = pickle.load(inputfile)
         return obj
 
@@ -373,7 +359,7 @@ class Utils:
             # #     os.remove(os.sep.join(["data", "embedded", example]))
             # #     break
             # if os.path.exists(os.sep.join(["data", "embedded", current])):
-            squat = self.openEmbedding(current)
+            squat = self.openEmbedding(current, "embedded")
             for frame in squat:
                 for idx, coordinaat in enumerate(frame):
                     if (coordinaat < 0 or coordinaat > 1) and (idx + 1) % 3 != 0:
