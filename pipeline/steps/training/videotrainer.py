@@ -1,3 +1,4 @@
+from cgi import test
 import os
 import random
 
@@ -26,10 +27,6 @@ class VideoTrainer(Step):
             np.random.seed(69)
             random.seed(42)
             tf.random.set_seed(42)
-
-        list_of_train_embeds = [i for i in os.listdir(os.sep.join(["data", "embedded"]))]
-        if self.settings["normalize_landmarks"]:
-            list_of_train_embeds = [i for i in list_of_train_embeds if "normalized" in i]
 
         random.shuffle(list_of_train_embeds)
         if self.settings["amount"] > 0:
@@ -70,7 +67,10 @@ class VideoTrainer(Step):
         test_data = None
         if self.settings["trainmode"] is not False:
             test_data = [np.array([Utils().openEmbedding(i, "testdata")]) for i in list_of_test_embeds]
-        return test_data, np.array(labels), model
+        dictionary = {"test_data": test_data, "labels": np.array(labels), "model": model}
+        return dictionary
+
+       
 
     def train_generator(self, listofvids):
         """Generates batches (1 piece) of data for training"""
