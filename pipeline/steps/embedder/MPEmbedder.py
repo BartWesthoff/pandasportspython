@@ -94,7 +94,7 @@ class MPEmbedder(Embedder):
             print("video is production")
             embedded_location = os.sep.join(["data", "embedded_test", video_title + extra])
         if os.path.exists(embedded_location):
-            return Utils.openEmbedding(video_title + extra)
+            return Utils.openEmbedding(video_title + extra, "embedded")
         print(f"embedding: {data}")
         cap = cv2.VideoCapture(video_location)
         print(f"video_location: {video_location}")
@@ -239,7 +239,7 @@ class MPEmbedder(Embedder):
         video_location = os.sep.join(["data", folder, data])
         embedded_location = os.sep.join(["data", "embedded_test", video_title])
         if os.path.exists(embedded_location):
-            return Utils.open_embedded_test(video_title)
+            return Utils.openEmbedding(video_title, "embedded_test")
         print(f"embedding: {data}")
         cap = cv2.VideoCapture(video_location)
         print(f"video_location: {video_location}")
