@@ -13,4 +13,4 @@ settings:
     - right_foot_index
   tf_lite_model: thunder_float16.tflite
   color: false
-  trainmode: true
+  trainmode: false

@@ -15,10 +15,7 @@ class Pipeline:
 
     # process -> take some data, modify it, output some data
     def process(self) -> object | None:  # nog onzeker over format van data
-        """
-        :param data:  1-d List of strings (queries)
-        :return: list of tuples [(anomaly,id,query)]
-        """
+        """ Process the data of the pipeline so that it can be used by the next step """
         data = None
 
 

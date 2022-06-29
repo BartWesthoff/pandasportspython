@@ -15,7 +15,6 @@ class VideoPrediction(Step):
 
     def process(self, data):  # validation data
         """ process the data of the step """
-        # {"test_data": test_data, "labels": np.array(labels), "model": model}
         model = data["model"]
 
         if model is None:
@@ -26,7 +25,6 @@ class VideoPrediction(Step):
             data_to_predict = os.listdir(os.sep.join(["data", "embedded_test"]))
             y_true = [1 if "positive" in i else 0 for i in data_to_predict]
             data_to_predict = [np.array([Utils().openEmbedding(i, "embedded_test")]) for i in data_to_predict]
-
 
         y_pred = [model.predict(i) for i in data_to_predict]
         # correct, y_pred = self.correlationChecker(data[1], y_pred)

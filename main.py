@@ -13,5 +13,5 @@ if __name__ == "__main__":
     steps = [GoogleDriveService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
              VideoEvaluation()]
     pipeline = Pipeline(
-        steps=steps, model=None)  # testdata=False
+        steps=steps, model=model)  # testdata=False
     pipeline.process()
