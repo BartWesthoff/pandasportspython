@@ -23,7 +23,7 @@ class Pipeline:
         data = None
 
 
-
+        Utils().check_directories()
         for step in self.steps:
             if issubclass(type(step), Input):
                 data = step.process()

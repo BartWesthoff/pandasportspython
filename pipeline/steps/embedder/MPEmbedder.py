@@ -63,11 +63,11 @@ class MPEmbedder(Embedder):
         data += os.listdir(os.sep.join(["data", "negative_squat"]))
         testdata = os.listdir(os.sep.join(["data", "production"]))
 
-        for file in data:
-            squat = self.embed(file)
-            points.append(squat)
+        # for file in testdata:
+        #     squat = self.embed(file)
+        #     points.append(squat)
 
-        if self.trainmode == False:
+        if not self.trainmode:
             for file in testdata:
                 squat = self.embed_test_squat(file)
 

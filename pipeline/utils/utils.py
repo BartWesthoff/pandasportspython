@@ -381,3 +381,11 @@ class Utils:
                             os.remove(os.sep.join(["data", "embedded", current]))
                             print(f"{current} is invalid")
                             break
+
+    def check_directories(self):
+        dirs = ['credentials', 'embedded', 'embedded_test', 'embedders', 'negative_squat', 'positive_squat', 'production']
+
+        for dir in dirs:
+            if not os.path.exists(os.sep.join(["data", dir])):
+                os.makedirs(os.sep.join(["data", dir]))
+
