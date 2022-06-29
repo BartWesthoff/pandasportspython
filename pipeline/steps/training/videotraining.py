@@ -59,14 +59,16 @@ class VideoTrainer(Step):
             print(model.summary(90))
             model.compile(loss="binary_crossentropy", optimizer="adam")
             epochs = 50
+            if self.settings["amount"] < epochs:
+                epochs = self.settings["amount"]
             steps_per_epoch = len(list_of_train_embeds) // epochs
             model.fit(self.train_generator(list_of_train_embeds), steps_per_epoch=steps_per_epoch, epochs=epochs,
                       verbose=1)
-            model.save('baselinemodel42000NG9train.h5')
+            model.save('testtrainmodel.h5')
         labels = [1 if "positive" in i else 0 for i in list_of_test_embeds]
         print(f"amount of labels {len(labels)}")
         test_data = None
-        if self.testdata is not None:
+        if self.trainmode is not False:
             test_data = [np.array([Utils().openTestEmbedding(i)]) for i in list_of_test_embeds]
         return test_data, np.array(labels), model
 

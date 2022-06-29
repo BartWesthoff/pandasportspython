@@ -14,11 +14,7 @@ from pipeline.steps.training.videotraining import VideoTrainer
 
 if __name__ == "__main__":
     model = tf.keras.models.load_model("custommodel42000NG9train.h5")
-    steps = [YoutubeService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(), VideoEvaluation()]
+    steps = [GoogleDriveService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(), VideoEvaluation()]
     pipeline = Pipeline(
-        steps=steps, model=model)
+        steps=steps, model=None, trainmode=False) # testdata=False
     pipeline.process()
-
-
-
-

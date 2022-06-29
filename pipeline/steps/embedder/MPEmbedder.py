@@ -67,7 +67,7 @@ class MPEmbedder(Embedder):
             squat = self.embed(file)
             points.append(squat)
 
-        if self.testdata is None:
+        if self.trainmode == False:
             for file in testdata:
                 squat = self.embed_test_squat(file)
 
@@ -78,12 +78,10 @@ class MPEmbedder(Embedder):
         # dit moet nog worden bijgewerkt
         """ Embeds the data """
         folder = 'production'
-        print(data)
         if 'positive' in data:
             folder = 'positive_squat'
         elif 'negative' in data and ('production' not in data):
             folder = 'negative_squat'
-        print(f"folder is first time {folder}")
         video_title = data.split('.')[0]
         # haalt de default waarde van de landmarks op
         video_location = os.sep.join(["data", folder, data])
