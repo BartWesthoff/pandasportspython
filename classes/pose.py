@@ -1,8 +1,8 @@
-from typing import Set, List, Dict, Any
+from typing import List, Any
 
-#Klasse voor het opslaan van joints 
 
 class Pose:
+    """class to save a list of joints wich are represented as a pose"""
 
     def __init__(self, joints: List) -> None:
         self.joints = joints

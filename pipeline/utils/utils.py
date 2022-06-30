@@ -61,7 +61,7 @@ class Utils:
             pickle.dump(model, fp)
 
     @staticmethod
-    def openObject(filename: str) -> object:
+    def openobject(filename: str) -> np.ndarray | int | float:
         """" returns object from (pickle) file"""
         with open(filename, "rb") as inputfile:
             obj = pickle.load(inputfile)
@@ -74,30 +74,25 @@ class Utils:
             obj = pickle.load(inputfile)
         return obj
 
-    # @staticmethod
-    # def openObject(filename: str) -> np.ndarray | abc.Iterable | int | float:  # return object
-    #    """" opens object from (pickle) file"""
-    #    with open(filename, "rb") as fp:
-    #        object = pickle.load(fp)
-    #    return object
+    @deprecated
+    def _checkifexists(self):
+        """ check if jsonfile exists so that we can do IO operations"""
+        if not os.path.exists(self.jsonfile):
+            with open(self.jsonfile, "x") as f:
+                f.write("{}")
 
-    # def _checkifexists(self):
-    #     """ check if jsonfile exists so that we can do IO operations"""
-    #     if not os.path.exists(self.jsonfile):
-    #         with open(self.jsonfile, "x") as f:
-    #             f.write("{}")
-    #
-    #     with open(self.jsonfile, "r") as f:
-    #         text = f.read()
-    #         if len(text) == 0 or text[0] != "{":
-    #             with open(self.jsonfile, "w+") as f:
-    #                 f.write("{}")
-    #
-    #     if not os.path.exists(self.yamlfile):
-    #         with open(self.yamlfile, "x") as f:
-    #             f.write("")
+        with open(self.jsonfile, "r") as f:
+            text = f.read()
+            if len(text) == 0 or text[0] != "{":
+                with open(self.jsonfile, "w+") as f:
+                    f.write("{}")
 
-    def generatePose(self) -> pose.Pose:
+        if not os.path.exists(self.yamlfile):
+            with open(self.yamlfile, "x") as f:
+                f.write("")
+
+    @deprecated
+    def generatepose(self) -> pose.Pose:
         """"returns dummy random generated pose"""
         # TODO gezicht weghalen
         sides = ["left", "right"]
@@ -106,12 +101,12 @@ class Utils:
         for side in sides:
             for name in joint_names:
                 jointname = side + name
-                joints.append(self.generateJoint(jointname))
-        joints.append(self.generateJoint("nose"))
+                joints.append(self.generatejoint(jointname))
+        joints.append(self.generatejoint("nose"))
         return pose.Pose(joints)
 
     @staticmethod
-    def generateJoint(name: str) -> joint.Joint:  # wat is joint
+    def generatejoint(name: str) -> joint.Joint:  # wat is joint
         """"returns dummy random generated Joint"""
 
         maxInt = 100000
@@ -124,7 +119,7 @@ class Utils:
                            name=name)
         return join
 
-    def generatePoseList(self, frames: int, poses: int) -> list[list[int]]:
+    def generateposelist(self, frames: int, poses: int) -> list[list[int]]:
         """"generates a random list of poses that are a squat"""
         random = Random()
         squat = []
@@ -141,6 +136,7 @@ class Utils:
             squat.append(pose)
         return squat
 
+    @deprecated
     def save(self, _dict: dict) -> None:
         """saves dictionary to disk"""
         with open(self.jsonfile, "w+") as f:
@@ -185,11 +181,11 @@ class Utils:
     @deprecated
     def load_yaml(self):
         """laods yamlfile """
-        """returns settings type of dictionary"""
         with open(self.yamlfile, "r") as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data
 
+    @deprecated
     def save_yaml(self, data):
         """saves data to a yaml file"""
         with open(self.yamlfile, "w") as f:
@@ -201,6 +197,7 @@ class Utils:
             data = yaml.load(f, Loader=yaml.FullLoader)
         return data["settings"]
 
+    @deprecated
     def augmentation(self, name: str, squat: ndarray, spreadx: int = None, spready: int = None, width: int = None,
                      height: int = None, amount: int = 10, save: bool = False) -> ndarray:
         """augmentation of the squats to make more squats"""
@@ -241,8 +238,8 @@ class Utils:
         output_source = os.sep.join([path, newname])
         return output_source
 
-    @staticmethod
-    def define_model() -> Sequential:
+    @deprecated
+    def define_model(self) -> Sequential:
         """defines sequential model"""
         # input1 = Input(shape=(137, 99, 1))  # take the reshape last two values, see "data = np.reshape(data,(137,
         # 99,1))" which is "data/batch-size, row, column"
@@ -318,11 +315,12 @@ class Utils:
         return random_squats
 
     # Functie om met de training data te spelen
+    @deprecated
     def playground(self):
         """"playground function. Meant for saving dummy code for testing or demonstrating"""
         # define model for simple BI-LSTM + DNN based binary classifier
 
-        train_data = Utils().openObject("400 squats")
+        train_data = Utils().openobject("400 squats")
         # print(allframes)
         data = np.array(train_data)  # (137,99) (frames, joints*3)
 
@@ -337,17 +335,15 @@ class Utils:
         model.fit(data, np.array(Y), epochs=2, batch_size=2, verbose=1)
 
         # Take a test data to test the working of the model
-        correct_pose = Utils().openObject("voorbeeld")
+        correct_pose = Utils().openobject("voorbeeld")
         test_data = np.array(correct_pose)
         # reshape the test data
         test_data = np.reshape(test_data, (1, 137, 99))
         pred = model.predict(test_data)
         print("predicted sigmoid output => ", pred)
 
-
     @deprecated
     def check_invalid_squats(self):
-        checked = []
         for current in list(os.listdir(os.sep.join(["data", "embedded"]))):
 
             # # if np.array_equal(current_squat, example_squat):
@@ -367,11 +363,11 @@ class Utils:
                             os.remove(os.sep.join(["data", "embedded", current]))
                             print(f"{current} is invalid")
                             break
-
-    def check_directories(self):
-        dirs = ['credentials', 'embedded', 'embedded_test', 'embedders', 'negative_squat', 'positive_squat', 'production', 'testdata']
+    @staticmethod
+    def checkdirectories():
+        dirs = ['credentials', 'embedded', 'embedded_test', 'embedders', 'negative_squat', 'positive_squat',
+                'production', 'testdata']
 
         for dir in dirs:
             if not os.path.exists(os.sep.join(["data", dir])):
                 os.makedirs(os.sep.join(["data", dir]))
-

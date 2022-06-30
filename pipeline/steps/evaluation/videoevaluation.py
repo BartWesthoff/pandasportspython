@@ -16,24 +16,25 @@ from sklearn.metrics import confusion_matrix
 
 class VideoEvaluation(Step):
 
-    def process(self, data: list[list[int]]) -> None:
+    def process(self, data: dict) -> None:
         """Process the data of the step"""
         self.evaluate(data)
 
-    def evaluate(self, data: list[list[int]]) -> None:
+    def evaluate(self, data: dict) -> None:
         """Evaluates the model outcomes and classifying the results"""
         print("Evaluation")
 
-        y_true = data[1]
-        y_pred = data[0]
+        y_true = data["y_true"]
+        y_pred = data["y_pred"]
+        print(y_pred)
         y_pred_hard = [1 if i > 0.5 else 0 for i in y_pred]
         total_positive = sum(y_true)
         total_negative = len(y_true) - total_positive
         print("Total positive:", total_positive)
         print("Total negative:", total_negative)
         cm = confusion_matrix(y_true, y_pred_hard)
-        # tn, fp, fn, tp = cm.ravel()
-        # specificity = tn / (tn + fp)
+        tn, fp, fn, tp = cm.ravel()
+        specificity = tn / (tn + fp)
         precision = precision_score(y_true, y_pred_hard)
         accuracy = accuracy_score(y_true, y_pred_hard)
         recall = recall_score(y_true, y_pred_hard)
@@ -43,7 +44,7 @@ class VideoEvaluation(Step):
         print(f"accuracy: {accuracy}")
         print(f"recall: {recall}")
         print(f"f1: {f1}")
-        # print(f"specificity: {specificity}")
+        print(f"specificity: {specificity}")
 
         x = [i for i in range(len(y_true))]
 

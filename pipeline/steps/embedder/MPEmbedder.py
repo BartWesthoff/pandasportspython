@@ -3,7 +3,6 @@ import os
 import cv2
 import mediapipe as mp
 import numpy as np
-from numpy import ndarray
 
 from pipeline.steps.embedder.videoembedder import Embedder
 from pipeline.utils.utils import Utils
@@ -51,31 +50,23 @@ landmarks_config = {
 
 
 class MPEmbedder(Embedder):
-    # lijst van een pose (list[float])
-    # meerdere poses vormen een squat (list[list[float]])
-    # meerdere sqats vormen een alle data (list[list[list[float]]])
+    """ Embed a video file using MediaPipe """
 
-    # misschien niks terug geven en ophalen vanuit directory
-    def process(self, data: list[str]) -> list[list[list[float]]]:
+    def process(self, data: None) -> None:
         """ Processes the data """
-        points = []
         data = os.listdir(os.sep.join(["data", "positive_squat"]))
         data += os.listdir(os.sep.join(["data", "negative_squat"]))
         testdata = os.listdir(os.sep.join(["data", "production"]))
 
-        # for file in testdata:
-        #     squat = self.embed(file)
-        #     points.append(squat)
+        if self.settings["trainmode"]:
+            for file in testdata:
+                self.embed(file)
 
         if not self.settings["trainmode"]:
             for file in testdata:
-                squat = self.embed_test_squat(file)
+                self.embed_test_squat(file)
 
-        return points
-
-    def embed(self, data: str) -> list[list[int]] | ndarray:
-        # -> Set[sizeOf(results.pose_landmarks.landmark)]
-        # dit moet nog worden bijgewerkt
+    def embed(self, data: str) -> None:
         """ Embeds the data """
         folder = 'production'
         if 'positive' in data:
@@ -85,26 +76,21 @@ class MPEmbedder(Embedder):
         video_title = data.split('.')[0]
         # haalt de default waarde van de landmarks op
         video_location = os.sep.join(["data", folder, data])
-        if self.settings['normalize_landmarks']:
-            extra = '_normalized'
-        else:
-            extra = ''
-        embedded_location = os.sep.join(["data", "embedded", video_title + extra])
+
+        embedded_location = os.sep.join(["data", "embedded", video_title])
         if folder == 'production':
-            print("video is production")
-            embedded_location = os.sep.join(["data", "embedded_test", video_title + extra])
+            embedded_location = os.sep.join(["data", "embedded_test", video_title])
         if os.path.exists(embedded_location):
-            return Utils.openEmbedding(video_title + extra, "embedded")
+            return
         print(f"embedding: {data}")
         cap = cv2.VideoCapture(video_location)
-        print(f"video_location: {video_location}")
         width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)  # float `width`
         height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         print("width: ", width)
         print("height: ", height)
-        mp_drawing = mp.solutions.drawing_utils
-        mp_drawing_styles = mp.solutions.drawing_styles
+        # mp_drawing = mp.solutions.drawing_utils
+        # mp_drawing_styles = mp.solutions.drawing_styles
         mp_pose = mp.solutions.pose
         pose = mp_pose.Pose(model_complexity=2)
 
@@ -147,8 +133,8 @@ class MPEmbedder(Embedder):
                             currentframe.append(data_point.x)
                             currentframe.append(data_point.y)
                             currentframe.append(data_point.z)
-                            current_flipped_frame.append(1- data_point.x)
-                            current_flipped_frame.append(1- data_point.x)
+                            current_flipped_frame.append(1 - data_point.x)
+                            current_flipped_frame.append(1 - data_point.x)
                             current_flipped_frame.append(data_point.z)
                         else:
                             currentframe.append(data_point.x * width)
@@ -176,37 +162,36 @@ class MPEmbedder(Embedder):
         print(f"this is folder {folder}")
         if folder != 'production':
             Utils().saveObject(flipped_squat, embedded_location + '_flipped')
-        newSquat = self.scaleSquat(squat)
-        return newSquat
+        return
 
-    def scaleValue(self, val, minMaxValues):
+    def scalevalue(self, val, minmaxvalues):
         # Give the appropriate dimension in the values
-        returnTuple = (val - minMaxValues['min']) / (minMaxValues['max'] - minMaxValues['min'])
-        return returnTuple
+        returntuple = (val - minmaxvalues['min']) / (minmaxvalues['max'] - minmaxvalues['min'])
+        return returntuple
 
-    def scaleSquat(self, squat):
-        minMaxValues = self.minMaxVals(squat)
+    def scalesquat(self, squat):
+        minmaxvalues = self.minmaxvals(squat)
         iterator = 1
         for i, frame in enumerate(squat):
             for j, coordinate in enumerate(frame):
                 if iterator % 3 == 1:
-                    squat[i][j] = self.scaleValue(coordinate, minMaxValues[0])
+                    squat[i][j] = self.scalevalue(coordinate, minmaxvalues[0])
                 elif iterator % 3 == 2:
-                    squat[i][j] = self.scaleValue(coordinate, minMaxValues[1])
+                    squat[i][j] = self.scalevalue(coordinate, minmaxvalues[1])
                 elif iterator % 3 == 0:
-                    squat[i][j] = self.scaleValue(coordinate, minMaxValues[2])
+                    squat[i][j] = self.scalevalue(coordinate, minmaxvalues[2])
                 iterator += 1
             iterator = 1
         return squat
 
-    def minMaxVals(self, squat):
+    def minmaxvals(self, squat):
         iterator = 1
-        current = ''
+        # current = ''
         xVals = {'min': None, 'max': None}
         yVals = {'min': None, 'max': None}
         zVals = {'min': None, 'max': None}
 
-        def setVals(vals, value):
+        def setvals(vals, value):
             if vals['min'] is None or vals['min'] > value:
                 vals['min'] = value
             if vals['max'] is None or vals['max'] < value:
@@ -216,23 +201,20 @@ class MPEmbedder(Embedder):
         for frame in squat:
             for coordinate in frame:
                 if iterator % 3 == 1:
-                    current = 'x'
-                    xVals = setVals(xVals, coordinate)
+                    # current = 'x'
+                    xVals = setvals(xVals, coordinate)
                 elif iterator % 3 == 2:
-                    yVals = setVals(yVals, coordinate)
-                    current = 'y'
+                    yVals = setvals(yVals, coordinate)
+                    # current = 'y'
                 elif iterator % 3 == 0:
-                    zVals = setVals(zVals, coordinate)
-                    current = 'z'
+                    zVals = setvals(zVals, coordinate)
+                    # current = 'z'
                 iterator += 1
             iterator = 1
         return xVals, yVals, zVals
 
-
-    def embed_test_squat(self, data):
-        # -> Set[sizeOf(results.pose_landmarks.landmark)]
-        # dit moet nog worden bijgewerkt
-        """ Embeds the data """
+    def embed_test_squat(self, data: str) -> None:
+        """ Embeds production data """
         folder = 'production'
         video_title = data.split('.')[0]
         # haalt de default waarde van de landmarks op
@@ -280,20 +262,14 @@ class MPEmbedder(Embedder):
                     #       'visibility is', data_point.visibility)
 
                     if landmarks_config[index] in self.settings["landmarks_to_pick"]:
-
                         # Als settings staat op 'normalize_landmarks' voeg de data points to aan de list
                         # "currentframe" Voor alle andere settings worden de data punten eerste aangepast en daarna
                         # toegevoegd aan de list "currentframe"
                         # print(landmarks_config[index], ": ", data_point.x, data_point.y, data_point.z)
-                        if self.settings['normalize_landmarks']:
-                            currentframe.append(data_point.x)
-                            currentframe.append(data_point.y)
-                            currentframe.append(data_point.z)
 
-                        else:
-                            currentframe.append(data_point.x * width)
-                            currentframe.append(data_point.y * height)
-                            currentframe.append(data_point.z * width)
+                        currentframe.append(data_point.x)
+                        currentframe.append(data_point.y)
+                        currentframe.append(data_point.z)
 
                         percentage += 1
                         # print(index, data_point.x * width, data_point.y * height)
@@ -310,6 +286,5 @@ class MPEmbedder(Embedder):
         squat = np.array(allframes)
         Utils().saveObject(squat, embedded_location)
         print(f"this is folder {folder}")
-        newSquat = self.scaleSquat(squat)
+        newSquat = self.scalesquat(squat)
         return newSquat
-

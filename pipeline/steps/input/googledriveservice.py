@@ -13,7 +13,7 @@ from pipeline.utils.deprecated import deprecated
 
 
 class GoogleDriveService(Input):
-    """" Class for recieving data from Google Drive step"""
+    """" Class for receiving data from Google Drive step"""
 
     def __init__(self):
         """" Instantiate the GoogleDriveService class """
@@ -23,7 +23,7 @@ class GoogleDriveService(Input):
 
     def process(self) -> list[str]:
         """given items returned by Google Drive API"""
-        files = self.get_files_in_folder("videos minor ai")
+        files = self.get_files_in_folder("1WfSjXln7U1ihbTD2h_uhM8UlHt-LCEdo")
         print(f"found {len(files)} files")
 
         if self.settings["amount"] > 0:
@@ -69,13 +69,13 @@ class GoogleDriveService(Input):
         # return Google Drive API service
         return build("drive", "v3", credentials=creds)
 
-    def get_files_in_folder(self, foldername: str) -> list[CloudFile]:
+    def get_files_in_folder(self, folderid: str) -> list[CloudFile]:
         """given items returned by Google Drive API"""
         # TODO check naam ipv folder ID
         results = self.service.files().list(pageSize=400,  # TODO kijken of je kan querying op folder ipv alle bestanden
                                             fields="nextPageToken, files(id, name, parents)").execute()
         # get the results
-        folderid = "1WfSjXln7U1ihbTD2h_uhM8UlHt-LCEdo"
+
         items = results.get("files", [])
 
         if not items:

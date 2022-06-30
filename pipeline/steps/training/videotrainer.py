@@ -18,7 +18,7 @@ from pipeline.utils.utils import Utils
 class VideoTrainer(Step):
     """" Class for the video training step"""
 
-    def process(self, data):  # TODO even nog checken wat ie teruggeeft
+    def process(self, data: None) -> dict:  # TODO even nog checken wat ie teruggeeft
         """" process the data of the step """
         # For debugging. Eliminates any randomness from the program
         using_seed = True
@@ -36,13 +36,11 @@ class VideoTrainer(Step):
         if self.settings["amount"] > 0:
             list_of_test_embeds = list_of_test_embeds[:self.settings["amount"]]
 
-
-
         create_model = self.model is None
         model = None
         if create_model:
             model = Sequential([
-                LSTM(12, input_shape=(None,30), activation="relu"),
+                LSTM(12, input_shape=(None, 30), activation="relu"),
                 Dense(1, activation="sigmoid")
             ])
 

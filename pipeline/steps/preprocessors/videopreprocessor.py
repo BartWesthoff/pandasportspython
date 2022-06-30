@@ -19,15 +19,12 @@ used to preprocess video material
 class VideoPreProcessor(Step):
     """" class for video preprocessing """
 
-    def process(self, data: list[str]) -> None:
+    def process(self, data: None) -> None:
         """" processes given data"""
-        # self._preprocessVideo()
-        return
-        # return data
+        self._preprocessVideo()
 
     def _preprocessVideo(self) -> None:
         """" preprocesses video """
-        proccessed_data = []
         path = os.sep.join(["data", "production"])
 
         # path2 = os.sep.join(["data", "positive_squat"])
@@ -41,7 +38,6 @@ class VideoPreProcessor(Step):
                 name_of_file = name.split(os.sep)[-1]
                 if "negative" in name_of_file:
                     if not os.path.exists(os.sep.join(["data", "negative_squat", name_of_file])):
-
                         os.rename(name, os.sep.join(["data", "negative_squat", name_of_file]))
                 elif "positive" in name_of_file:
                     if not os.path.exists(os.sep.join(["data", "positive_squat", name_of_file])):
@@ -49,7 +45,6 @@ class VideoPreProcessor(Step):
                 else:
                     os.rename(name, os.sep.join(["data", "production", name_of_file]))
                 # os.remove(source)
-                proccessed_data.append(name)
 
         # for root, directories, files in os.walk(path2, topdown=False):
         #     for name in files:
@@ -58,14 +53,14 @@ class VideoPreProcessor(Step):
         #             name = self.grayvideo(name)
         #         proccessed_data.append(name)
 
-        return proccessed_data
-
     def _getnewname(self, fullsource: str, appendix: str) -> str:
+        """ gets a new name for the preprocessed video """
         name = fullsource.split(os.sep)[-1].split(".")[0]
         source = os.sep.join(fullsource.split(os.sep)[:-1])
         new_name = f"{source}{os.sep}{name}_{appendix}.mp4"
         return new_name
 
+    @deprecated
     def removesound(self, source: str) -> str:
         """" Removes sound from video """
         new_name = self._getnewname(source, "NS")
@@ -86,6 +81,7 @@ class VideoPreProcessor(Step):
         video.write_videofile(output, fps=fps)
         video.close()
 
+    @deprecated
     def cropVideo(self, source: str):
         """" changed width and height of video """
         new_name = self._getnewname(source, "NB")
@@ -146,6 +142,7 @@ class VideoPreProcessor(Step):
             cv2.destroyAllWindows()
             return new_name
 
+    @deprecated
     def playVideo(self, source: str) -> None:
         """" plays video """
         cap = cv2.VideoCapture(source)
@@ -182,7 +179,7 @@ class VideoPreProcessor(Step):
         # Closes all the frames
         cv2.destroyAllWindows()
 
-    # alleen voor vergelijken gebruiken
+    @deprecated
     def grayvideo(self, source: str) -> str:
         """" Convert video to black/white """
         new_name = self._getnewname(source, "BW")
@@ -297,13 +294,15 @@ class VideoPreProcessor(Step):
 
         video.close()
 
-    def runBash(self, command: str) -> None:
+    @deprecated
+    def runbash(self, command: str) -> None:
         """ Run bash command """
         os.system(command)
 
+    @deprecated
     def crop(self, start: float, end: float, source: str, output: str) -> None:
         """ crop video by given start and end time """
         name = os.sep.join([Utils().datafolder, source])
         output = os.sep.join([Utils().datafolder, output])
         str = f"ffmpeg -i {name}.mp4 -ss  {start} -to {end} -c copy {output}.mp4"
-        self.runBash(str)
+        self.runbash(str)

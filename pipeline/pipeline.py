@@ -18,8 +18,7 @@ class Pipeline:
         """ Process the data of the pipeline so that it can be used by the next step """
         data = None
 
-
-        Utils().check_directories()
+        Utils.checkdirectories()
         for step in self.steps:
             if issubclass(type(step), Input):
                 data = step.process()

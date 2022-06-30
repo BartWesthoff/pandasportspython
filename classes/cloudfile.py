@@ -1,8 +1,10 @@
 from collections.abc import Iterable
 
-#Klasse voor het opslaan van cloudfiles
+
+
 
 class CloudFile:
+    """class to represent a file downloaded from the cloud"""
 
     def __init__(self, id: str, name: str, parents: str) -> None:
         self._id = id,

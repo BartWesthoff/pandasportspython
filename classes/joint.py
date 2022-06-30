@@ -1,10 +1,9 @@
-from typing import Set, Dict, Any
+from typing import Any
 
-#Klasse voor het opslaan van x,y,x, coördinaten in een frame
 
 class Joint:
+    """class to save a joint from a pose"""
 
-    # Is likelihood een floating point?
     def __init__(self, x: float, y: float, z: float, likelihood: float, name: str) -> None:
         self.x = x
         self.y = y
