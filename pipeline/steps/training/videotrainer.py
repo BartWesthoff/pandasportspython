@@ -6,7 +6,6 @@ import tensorflow as tf
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.models import Sequential
-from keras.optimizers import SGD
 
 from pipeline.steps.step import Step
 from pipeline.utils.utils import Utils
@@ -40,15 +39,13 @@ class VideoTrainer(Step):
         model = None
         if create_model:
             model = Sequential([
-                LSTM(12, input_shape=(None, 30), activation="relu"),
+                LSTM(12, input_shape=(None, 30)),
                 Dense(1, activation="sigmoid")
             ])
 
             print(model.summary(90))
-            model.compile(SGD(lr=0.003), "binary_crossentropy", metrics=["accuracy"])
+            model.compile(loss="binary_crossentropy", optimizer="adam")
             epochs = 2
-            # if self.settings["amount"] < epochs:
-            #     epochs = self.settings["amount"]
             steps_per_epoch = len(list_of_train_embeds) // epochs
             model.fit(self.train_generator(list_of_train_embeds), steps_per_epoch=steps_per_epoch, epochs=epochs,
                       verbose=1)
@@ -58,6 +55,7 @@ class VideoTrainer(Step):
         test_data = None
         if self.settings["trainmode"] is not False:
             test_data = [np.array([Utils().openEmbedding(i, "testdata")]) for i in list_of_test_embeds]
+
         dictionary = {"test_data": test_data, "labels": np.array(labels), "model": model}
         return dictionary
 

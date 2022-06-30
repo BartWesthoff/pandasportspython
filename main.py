@@ -9,9 +9,22 @@ from pipeline.steps.preprocessors.videopreprocessor import VideoPreProcessor
 from pipeline.steps.training.videotrainer import VideoTrainer
 
 if __name__ == "__main__":
-    model = tf.keras.models.load_model("modelkaspersquats.h5")
+    model = tf.keras.models.load_model("custommodel42000train.h5")
     steps = [GoogleDriveService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
              VideoEvaluation()]
     pipeline = Pipeline(
-        steps=steps, model=model)  # testdata=False
+        steps=steps, model=model)
+    pipeline.process()
+
+    model = tf.keras.models.load_model("baselinemodel42000train.h5")
+    steps = [GoogleDriveService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
+             VideoEvaluation()]
+    pipeline = Pipeline(
+        steps=steps, model=model)
+    pipeline.process()
+
+    steps = [GoogleDriveService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
+             VideoEvaluation()]
+    pipeline = Pipeline(
+        steps=steps, model=None)
     pipeline.process()

@@ -24,6 +24,7 @@ class VideoPrediction(Step):
         if not self.settings["trainmode"]:
             data_to_predict = os.listdir(os.sep.join(["data", "embedded_test"]))
             y_true = [1 if "positive" in i else 0 for i in data_to_predict]
+
             data_to_predict = [np.array([Utils().openEmbedding(i, "embedded_test")]) for i in data_to_predict]
 
         y_pred = [model.predict(i) for i in data_to_predict]
