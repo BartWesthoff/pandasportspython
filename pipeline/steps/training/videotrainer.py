@@ -39,7 +39,7 @@ class VideoTrainer(Step):
         model = None
         if create_model:
             model = Sequential([
-                LSTM(12, input_shape=(None, 30)),
+                LSTM(4, input_shape=(None, 30)),
                 Dense(1, activation="sigmoid")
             ])
 

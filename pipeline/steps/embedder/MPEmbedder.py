@@ -59,7 +59,8 @@ class MPEmbedder(Embedder):
         testdata = os.listdir(os.sep.join(["data", "production"]))
 
         if self.settings["trainmode"]:
-            for file in testdata:
+            for file in data:
+                print(file)
                 self.embed(file)
 
         if not self.settings["trainmode"]:
@@ -71,7 +72,7 @@ class MPEmbedder(Embedder):
         folder = 'production'
         if 'positive' in data:
             folder = 'positive_squat'
-        elif 'negative' in data and ('production' not in data):
+        elif 'negative' in data:
             folder = 'negative_squat'
         video_title = data.split('.')[0]
         # haalt de default waarde van de landmarks op
@@ -129,25 +130,21 @@ class MPEmbedder(Embedder):
                         # "currentframe" Voor alle andere settings worden de data punten eerste aangepast en daarna
                         # toegevoegd aan de list "currentframe"
                         # print(landmarks_config[index], ": ", data_point.x, data_point.y, data_point.z)
-                        if self.settings['normalize_landmarks']:
-                            currentframe.append(data_point.x)
-                            currentframe.append(data_point.y)
-                            currentframe.append(data_point.z)
+
+                        currentframe.append(data_point.x)
+                        currentframe.append(data_point.y)
+                        currentframe.append(data_point.z)
+                        if folder != "production":
                             current_flipped_frame.append(1 - data_point.x)
                             current_flipped_frame.append(1 - data_point.x)
                             current_flipped_frame.append(data_point.z)
-                        else:
-                            currentframe.append(data_point.x * width)
-                            currentframe.append(data_point.y * height)
-                            currentframe.append(data_point.z * width)
-                            current_flipped_frame.append((width - data_point.x - 1) * width)
-                            current_flipped_frame.append(data_point.y * height)
-                            current_flipped_frame.append(data_point.z * width)
+
                         percentage += 1
                         # print(index, data_point.x * width, data_point.y * height)
             print('{:.2f} %'.format(round(percentage / frame_count * 10, 2)))
             allframes.append(currentframe)
-            all_flipped_frames.append(current_flipped_frame)
+            if folder != "production":
+                all_flipped_frames.append(current_flipped_frame)
 
             # mp_drawing.draw_landmarks(
             #     image,
