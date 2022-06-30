@@ -186,7 +186,6 @@ class MPEmbedder(Embedder):
 
     def minmaxvals(self, squat):
         iterator = 1
-        # current = ''
         xVals = {'min': None, 'max': None}
         yVals = {'min': None, 'max': None}
         zVals = {'min': None, 'max': None}
@@ -201,14 +200,11 @@ class MPEmbedder(Embedder):
         for frame in squat:
             for coordinate in frame:
                 if iterator % 3 == 1:
-                    # current = 'x'
                     xVals = setvals(xVals, coordinate)
                 elif iterator % 3 == 2:
                     yVals = setvals(yVals, coordinate)
-                    # current = 'y'
                 elif iterator % 3 == 0:
                     zVals = setvals(zVals, coordinate)
-                    # current = 'z'
                 iterator += 1
             iterator = 1
         return xVals, yVals, zVals
