@@ -7,12 +7,13 @@ from pipeline.steps.input.googledriveservice import GoogleDriveService
 from pipeline.steps.prediction.videoprediction import VideoPrediction
 from pipeline.steps.preprocessors.videopreprocessor import VideoPreProcessor
 from pipeline.steps.training.videotrainer import VideoTrainer
+from pipeline.steps.input.youtubeservice import YoutubeService
 import sys
 
 if __name__ == "__main__":
     def mode_one():
         model = tf.keras.models.load_model("custommodel42000train.h5")
-        steps = [GoogleDriveService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
+        steps = [YoutubeService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
                 VideoEvaluation()]
         pipeline = Pipeline(
             steps=steps, model=model)
@@ -20,14 +21,14 @@ if __name__ == "__main__":
 
     def mode_two():
         model = tf.keras.models.load_model("baselinemodel42000train.h5")
-        steps = [GoogleDriveService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
+        steps = [YoutubeService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
                 VideoEvaluation()]
         pipeline = Pipeline(
             steps=steps, model=model)
         pipeline.process()
 
     def mode_three():
-        steps = [GoogleDriveService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
+        steps = [YoutubeService(), VideoPreProcessor(), MPEmbedder(), VideoTrainer(), VideoPrediction(),
                 VideoEvaluation()]
         pipeline = Pipeline(
             steps=steps, model=None)
